@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-from math import *
 import random
 
 def euclid(a:int,b:int):  
@@ -118,33 +117,45 @@ def exp_mod(a,exp,mod):
     
     return res
 
-def millerT(n):
-    # Initialisation -> 2^0*d=n-1
-    d = n - 1
-    c = 0
-
-    while d%2 == 0:
-        d = d/2
-        # c factors of 2
-        c = c + 1
-
-    import random as r
-    import math as m
-
-    a = r.randint(2, n-2)
-    x = exp_mod(a,d,n)
-
-    if(x == 1 or x == n - 1):
-        return False
-    else:
-        for i in range(0,c):
-            x = m.pow(x,2) % n
-            if(x == n - 1):
-                return False
-        return True
     
-def millerR (n, s):
-    for i in range(1, s):
+def millerR (n:int, s=5):
+
+    """Use Rabin-Miller algorithm to return True (n is probably prime) or False (n is definitely composite)."""
+
+    if n<4 or n%2 == 0 : return "Error: n>3 and need to be an odd number."
+
+    def millerT(n):
+        if n<6: # Shortcut for small cases here
+            return [False,False,True,True,False,True][n]
+
+        # Initialisation -> 2^0*d=n-1
+        d = n - 1
+        power = 0
+
+        while d%2 == 0:
+            d = d/2
+            # c factors of 2
+            power+=1
+
+        import random as r
+        import math as m
+
+        a = r.randint(2, n-2)
+        x = exp_mod(a,d,n)
+
+        if(x == 1 or x == n - 1):
+            return False
+        else:
+            for i in range(0,power):
+                x = m.pow(x,2) % n
+                if(x == n - 1):
+                    return False
+            return True
+
+    # Trying s times to check
+
+    for _ in range(1, s):
         if millerT(n):
             return False
+
     return True
