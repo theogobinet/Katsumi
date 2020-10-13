@@ -27,6 +27,6 @@ def millerR (n, s):
     for i in range(1, s):
         if millerT(n):
             return False
-    return False
+    return True
     
 millerR (31,5)
