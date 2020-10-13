@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+from math import sqrt, floor
 import random
 
 def euclid(a:int,b:int):  
@@ -146,7 +147,7 @@ def millerR (n:int, s=5):
         if(x == 1 or x == n - 1):
             return False
         else:
-            for i in range(0,power):
+            for _ in range(0,power):
                 x = m.pow(x,2) % n
                 if(x == n - 1):
                     return False
