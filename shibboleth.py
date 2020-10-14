@@ -5,6 +5,12 @@ import os
 import sys
 import time
 
+def clear():
+    if os.name == 'nt':
+        os.system("cls")
+    else:
+        os.system("clear")
+
 def work_with_selection(pSelection):
     """Interact with others py functions depending on user choice."""
 
@@ -29,11 +35,11 @@ def work_with_selection(pSelection):
     elif pSelection == 10 :
         print("Test")
     elif pSelection == 11 :
-        os.system("clear")
+        clear()
         print("\t --- Goodbye M'Lord. --- \n")
         sys.exit
     else:
-        os.system("clear")
+        clear()
         print("\n That's not available in the given menu lad !")
         time.sleep(1)
         menu()
@@ -72,7 +78,7 @@ def menu():
 
 
 def main():
-    os.system("clear")
+    clear()
     menu()
 
 if __name__ == '__main__':
