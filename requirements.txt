@@ -1,0 +1,4 @@
+###### Requirements without Version Specifiers ######`
+curses-menu
+
+###### Requirements with Version Specifiers ######`
