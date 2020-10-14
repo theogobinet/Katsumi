@@ -11,8 +11,16 @@ def clear():
     else:
         os.system("clear")
 
-def work_with_selection(pSelection):
+def work_with_selection(pSelection,pCipher):
     """Interact with others py functions depending on user choice."""
+
+    # Cipher verification
+    if pCipher > 3 :
+        print("Error: You didn't choose a cipher properly.")
+        time.sleep(1)
+        menu()
+
+    # Selection orientation 
 
     if pSelection == 1 :
         print("Hello")
@@ -43,6 +51,28 @@ def work_with_selection(pSelection):
         print("\n That's not available in the given menu lad !")
         time.sleep(1)
         menu()
+    
+    return None
+
+def select():
+    while True :
+        try:
+            selection=int(input("\n - Please enter your choice: "))
+        except ValueError:
+            print("Hmm.. Nope. Repeat please !")
+            continue
+        else:
+            return selection
+
+
+def cipher_choice():
+    clear()
+    print(" Choice cypher method : ")
+    print(" 1 - ECB \n 2 - CBC \n 3 - PCBC")
+    selection=select()
+    clear()
+    return selection
+
 
 def menu():
     
@@ -63,23 +93,18 @@ def menu():
 
     for i,elt in enumerate(choices):
         print(f"\t({i+1}) - {elt}")
-    
-    while True :
-        try:
-            selection=int(input("\n - Please enter your choice: "))
-        except ValueError:
-            print("Hmm.. Nope. Repeat please !")
-            continue
-        else:
-            break
 
-    work_with_selection(selection)
+    selection=select()
+    cipher=cipher_choice()
+
+    work_with_selection(selection,cipher)
 
 
 
 def main():
     clear()
     menu()
+
 
 if __name__ == '__main__':
     main()
