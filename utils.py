@@ -46,7 +46,7 @@ def inv(a:int,m:int):
     
     # Modular inverse u solves the given equation: a.u+m.v=1 
     # n number of iterations
-    _,u,v,_,n=euclid_ext(a,m)
+    _,u,_,_,_=euclid_ext(a,m)
     
     if u < 0 : u+=m
     
