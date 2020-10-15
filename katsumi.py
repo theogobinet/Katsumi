@@ -11,20 +11,16 @@ def clear():
     else:
         os.system("clear")
 
-def work_with_selection(pSelection,pCipher):
+def work_with_selection(pSelection):
     """Interact with others py functions depending on user choice."""
-
-    # Cipher verification
-    if pCipher > 3 :
-        print("Error: You didn't choose a cipher properly.")
-        time.sleep(1)
-        menu()
 
     # Selection orientation 
 
     if pSelection == 1 :
+        cipher=cipher_choice()
         print("Hello")
     elif pSelection == 2 :
+        cipher=cipher_choice()
         print("Test")
     elif pSelection == 3 :
         print("Ceci est un deux.")
@@ -69,22 +65,37 @@ def cipher_choice():
     clear()
     print(" Choice cypher method : ")
     print(" 1 - ECB \n 2 - CBC \n 3 - PCBC")
-    selection=select()
+    pCipher=select()
+    # Cipher verification
+    if pCipher > 3 :
+        print("Error: You didn't choose a cipher properly.")
+        time.sleep(1)
+        menu()
     clear()
-    return selection
+    return pCipher
 
 
 def menu():
     
     choices=["Encrypt a message.", "Uncrypt a message.", "Generate public/private key pairs.","Generate a hash / fingerprint.","Check a hash / a fingerprint.","Perform a proof of work.","Check a transaction.","Start / increment Block-chain.","Check Block-chain integrity's","I WANT IT ALL !! I WANT IT NOW !","Exit"]
     
-    print("------------------------------------------------------")
-    print('''
-     __ _     _ _     _           _      _   _     
-    / _\ |__ (_) |__ | |__   ___ | | ___| |_| |__  
-    \ \| '_ \| | '_ \| '_ \ / _ \| |/ _ \ __| '_ \ 
-    _\ \ | | | | |_) | |_) | (_) | |  __/ |_| | | |
-    \__/_| |_|_|_.__/|_.__/ \___/|_|\___|\__|_| |_|
+    print("------------------------------------------------------------------")
+    print('''                         
+       _                        
+       \`*-.                 _  __     _                       _    
+        )  _`-.             | |/ /    | |                     (_)    
+       .  : `. .            | ' / __ _| |_ ___ _   _ _ __ ___  _     
+       : _   '  \           |  < / _` | __/ __| | | | '_ ` _ \| |    
+       ; *` _.   `*-._      | . \ (_| | |_\__ \ |_| | | | | | | |    
+       `-.-'          `-.   |_|\_\__,_|\__|___/\__,_|_| |_| |_|_|    
+         ;       `       `.     
+         :.       .        \    
+         . \  .   :   .-'   .   1
+         '  `+.;  ;  '      :   
+         :  '  |    ;       ;-. 
+         ; '   : :`-:     _.`* ;
+     .*' /  .*' ; .*`- +'  `*' 
+      `*-*   `*-*  `*-*'           
                                                
 ''')
     print("- Created by : Gobinet Théo && Martin Azaël ")
@@ -95,9 +106,8 @@ def menu():
         print(f"\t({i+1}) - {elt}")
 
     selection=select()
-    cipher=cipher_choice()
 
-    work_with_selection(selection,cipher)
+    work_with_selection(selection)
 
 
 

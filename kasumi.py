@@ -34,7 +34,6 @@ def set_key(master_key):
      # Chosen as a "nothing up my sleeve" number
     
      numsn=hexToArr('123456789abcdeffedcba9876543210')
-     master_key_prime=XOR_Arr(master_key,numsn)
 
      return None
 
