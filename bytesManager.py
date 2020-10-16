@@ -21,8 +21,8 @@ def zfill_b(byteA,n:int):
 
     return byteA
 
-def b_xor(b1,b2):
-    """XORing two bytes arrays."""
+def b_op(b1,b2,ope="XOR"):
+    """Bitwise operation between two bytes arrays (XOR, AND, OR available)"""
     
     by=bytearray()
 
@@ -33,10 +33,16 @@ def b_xor(b1,b2):
         b2=zfill_b(b2,m)
     
     for i,j in zip(b1,b2):
-        by.append(int(i)^int(j))
+        if ope == "XOR":
+            by.append(int(i) ^ int(j))
+        elif ope == "AND":
+            by.append(int(i) & int(j))
+        elif ope == "OR":
+            by.append(int(i) | int(j))
+        else:
+            return None 
 
     return by
-
 
 def splitBytes(data,n=8):
     """Split BytesArray into chunks of n (=8 by default) bytes."""
@@ -52,7 +58,7 @@ def packSplittedBytes(pSplitted):
     return packed
 
 def leftRotate(arr, n=1): 
-    '''Circular shift to left'''
+    '''Circular shift to left of n (=1 by default) bits'''
 
     nB = len(arr)*8
     arrInt = int.from_bytes(arr,'big')

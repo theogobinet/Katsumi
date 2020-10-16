@@ -1,44 +1,39 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from text import *
+from bytesManager import *
 
 #################################################
 ############ Key Schedule #######################
 #################################################
-
-# Key to test
-master_key="6C6C6C6C6C6C6C6C6C6C6C6C6C6C6C6C"
 
 # To convert hexadecimal to an array of bytes
 hexToArr = lambda h : ['{:08b}'.format(int(h[x*2:(x+1)*2],16)) for x in range(0,round(len(h)/2))]
 
 
 
-def set_key(master_key):
-     
-     # The 128-bit key K is divided into eight 16-bit sub keys Ki
-     K=[]
-     # Additionally a modified key K', similarly divided into 16-bit sub keys K'i, is used.
-     K_prime=[]
-
-     KL1=[None,None]
-     KL2=[None,None]
-     KO1=[None,None]
-     KO2=[None,None]
-     KO3=[None,None]
-     KI2=[None,None]
-     KI2=[None,None]
-     KI3=[None,None]
+def set_key(km="y/B?E(H+MbQeThVm".encode()):
 
      # Chosen as a "nothing up my sleeve" number
-    
-     numsn=hexToArr('123456789abcdeffedcba9876543210')
+     nums = b'\x124Vx\x9a\xbc\xde\xff\xed\xcb\xa9\x87eC!\x00'
+
+     # Additionally a modified key K', similarly divided into 16-bit sub keys K'i, is used.
+     kp = b_op(km,nums,"XOR")
+
+     # The 128-bit key K is divided into eight 16-bit sub keys Ki
+     skm, skp = splitBytes (km,2), splitBytes (kp,2)
+
+
+     KL1 = [bytearray(leftRotate (skm[x],1)) for x in range (0,8)]
+     KL2 = [skp[(x+2) % 8] for x in range (0,8)]
+     KO1 = [bytearray(leftRotate (skm[(x + 1) % 8], 5)) for x in range (0,8)]
+     KO2 = [bytearray(leftRotate (skm[(x + 5) % 8], 8)) for x in range (0,8)]
+     KO3 = [bytearray(leftRotate (skm[(x + 6) % 8], 13)) for x in range (0,8)]
+     KI1 = [skp[(x + 4) % 8] for x in range (0,8)]
+     KI2 = [skp[(x + 3) % 8] for x in range (0,8)]
+     KI3 = [skp[(x + 7) % 8] for x in range (0,8)]
 
      return None
-
-
-
 
 #################################################
 ############### Algorithm #######################
@@ -48,7 +43,18 @@ def set_key(master_key):
 #######
 ### FL
 #######
+def FL(KL1, KL2, arr):
+    if(len(arr) != 4):
+        print("FL takes 32 bits as 4 bytes array in input")
+    else:
+        arr = splitBytes(arr,2)
+        l = arr[0]
+        r = arr[1]
 
+        rp = b_op(leftRotate(b_op(l,KL1,"AND"),1), r, "XOR")
+        lp = b_op(leftRotate(b_op(rp,KL2,"OR"),1), l, "XOR")
+
+        return rp + lp
 
 
 #######
