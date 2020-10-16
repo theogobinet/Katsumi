@@ -9,11 +9,11 @@ from bytesManager import *
 
 # To convert hexadecimal to an array of bytes
 hexToArr = lambda h : ['{:08b}'.format(int(h[x*2:(x+1)*2],16)) for x in range(0,round(len(h)/2))]
-
-
+KL1, KL2, KO1, KO2, KO3, KI1, KI2, KI3
 
 def set_key(km="y/B?E(H+MbQeThVm".encode()):
 
+     global KL1, KL2, KO1, KO2, KO3, KI1, KI2, KI3
      # Chosen as a "nothing up my sleeve" number
      nums = b'\x124Vx\x9a\xbc\xde\xff\xed\xcb\xa9\x87eC!\x00'
 
@@ -33,7 +33,6 @@ def set_key(km="y/B?E(H+MbQeThVm".encode()):
      KI2 = [skp[(x + 3) % 8] for x in range (0,8)]
      KI3 = [skp[(x + 7) % 8] for x in range (0,8)]
 
-     return None
 
 #################################################
 ############### Algorithm #######################
