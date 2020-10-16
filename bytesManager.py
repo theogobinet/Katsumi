@@ -50,3 +50,19 @@ def packSplittedBytes(pSplitted):
         packed+=elt
     
     return packed
+
+def leftRotate(arr, n=1): 
+    '''Circular shift to left'''
+
+    nB = len(arr)*8
+    arrInt = int.from_bytes(arr,'big')
+
+    # Generate full bytes of 1 of the size of the array
+    size = int("0x" + "".join(["FF" for _ in range(0,len(arr))]),16)
+
+    # ((arrInt << n)        shift to left, create 0 to the right
+    # (arrInt >> (nB - n))) get all bytes from left who needs to go right to the right, rest is 0
+    # AND                   the two bytes
+    # & size                remove from left the oversize bits
+
+    return (((arrInt << n)|(arrInt >> (nB - n))) & size).to_bytes(2, 'big')
