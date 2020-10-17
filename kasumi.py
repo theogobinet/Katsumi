@@ -12,27 +12,33 @@ hexToArr = lambda h : ['{:08b}'.format(int(h[x*2:(x+1)*2],16)) for x in range(0,
 KL1 = KL2 = KO1 = KO2 = KO3 = KI1 = KI2 = KI3 = []
 
 def set_key(km="y/B?E(H+MbQeThVm".encode()):
+    '''Kasumi's keyscheduler.'''
 
-     global KL1, KL2, KO1, KO2, KO3, KI1, KI2, KI3
-     # Chosen as a "nothing up my sleeve" number
-     nums = b'\x124Vx\x9a\xbc\xde\xff\xed\xcb\xa9\x87eC!\x00'
+    global KL1, KL2, KO1, KO2, KO3, KI1, KI2, KI3
+    # Chosen as a "nothing up my sleeve" number
+    nums = b'\x124Vx\x9a\xbc\xde\xff\xed\xcb\xa9\x87eC!\x00'
 
-     # Additionally a modified key K', similarly divided into 16-bit sub keys K'i, is used.
-     kp = b_op(km,nums,"XOR")
+    # Additionally a modified key K', similarly divided into 16-bit sub keys K'i, is used.
+    kp = b_op(km,nums,"XOR")
 
-     # The 128-bit key K is divided into eight 16-bit sub keys Ki
-     skm, skp = splitBytes (km,2), splitBytes (kp,2)
+    # The 128-bit key K is divided into eight 16-bit sub keys Ki
+    skm, skp = splitBytes (km,2), splitBytes (kp,2)
 
 
-     KL1 = [bytearray(leftRotate (skm[x],1)) for x in range (0,8)]
-     KL2 = [skp[(x+2) % 8] for x in range (0,8)]
-     KO1 = [bytearray(leftRotate (skm[(x + 1) % 8], 5)) for x in range (0,8)]
-     KO2 = [bytearray(leftRotate (skm[(x + 5) % 8], 8)) for x in range (0,8)]
-     KO3 = [bytearray(leftRotate (skm[(x + 6) % 8], 13)) for x in range (0,8)]
-     KI1 = [skp[(x + 4) % 8] for x in range (0,8)]
-     KI2 = [skp[(x + 3) % 8] for x in range (0,8)]
-     KI3 = [skp[(x + 7) % 8] for x in range (0,8)]
+    KL1 = [bytearray(leftRotate (skm[x],1)) for x in range (0,8)]
+    KL2 = [skp[(x+2) % 8] for x in range (0,8)]
+    KO1 = [bytearray(leftRotate (skm[(x + 1) % 8], 5)) for x in range (0,8)]
+    KO2 = [bytearray(leftRotate (skm[(x + 5) % 8], 8)) for x in range (0,8)]
+    KO3 = [bytearray(leftRotate (skm[(x + 6) % 8], 13)) for x in range (0,8)]
+    KI1 = [skp[(x + 4) % 8] for x in range (0,8)]
+    KI2 = [skp[(x + 3) % 8] for x in range (0,8)]
+    KI3 = [skp[(x + 7) % 8] for x in range (0,8)]
 
+<<<<<<< HEAD
+=======
+    return None
+
+>>>>>>> 773af5484b5acb57bb4a63585f8ee7e338f213fc
 #################################################
 ############### Algorithm #######################
 #################################################
