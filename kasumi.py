@@ -34,11 +34,8 @@ def set_key(km="y/B?E(H+MbQeThVm".encode()):
     KI2 = [skp[(x + 3) % 8] for x in range (0,8)]
     KI3 = [skp[(x + 7) % 8] for x in range (0,8)]
 
-<<<<<<< HEAD
-=======
     return None
 
->>>>>>> 773af5484b5acb57bb4a63585f8ee7e338f213fc
 #################################################
 ############### Algorithm #######################
 #################################################
@@ -55,8 +52,6 @@ def kasumi (arr, encrypt=True):
                if not encrypt:
                     i = 7 - i
                
-               print(i)
-
                KO = [KO1[i], KO2[i], KO3[i]]
                KI = [KI1[i], KI2[i], KI3[i]]
                KL = [KL1[i], KL2[i]]
