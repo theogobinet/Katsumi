@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from kasumi import kasumi
-from bytesManager import b_op, splitBytes
-
+from core.kasumi import kasumi
+from core.bytesManager import b_op, splitBytes
 
 #################################################
 ############ Main Method  #######################
@@ -13,22 +12,13 @@ def cipher(arr,method=3,encrypt=True):
     """Algorithm that uses a block cipher to provide information security such as confidentiality or authenticity."""
 
     if method==1: #ECB
-        if encrypt:
-            return ECB(arr)
-        else:
-            return ECB(arr,False)
+        return ECB(arr, encrypt)
     
     elif method==2: #CBC
-        if encrypt:
-            return CBC(arr)
-        else:
-            return CBC(arr,False)
+        return CBC(arr, encrypt)
 
     elif method==3: #PCBC
-        if encrypt:
-            return PCBC(arr)
-        else:
-            return PCBC(arr,False)
+        return PCBC(arr, encrypt)
     else:
         return "Error: Not implemented cipher mode. (Not yet ?) "
 
@@ -46,7 +36,7 @@ def run(file="encrypted.kat",inFile=True,encrypt=False,method=3):
     encrypt: False to decrypte
     method: Block cyphering method
     """
-    from bytesManager import fileToBytes, codeOut
+    from core.bytesManager import fileToBytes, codeOut
 
     data=fileToBytes(file)
     splitted=splitBytes(data)
@@ -55,21 +45,15 @@ def run(file="encrypted.kat",inFile=True,encrypt=False,method=3):
     return codeOut(ciphered,encrypt,print)
 
 ####### Additionnals method to know where you are in time process
-def clear():
-    import os
-
-    if os.name == 'nt':
-        os.system("cls")
-    else:
-        os.system("clear")
-
 def percentage(arr,i):
+
+    from katsumi import clear
 
     clear()
     l=len(arr)
     p=round(i/l*100,2)
 
-    print(f"{p}%")
+    print(f"Progress : {p}%")
 
     return None
     
@@ -108,7 +92,7 @@ def CBC(arr,encrypt=True):
 
     res=[]
 
-    for i,message in enumerate(arr):
+    for i, message in enumerate(arr):
 
         percentage(arr,i)
 

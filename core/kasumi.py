@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from bytesManager import *
+from core.bytesManager import b_op, splitBytes, leftRotate, zfill_b
 
 #################################################
 ############ Key Schedule #######################

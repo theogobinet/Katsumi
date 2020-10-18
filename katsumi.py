@@ -6,8 +6,8 @@ import sys
 import time
 from datetime import datetime
 
-from kasumi import kasumi
-from ciphers import run
+from core.kasumi import kasumi
+from core.ciphers import run
 
 
 #################################################
@@ -16,8 +16,9 @@ from ciphers import run
 
 def query_yn(question, default="yes"):
     """Ask a yes/no question via input() and return their answer."""
-    valid = {"yes": True, "y": True, "ye": True,
-             "no": False, "n": False}
+
+    valid = {"yes": True, "y": True, "ye": True, "no": False, "n": False}
+
     if default is None:
         prompt = " [y/n] "
     elif default == "yes":
@@ -34,8 +35,7 @@ def query_yn(question, default="yes"):
         elif choice in valid:
             return valid[choice]
         else:
-            print("Please respond with 'yes' or 'no' "
-                             "(or 'y' or 'n').\n")
+            print("Please respond with 'yes' or 'no' (or 'y' or 'n').\n")
 
 
 def clear():
@@ -48,12 +48,15 @@ def cipher_choice():
     clear()
     print(" Choice cypher method : ")
     print(" 1 - ECB \n 2 - CBC \n 3 - PCBC (Recommended)")
+
     pCipher=select()
+
     # Cipher verification
     if pCipher > 3 :
         print("Error: You didn't choose a cipher properly.")
         time.sleep(1)
         menu()
+
     elif pCipher == 1:
         answer=query_yn(" ECB is not recommended for use in cryptographic protocols. Are you sure ?")
         if answer:
@@ -75,7 +78,7 @@ def work_with_selection(pSelection):
     if pSelection == 1 :
         # Encryption
         cipher=cipher_choice()
-        print("Please enter the filename (with extension) to crypt.")
+        print("Please enter the filename (with extension) to encrypt.")
         
         answer=input("E.g: clearMessage.txt (leave blank by default): ")
         
@@ -88,6 +91,7 @@ def work_with_selection(pSelection):
         run(answer,True,True,cipher)
         end=datetime.now() - begin_time
 
+        clear()
         print(f"Encryption finished in {end} seconds !\n")
 
         answer=query_yn("Do you want to do something else ?")
@@ -102,7 +106,7 @@ def work_with_selection(pSelection):
         # Decryption
         cipher=cipher_choice()
         
-        print("Please enter the filename (with extension) to crypt.")
+        print("Please enter the filename (with extension) to decrypt.")
         answer=input("E.g: encrypted.kat (leave blank by default) : ")
         
         if answer=="":
@@ -114,6 +118,7 @@ def work_with_selection(pSelection):
         run(answer,True,False,cipher)
         end=datetime.now() - begin_time
 
+        clear()
         print(f"Decryption finished in {end} seconds !\n")
 
         answer=query_yn("Do you want to do something else ?")

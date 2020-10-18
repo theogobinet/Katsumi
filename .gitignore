@@ -1,3 +1,5 @@
 *.ipynb
 .vscode
 __pycache__/*
+core/__pycache__/*
+share/*
