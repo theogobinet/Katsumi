@@ -1,6 +1,20 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import os
+
+THIS_FOLDER = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+file_name=""
+without_ext=""
+
+def findFile(ext):
+    """To find a file given extension and return is name."""
+    for f in os.listdir(os.path.join(THIS_FOLDER,"share/")):
+        if f.endswith(ext):
+            name=f
+    return name
+
 
 def fileToBytes(file,message=True):
     """
@@ -8,13 +22,17 @@ def fileToBytes(file,message=True):
     True if it's a .txt file with a message.
     """
 
+    global file_name, without_ext
+    file_name=os.path.join(THIS_FOLDER, "share/"+file)
+    without_ext=os.path.splitext(file)[0]
+
     print(f"Opening the {file} file.")
 
-    with open(file,'rb') as f:
+    with open(file_name,'rb') as f:
         data=bytearray(f.read())
 
     if not message: # If it's a file
-        if len(data)*8 < 5000: # At least some kilo_octets
+        if len(data) < 1024: # At least some kilo_octets
             return "Error: give in input at least some kilo_octets file's."
         else:
             return data
@@ -27,18 +45,18 @@ def codeOut(thing,coded=True,inFile=True):
     thing : Array of bytesArrays
     '''
     # Pack and remove null bytes added by z_filling.
+    if not coded:
+        thing[-1]=thing[-1].replace(b'\x00',b'')
+
     packed=packSplittedBytes(thing)
 
-    if not coded: 
-        packed=packed.replace(b'\x00',b'')
     if inFile:
-
         if coded:
             #Let's write byte per byte into a .kat file
-            katFile=open("encrypted.kat","wb")
+            katFile=open(file_name+".kat","wb")
             katFile.write(bytes(packed))
         else:
-            katFile=open("decrypted","wb")
+            katFile=open(os.path.join(THIS_FOLDER,"share/decrypted-"+without_ext),"wb")
             katFile.write(bytes(packed))
         
         katFile.close()

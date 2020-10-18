@@ -8,6 +8,7 @@ from datetime import datetime
 
 from core.kasumi import kasumi
 from core.ciphers import run
+from core.bytesManager import findFile
 
 
 #################################################
@@ -39,6 +40,7 @@ def query_yn(question, default="yes"):
 
 
 def clear():
+    """Clearing the screen."""
     if os.name == 'nt':
         os.system("cls")
     else:
@@ -80,7 +82,7 @@ def work_with_selection(pSelection):
         cipher=cipher_choice()
         print("Please enter the filename (with extension) to encrypt.")
         
-        answer=input("E.g: clearMessage.txt (leave blank by default): ")
+        answer=input("E.g: pic.jpg (leave blank by default): ")
         
         if answer=="":
             answer="clearMessage.txt"
@@ -106,11 +108,12 @@ def work_with_selection(pSelection):
         # Decryption
         cipher=cipher_choice()
         
-        print("Please enter the filename (with extension) to decrypt.")
-        answer=input("E.g: encrypted.kat (leave blank by default) : ")
+        print("Please enter the filename (without .kat ext) to decrypt.")
+        answer=input("E.g: encrypted-pic.jpg (leave blank by default) : ")
         
         if answer=="":
-            answer="encrypted.kat"
+            # Find the first .kat file in the folder
+            answer=findFile(".kat")
 
         print("Decryption started....")
 
