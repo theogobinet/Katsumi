@@ -2,11 +2,19 @@
 # -*- coding: utf-8 -*-
 
 import os
+from math import log
 
 THIS_FOLDER = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 file_name=""
 without_ext=""
+
+
+def bytes_needed(n):
+    if n == 0:
+        return 1
+    return int(log(n, 256)) + 1
+
 
 def findFile(ext):
     """To find a file given extension and return is name."""
@@ -63,7 +71,11 @@ def codeOut(thing,coded=True,inFile=True):
         return None
 
     else:
-        return packed
+        if coded:
+            return int.from_bytes(packed,"big")
+        else:
+            print("Here is your ciphered message, copy it and send it !\n")
+            return packed.decode()
 
 
 def zfill_b(byteA,n:int):

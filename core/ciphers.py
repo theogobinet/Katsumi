@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from core.kasumi import kasumi
-from core.bytesManager import b_op, splitBytes, zfill_b
+from core.bytesManager import b_op, splitBytes, zfill_b, findFile, bytes_needed
 
 #################################################
 ############ Main Method  #######################
@@ -30,7 +30,7 @@ def cipher(arr,method=3,encrypt=True):
 
 ###### Running method to run everything:
 
-def run(file="encrypted.kat",inFile=True,encrypt=False,method=3):
+def run(file=findFile(".kat"),inFile=True,encrypt=False,method=3):
 
     """
     Run encryption of decryption.
@@ -41,12 +41,23 @@ def run(file="encrypted.kat",inFile=True,encrypt=False,method=3):
     method: Block cyphering method
     """
     from core.bytesManager import fileToBytes, codeOut
+    
+    data=bytearray()
 
-    data=fileToBytes(file)
+    if inFile:
+        data=fileToBytes(file)
+    else:
+        if encrypt:
+            data=bytearray(file.encode())
+        else:
+            first=int(file)
+            bits=bytes_needed(first)
+            data=first.to_bytes(bits,"big")
+
     splitted=splitBytes(data)
     ciphered=cipher(splitted,method,encrypt)
     
-    return codeOut(ciphered,encrypt,print)
+    return codeOut(ciphered,encrypt,inFile)
 
     
 #################################################
@@ -122,7 +133,7 @@ def PCBC(arr,encrypt=True):
     res=[]
 
     for i,message in enumerate(arr):
-        
+
         if i == 0:
             # Initialization (same as CBC)
             if encrypt:
