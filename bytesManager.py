@@ -2,15 +2,50 @@
 # -*- coding: utf-8 -*-
 
 
+def fileToBytes(file,message=True):
+    """
+    Read a file and convert to bytearray.
+    True if it's a .txt file with a message.
+    """
 
-def fileToBytes(file):
-    """Read a .txt file and convert to bytearray."""
+    print(f"Opening the {file} file.")
 
-    with open(file+'.txt','rb') as f:
+    with open(file,'rb') as f:
         data=bytearray(f.read())
-        #data=f.read()
 
-    return data
+    if not message: # If it's a file
+        if len(data)*8 < 5000: # At least some kilo_octets
+            return "Error: give in input at least some kilo_octets file's."
+        else:
+            return data
+    else:
+        return data
+
+def codeOut(thing,coded=True,inFile=True):
+    '''Choose what to do with the text (ciphered or not) and deal with it.
+
+    thing : Array of bytesArrays
+    '''
+    # Pack and remove null bytes added by z_filling.
+    packed=packSplittedBytes(thing)
+
+    if not coded: 
+        packed=packed.replace(b'\x00',b'')
+    if inFile:
+
+        if coded:
+            #Let's write byte per byte into a .kat file
+            katFile=open("encrypted.kat","wb")
+            katFile.write(bytes(packed))
+        else:
+            katFile=open("decrypted","wb")
+            katFile.write(bytes(packed))
+        
+        katFile.close()
+        return None
+
+    else:
+        return packed
 
 
 def zfill_b(byteA,n:int):

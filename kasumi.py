@@ -40,39 +40,46 @@ def set_key(km="y/B?E(H+MbQeThVm".encode()):
 ############### Algorithm #######################
 #################################################
 def kasumi (arr, encrypt=True):
-     if(len(arr) != 8):
-          print("FL takes 64 bits as 8 bytes array in input")
-     else:
-          arr = splitBytes(arr,4)
-          l = arr[0]
-          r = arr[1]
 
-          for i in range(0, 8):
+    # Keys initialisation
+    set_key()
 
-               if not encrypt:
-                    i = 7 - i
-               
-               KO = [KO1[i], KO2[i], KO3[i]]
-               KI = [KI1[i], KI2[i], KI3[i]]
-               KL = [KL1[i], KL2[i]]
-               lp = l
+    if(len(arr) > 8):
+        return "Error: FL takes 64 bits as 8 bytes array in input"
+    else:
+        # If arr < 64 bits, let's fill it !
+        arr = zfill_b(arr,8)
+        arr = splitBytes(arr,4)
+        l = arr[0]
+        r = arr[1]
 
-               if(i % 2 == 0):
-                    l = FL(KL, FO(KO, KI, l))
-               else:
-                    l = FO(KO, KI, FL(KL, l))
+        for i in range(0, 8):
 
-               l = b_op(l, r, "XOR")
-               r = lp
-                    
-          return r+l
+            if not encrypt:
+                i = 7 - i
+            
+            KO = [KO1[i], KO2[i], KO3[i]]
+            KI = [KI1[i], KI2[i], KI3[i]]
+            KL = [KL1[i], KL2[i]]
+            lp = l
+
+            if(i % 2 == 0):
+                l = FL(KL, FO(KO, KI, l))
+            else:
+                l = FO(KO, KI, FL(KL, l))
+
+            l = b_op(l, r, "XOR")
+            r = lp
+                
+        return r+l
 
 #######
 ### FL
 #######
 def FL(KL, arr):
+
     if(len(arr) != 4):
-        print("FL takes 32 bits as 4 bytes array in input")
+        return "Error: FL takes 32 bits as 4 bytes array in input"
     else:
         arr = splitBytes(arr,2)
         l = arr[0]
@@ -89,7 +96,7 @@ def FL(KL, arr):
 #######
 def FO(KO, KL, arr):
     if(len(arr) != 4):
-        print("FO takes 32 bits as 4 bytes array in input")
+        return "Error: FO takes 32 bits as 4 bytes array in input"
     else:
         arr = splitBytes(arr,2)
         l = arr[0]
