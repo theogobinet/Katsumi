@@ -2,6 +2,13 @@
 # -*- coding: utf-8 -*-
 from math import sqrt, floor
 import random
+import numpy as np
+
+
+def swapPos(list, pos1, pos2): 
+    """Swap two elements in list."""
+    list[pos1], list[pos2] = list[pos2], list[pos1] 
+    return list
 
 def euclid(a:int,b:int):  
     
