@@ -74,12 +74,17 @@ def codeOut(thing,coded=True,inFile=True):
         if coded:
             return packed.hex()
         else:
-            print("Here is your ciphered message, copy it and send it !\n")
-            return packed.decode()
+            try:
+                print("Here is your ciphered message, copy it and send it !\n")
+                return packed.decode()
+            except UnicodeDecodeError:
+                print("ERROR : Unable to decode the message, the decryption method does not match the encryption method or the encrypted message has been corrupted.\n")
 
 
 def zfill_b(byteA,n:int):
     """Fill ByteArray till length n."""
+
+    byteA = bytearray(byteA)
 
     while n > len(byteA) :
         byteA.insert(0,0)

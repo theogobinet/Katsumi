@@ -50,14 +50,21 @@ def run(file=findFile(".kat"),inFile=True,encrypt=False,method=3):
         if encrypt:
             data=bytearray(file.encode())
         else:
-            first=int(file,16)
-            bits=bytes_needed(first)
-            data=first.to_bytes(bits,"big")
+            try:
+                first=int(file,16)
+                bits=bytes_needed(first)
+                data=first.to_bytes(bits,"big")
 
-    splitted=splitBytes(data)
-    ciphered=cipher(splitted,method,encrypt)
+            except ValueError:
+                print('ERROR : Unable to decode the message, the format of the encrypted message does not correspond to the expected one (hexadecimal).\n')
+
+    if(len(data) > 0):
+        splitted=splitBytes(data)
+        ciphered=cipher(splitted,method,encrypt)
     
-    return codeOut(ciphered,encrypt,inFile)
+        return codeOut(ciphered,encrypt,inFile)
+    
+    return "Decryption failed"
 
     
 #################################################
