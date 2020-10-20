@@ -111,8 +111,12 @@ def primeFactors(n:int):
         
 def exp_mod(a,exp,mod):
     """General method for fast computation of large positive integer powers of a number"""
-    
+
+    if mod == 1:
+        return 0
+
     res=1
+    a=a%mod
     
     while (exp>0) :
         
@@ -125,6 +129,27 @@ def exp_mod(a,exp,mod):
         a=(a*a)%mod
     
     return res
+
+def poly_exp_mod(P,exp,mod):
+    """General method for fast computation of polynomials powers of a number"""
+
+    if mod == np.poly1d([1]):
+        return 0
+
+    res=np.poly1d([1])
+    P=np.polydiv(P,mod)[1]
+
+    while (exp>0) :
+        if(exp%2==1):
+            res=np.polydiv(P*res,mod)[1]
+        
+        # Deleting LSB
+        exp=floor((exp/2))
+        # Updating P
+        P=np.polydiv(P*P,mod)[1]
+
+    return res
+
 
     
 def millerR (n:int, s=5):

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from core.kasumi import kasumi
+from core.kasumi import kasumi, set_key
 from core.bytesManager import b_op, splitBytes, zfill_b, findFile, bytes_needed
 
 #################################################
@@ -41,6 +41,9 @@ def run(input=findFile(".kat"),inFile=True,encrypt=False,method=3):
     method: Block cyphering method
     """
     from core.bytesManager import fileToBytes, codeOut
+
+    # Keys initialisation
+    set_key()
     
     data=bytearray()
 

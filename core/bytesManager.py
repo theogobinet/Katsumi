@@ -3,13 +3,15 @@
 
 import os
 from math import log
-from core.utils import swapPos
 
 THIS_FOLDER = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 file_name=""
 without_ext=""
 
+def swapPos(list, pos1, pos2): 
+    list[pos1], list[pos2] = list[pos2], list[pos1] 
+    return list
 
 def bytes_needed(n):
     if n == 0:
@@ -19,6 +21,8 @@ def bytes_needed(n):
 
 def findFile(ext=""):
     """To find a file given extension and return is name."""
+
+    name=""
 
     if ext=="":
         # Return the first file in the directory that is not crypted

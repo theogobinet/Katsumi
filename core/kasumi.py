@@ -52,9 +52,6 @@ def set_key(km="y/B?E(H+MbQeThVm".encode()):
 #################################################
 def kasumi (arr, encrypt=True):
 
-    # Keys initialisation
-    set_key()
-
     if(len(arr) > 8):
         return "Error: Kasumi takes 64 bits as 8 bytes array in input"
     else:
@@ -95,6 +92,8 @@ def FL(pKL, arr):
 
         rp = b_op(circularRotation(b_op(l,pKL[0],"AND"), 0, 1), r, "XOR")
         lp = b_op(circularRotation(b_op(rp,pKL[1],"OR"), 0, 1), l, "XOR")
+
+        # Inverted in Galois Field
 
         return rp + lp
 
