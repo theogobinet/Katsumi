@@ -12,7 +12,7 @@ def cipher(arr,method=3,encrypt=True):
     """Algorithm that uses a block cipher to provide information security such as confidentiality or authenticity."""
 
     # Dealing with possible last elt < 8 bytes
-    if encrypt and len(arr[-1]) < 8:
+    if len(arr[-1]) < 8:
         arr[-1] = zfill_b(arr[-1],8)
 
     if method==1: #ECB
@@ -30,12 +30,12 @@ def cipher(arr,method=3,encrypt=True):
 
 ###### Running method to run everything:
 
-def run(file=findFile(".kat"),inFile=True,encrypt=False,method=3):
+def run(input=findFile(".kat"),inFile=True,encrypt=False,method=3):
 
     """
     Run encryption of decryption.
     
-    file: file name with extension
+    input: file name with extension
     inFile: True to write an output file
     encrypt: False to decrypte
     method: Block cyphering method
@@ -45,13 +45,13 @@ def run(file=findFile(".kat"),inFile=True,encrypt=False,method=3):
     data=bytearray()
 
     if inFile:
-        data=fileToBytes(file)
+        data=fileToBytes(input)
     else:
         if encrypt:
-            data=bytearray(file.encode())
+            data=bytearray(input.encode())
         else:
             try:
-                first=int(file,16)
+                first=int(input,16)
                 bits=bytes_needed(first)
                 data=first.to_bytes(bits,"big")
 
@@ -64,7 +64,7 @@ def run(file=findFile(".kat"),inFile=True,encrypt=False,method=3):
     
         return codeOut(ciphered,encrypt,inFile)
     
-    return "Decryption failed"
+    return "Encoding failed"
 
     
 #################################################
