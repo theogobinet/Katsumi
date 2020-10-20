@@ -7,7 +7,14 @@ from core.bytesManager import b_op, splitBytes, circularRotation, zfill_b
 ############ Key Schedule #######################
 #################################################
 
-KL1 = KL2 = KO1 = KO2 = KO3 = KI1 = KI2 = KI3 = []
+KL1 = []
+KL2 = []
+KO1 = [] 
+KO2 = [] 
+KO3 = []
+KI1 = [] 
+KI2 = []
+KI3 = []
 
 def set_key(km="y/B?E(H+MbQeThVm".encode()):
     '''Kasumi's keyscheduler.'''
