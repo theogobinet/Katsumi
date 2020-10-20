@@ -7,8 +7,6 @@ from core.bytesManager import b_op, splitBytes, circularRotation, zfill_b
 ############ Key Schedule #######################
 #################################################
 
-# To convert hexadecimal to an array of bytes
-hexToArr = lambda h : ['{:08b}'.format(int(h[x*2:(x+1)*2],16)) for x in range(0,round(len(h)/2))]
 KL1 = KL2 = KO1 = KO2 = KO3 = KI1 = KI2 = KI3 = []
 
 def set_key(km="y/B?E(H+MbQeThVm".encode()):
@@ -47,8 +45,6 @@ def kasumi (arr, encrypt=True):
     if(len(arr) > 8):
         return "Error: FL takes 64 bits as 8 bytes array in input"
     else:
-        # If arr < 64 bits, let's fill it !
-        arr = zfill_b(arr,8)
         arr = splitBytes(arr,4)
         l = arr[0]
         r = arr[1]

@@ -8,6 +8,7 @@ from datetime import datetime
 
 from core.kasumi import kasumi
 from core.ciphers import run
+from core.bytesManager import findFile
 
 
 #################################################
@@ -39,10 +40,33 @@ def query_yn(question, default="yes"):
 
 
 def clear():
+    """Clearing the screen."""
     if os.name == 'nt':
         os.system("cls")
     else:
         os.system("clear")
+
+
+def readFromUser():
+    from sys import stdin
+
+    phrase=""
+
+    print("Enter the message there:")
+    
+    for line in stdin:
+        if line == '\n': # If empty string is read then stop the loop
+            break
+        phrase+=line
+
+    clear()
+
+    return phrase
+
+
+#################################################
+################## Selection  ###################
+#################################################
 
 def cipher_choice():
     clear()
@@ -78,21 +102,29 @@ def work_with_selection(pSelection):
     if pSelection == 1 :
         # Encryption
         cipher=cipher_choice()
-        print("Please enter the filename (with extension) to encrypt.")
-        
-        answer=input("E.g: clearMessage.txt (leave blank by default): ")
-        
-        if answer=="":
-            answer="clearMessage.txt"
+        fchoice=query_yn("Do you want to encrypt a file ?")
+        answer=""
+
+        if fchoice:
+            print("Please enter the filename (with extension) to encrypt.")
+            
+            answer=input("E.g: pic.jpg (leave blank by default): ")
+            
+            if answer=="":
+                answer="clearMessage.txt"
+        else:
+            answer=readFromUser()
+
 
         print("Encryption started....")
 
         begin_time = datetime.now()
-        run(answer,True,True,cipher)
+        print(run(answer,fchoice,True,cipher))
         end=datetime.now() - begin_time
+        input(f"Encryption finished in {end} seconds !\n")
 
         clear()
-        print(f"Encryption finished in {end} seconds !\n")
+
 
         answer=query_yn("Do you want to do something else ?")
         if answer:
@@ -105,21 +137,28 @@ def work_with_selection(pSelection):
     elif pSelection == 2 :
         # Decryption
         cipher=cipher_choice()
-        
-        print("Please enter the filename (with extension) to decrypt.")
-        answer=input("E.g: encrypted.kat (leave blank by default) : ")
-        
-        if answer=="":
-            answer="encrypted.kat"
+        fchoice=query_yn("Do you want to decrypt a file ?")  
+        answer=""
+
+        if fchoice:
+            print("Please enter the filename (without .kat ext) to decrypt.")
+            answer=input("E.g: encrypted-pic.jpg (leave blank by default) : ")
+            
+            if answer=="":
+                # Find the first .kat file in the folder
+                answer=findFile(".kat")
+        else:
+            answer=readFromUser()
 
         print("Decryption started....")
 
         begin_time = datetime.now()
-        run(answer,True,False,cipher)
+        print(run(answer,fchoice,False,cipher))
         end=datetime.now() - begin_time
+        input(f"Decryption finished in {end} seconds !\n")
 
         clear()
-        print(f"Decryption finished in {end} seconds !\n")
+
 
         answer=query_yn("Do you want to do something else ?")
         if answer:

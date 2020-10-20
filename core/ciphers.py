@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from core.kasumi import kasumi
-from core.bytesManager import b_op, splitBytes
+from core.bytesManager import b_op, splitBytes, zfill_b, findFile, bytes_needed
 
 #################################################
 ############ Main Method  #######################
@@ -10,6 +10,10 @@ from core.bytesManager import b_op, splitBytes
 
 def cipher(arr,method=3,encrypt=True):
     """Algorithm that uses a block cipher to provide information security such as confidentiality or authenticity."""
+
+    # Dealing with possible last elt < 8 bytes
+    if encrypt and len(arr[-1]) < 8:
+        arr[-1] = zfill_b(arr[-1],8)
 
     if method==1: #ECB
         return ECB(arr, encrypt)
@@ -26,7 +30,7 @@ def cipher(arr,method=3,encrypt=True):
 
 ###### Running method to run everything:
 
-def run(file="encrypted.kat",inFile=True,encrypt=False,method=3):
+def run(file=findFile(".kat"),inFile=True,encrypt=False,method=3):
 
     """
     Run encryption of decryption.
@@ -37,25 +41,24 @@ def run(file="encrypted.kat",inFile=True,encrypt=False,method=3):
     method: Block cyphering method
     """
     from core.bytesManager import fileToBytes, codeOut
+    
+    data=bytearray()
 
-    data=fileToBytes(file)
+    if inFile:
+        data=fileToBytes(file)
+    else:
+        if encrypt:
+            data=bytearray(file.encode())
+        else:
+            first=int(file)
+            bits=bytes_needed(first)
+            data=first.to_bytes(bits,"big")
+
     splitted=splitBytes(data)
     ciphered=cipher(splitted,method,encrypt)
     
-    return codeOut(ciphered,encrypt,print)
+    return codeOut(ciphered,encrypt,inFile)
 
-####### Additionnals method to know where you are in time process
-def percentage(arr,i):
-
-    from katsumi import clear
-
-    clear()
-    l=len(arr)
-    p=round(i/l*100,2)
-
-    print(f"Progress : {p}%")
-
-    return None
     
 #################################################
 ############ Electronic codebook ################
@@ -73,6 +76,7 @@ def ECB(arr,encrypt=True):
     else:
         for elt in arr:
             uncrypted.append(kasumi(elt,encrypt))
+
         return uncrypted
 
 
@@ -94,8 +98,6 @@ def CBC(arr,encrypt=True):
 
     for i, message in enumerate(arr):
 
-        percentage(arr,i)
-
         if i == 0:
             # Initialization
             if encrypt:
@@ -107,6 +109,7 @@ def CBC(arr,encrypt=True):
                 res.append(kasumi(b_op(res[i-1],message,"XOR")))
             else:
                 res.append(b_op(kasumi(message,False),arr[i-1],"XOR"))
+    
 
     if encrypt:
         # Adding the IV to the encrypted data
@@ -130,8 +133,6 @@ def PCBC(arr,encrypt=True):
     res=[]
 
     for i,message in enumerate(arr):
-
-        percentage(arr,i)
 
         if i == 0:
             # Initialization (same as CBC)
