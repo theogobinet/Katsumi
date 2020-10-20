@@ -72,7 +72,7 @@ def codeOut(thing,coded=True,inFile=True):
 
     else:
         if coded:
-            return int.from_bytes(packed,"big")
+            return packed.hex()
         else:
             print("Here is your ciphered message, copy it and send it !\n")
             return packed.decode()
@@ -89,25 +89,26 @@ def zfill_b(byteA,n:int):
 def b_op(b1,b2,ope="XOR"):
     """Bitwise operation between two bytes arrays (XOR, AND, OR available)"""
     
-    by=bytearray()
+    by=0
+    m=max(len(b1),len(b2))
 
     if len(b1) != len(b2):
-        m=max(len(b1),len(b2))
-
-        b1=zfill_b(b1,m)
-        b2=zfill_b(b2,m)
+        b1 = zfill_b(b1,m)
+        b2 = zfill_b(b2,m)
     
-    for i,j in zip(b1,b2):
-        if ope == "XOR":
-            by.append(int(i) ^ int(j))
-        elif ope == "AND":
-            by.append(int(i) & int(j))
-        elif ope == "OR":
-            by.append(int(i) | int(j))
-        else:
-            return None 
+    b1 = int().from_bytes(b1,"big")
+    b2 = int().from_bytes(b2,"big")
 
-    return by
+    if ope == "XOR":
+        by = b1 ^ b2
+    elif ope == "AND":
+        by = b1 & b2
+    elif ope == "OR":
+        by = b1 | b2
+    else:
+        return None 
+
+    return by.to_bytes(m,"big")
 
 def splitBytes(data,n=8):
     """Split BytesArray into chunks of n (=8 by default) bytes."""
