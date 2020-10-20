@@ -17,11 +17,19 @@ def bytes_needed(n):
     return int(log(n, 256)) + 1
 
 
-def findFile(ext):
+def findFile(ext=""):
     """To find a file given extension and return is name."""
-    for f in os.listdir(os.path.join(THIS_FOLDER,"share/")):
-        if f.endswith(ext):
-            name=f
+
+    if ext=="":
+        # Return the first file in the directory that is not crypted
+        for f in os.listdir(os.path.join(THIS_FOLDER,"share/")):
+            if not(f.endswith(".kat")):
+                name=f
+    else:
+        for f in os.listdir(os.path.join(THIS_FOLDER,"share/")):
+            if f.endswith(ext):
+                name=f
+
     return name
 
 
@@ -85,7 +93,10 @@ def codeOut(thing,coded=True,inFile=True):
 def zfill_b(byteA,n:int):
     """Fill ByteArray till length n."""
 
-    byteA = bytearray(byteA)
+    try:
+        byteA = bytearray(byteA)
+    except TypeError:
+        print(byteA)
 
     while n > len(byteA) :
         byteA.insert(0,0)

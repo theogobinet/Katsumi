@@ -111,7 +111,7 @@ def work_with_selection(pSelection):
             answer=input("E.g: pic.jpg (leave blank by default): ")
             
             if answer=="":
-                answer="clearMessage.txt"
+                answer=findFile()
         else:
             answer=readFromUser()
 
@@ -142,7 +142,7 @@ def work_with_selection(pSelection):
 
         if fchoice:
             print("Please enter the filename (without .kat ext) to decrypt.")
-            answer=input("E.g: encrypted-pic.jpg (leave blank by default) : ")
+            answer=input("E.g: encrypted-pic.jpg (leave blank by default) : ")+".kat"
             
             if answer=="":
                 # Find the first .kat file in the folder
@@ -159,8 +159,8 @@ def work_with_selection(pSelection):
 
         clear()
 
-
         answer=query_yn("Do you want to do something else ?")
+
         if answer:
             clear()
             return menu()

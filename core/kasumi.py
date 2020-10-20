@@ -3,6 +3,7 @@
 
 from core.bytesManager import b_op, splitBytes, circularRotation, zfill_b, swapPos
 
+
 #################################################
 ############ Key Schedule #######################
 #################################################
@@ -39,7 +40,12 @@ def set_key(km="y/B?E(H+MbQeThVm".encode()):
     KI2 = [skp[(x + 3) % 8] for x in range (0,8)]
     KI3 = [skp[(x + 7) % 8] for x in range (0,8)]
 
+    # SBoxes initialization considering the given master key !
+    initRC4(km)
+
     return None
+ 
+
 
 #################################################
 ############### Algorithm #######################
@@ -50,7 +56,7 @@ def kasumi (arr, encrypt=True):
     set_key()
 
     if(len(arr) > 8):
-        return "Error: FL takes 64 bits as 8 bytes array in input"
+        return "Error: Kasumi takes 64 bits as 8 bytes array in input"
     else:
         arr = splitBytes(arr,4)
         l = arr[0]
@@ -79,8 +85,7 @@ def kasumi (arr, encrypt=True):
 #######
 ### FL
 #######
-def FL(KL, arr):
-
+def FL(pKL, arr):
     if(len(arr) != 4):
         return "Error: FL takes 32 bits as 4 bytes array in input"
     else:
@@ -88,8 +93,8 @@ def FL(KL, arr):
         l = arr[0]
         r = arr[1]
 
-        rp = b_op(circularRotation(b_op(l,KL[0],"AND"), 0, 1), r, "XOR")
-        lp = b_op(circularRotation(b_op(rp,KL[1],"OR"), 0, 1), l, "XOR")
+        rp = b_op(circularRotation(b_op(l,pKL[0],"AND"), 0, 1), r, "XOR")
+        lp = b_op(circularRotation(b_op(rp,pKL[1],"OR"), 0, 1), l, "XOR")
 
         return rp + lp
 
@@ -97,7 +102,8 @@ def FL(KL, arr):
 #######
 ###FO
 #######
-def FO(KO, KI, arr):
+def FO(pKO, pKI, arr):
+
     if(len(arr) != 4):
         return "Error: FO takes 32 bits as 4 bytes array in input"
     else:
@@ -107,7 +113,7 @@ def FO(KO, KI, arr):
 
         for i in range (0,3):
             l = r
-            r = b_op(r, FI(b_op(l, KO[i], "XOR"), KI[i]),"XOR")
+            r = b_op(r, FI(b_op(l, pKO[i], "XOR"), pKI[i]),"XOR")
         
         return l + r
 
@@ -115,16 +121,16 @@ def FO(KO, KI, arr):
 #######
 ###FI
 #######
-def FI(b1, KI):
-     ''' '''
-     b1 = circularRotation(b1, 1, 2)
+def FI(b1, pKI):
 
-     z = splitBytes(KI,1)
+    b1 = circularRotation(b1, 1, 2)
 
-     subZ1 =S1[int.from_bytes(z[0],"big")].to_bytes(1,"big")
-     subZ2 =S2[int.from_bytes(z[1],"big")].to_bytes(1,"big")
+    z = splitBytes(pKI,1)
 
-     return b_op(b1, subZ1 + subZ2, "XOR")
+    subZ1 =S1[int.from_bytes(z[0],"big")].to_bytes(1,"big")
+    subZ2 =S2[int.from_bytes(z[1],"big")].to_bytes(1,"big")
+
+    return b_op(b1, subZ1 + subZ2, "XOR")
 
 
 ########################
@@ -133,33 +139,34 @@ def FI(b1, KI):
 # https://en.wikipedia.org/wiki/S-box
 #######################################
 
-# Using RC4 initialization and adding 
-
 S1=[]
 S2=[]
 
-def initRC4(K:bytes,iterationKey):
-    """Create a shaked array with a key of length between 8 and 24 bytes."""
+# Using RC4 initialization and adding 
+
+def initRC4(masterKey):
+    """Create a shaked array with two keys of length between 4 and 16 bytes."""
 
     global S1,S2
 
-    # To be sure to use a bytearrayed key
-    K=bytearray(K)
-    mid=len(K)/2
-    K1,K2=K[:mid],K[mid:]
+    l=len(masterKey)
+    mid=int(l/2)
+    K1,K2=masterKey[mid:],masterKey[:mid]
 
-    if len(K)<8 or len(K)>24:
-        return "Error: key need to be between 8 and 24 bytes."
+    if l<8 or l>24:
+        return False
 
     S1,S2=[i for i in range(0,256)],[i for i in range(0,256)]
 
     j=0
+    m=0
+
     for i in range(0,256):
 
-        j=(j+S1[i]+K1[i%len(K)])%256
-        k=(k+S2[i]+K2[i%len(K)])%256
+        j=(j+S1[i]+K1[i%len(K1)])%256
+        m=(m+S2[i]+K2[i%len(K2)])%256
 
-        S1,S2=swapPos(S1,i,j),swapPos(S2,i,k)
+        S1,S2=swapPos(S1,i,j),swapPos(S2,i,m)
 
 
-    return S1,S2
+    return True
