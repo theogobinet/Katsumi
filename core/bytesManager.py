@@ -92,8 +92,8 @@ def packSplittedBytes(pSplitted):
     
     return packed
 
-def leftRotate(arr, n=1): 
-    '''Circular shift to left of n (=1 by default) bits'''
+def circularRotation(arr, dir=0,n=1): 
+    '''Circular shift to dir (left=0, right=1) of n (=1 by default) bits'''
 
     nB = len(arr)*8
     arrInt = int.from_bytes(arr,'big')
@@ -106,4 +106,11 @@ def leftRotate(arr, n=1):
     # AND                   the two bytes
     # & size                remove from left the oversize bits
 
-    return (((arrInt << n)|(arrInt >> (nB - n))) & size).to_bytes(2, 'big')
+    r = 0
+
+    if(dir == 0):
+        r = (((arrInt << n)|(arrInt >> (nB - n))) & size)
+    else:
+        r = (((arrInt >> n)|(arrInt << (nB - n))) & size)
+
+    return r.to_bytes(len(arr), 'big')
