@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from math import sqrt, floor
 import random
-
+import numpy as np
 
 
 def swapPos(list, pos1, pos2): 

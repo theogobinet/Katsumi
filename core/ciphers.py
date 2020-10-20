@@ -50,7 +50,7 @@ def run(file=findFile(".kat"),inFile=True,encrypt=False,method=3):
         if encrypt:
             data=bytearray(file.encode())
         else:
-            first=int(file)
+            first=int(file,16)
             bits=bytes_needed(first)
             data=first.to_bytes(bits,"big")
 

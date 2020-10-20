@@ -73,7 +73,7 @@ def codeOut(thing,coded=True,inFile=True):
 
     else:
         if coded:
-            return int.from_bytes(packed,"big")
+            return packed.hex()
         else:
             print("Here is your ciphered message, copy it and send it !\n")
             return packed.decode()
@@ -90,25 +90,26 @@ def zfill_b(byteA,n:int):
 def b_op(b1,b2,ope="XOR"):
     """Bitwise operation between two bytes arrays (XOR, AND, OR available)"""
     
-    by=bytearray()
+    by=0
+    m=max(len(b1),len(b2))
 
     if len(b1) != len(b2):
-        m=max(len(b1),len(b2))
-
-        b1=zfill_b(b1,m)
-        b2=zfill_b(b2,m)
+        b1 = zfill_b(b1,m)
+        b2 = zfill_b(b2,m)
     
-    for i,j in zip(b1,b2):
-        if ope == "XOR":
-            by.append(int(i) ^ int(j))
-        elif ope == "AND":
-            by.append(int(i) & int(j))
-        elif ope == "OR":
-            by.append(int(i) | int(j))
-        else:
-            return None 
+    b1 = int().from_bytes(b1,"big")
+    b2 = int().from_bytes(b2,"big")
 
-    return by
+    if ope == "XOR":
+        by = b1 ^ b2
+    elif ope == "AND":
+        by = b1 & b2
+    elif ope == "OR":
+        by = b1 | b2
+    else:
+        return None 
+
+    return by.to_bytes(m,"big")
 
 def splitBytes(data,n=8):
     """Split BytesArray into chunks of n (=8 by default) bytes."""
@@ -123,8 +124,8 @@ def packSplittedBytes(pSplitted):
     
     return packed
 
-def leftRotate(arr, n=1): 
-    '''Circular shift to left of n (=1 by default) bits'''
+def circularRotation(arr, dir=0,n=1): 
+    '''Circular shift to dir (left=0, right=1) of n (=1 by default) bits'''
 
     nB = len(arr)*8
     arrInt = int.from_bytes(arr,'big')
@@ -137,6 +138,7 @@ def leftRotate(arr, n=1):
     # AND                   the two bytes
     # & size                remove from left the oversize bits
 
+<<<<<<< HEAD
     return (((arrInt << n)|(arrInt >> (nB - n))) & size).to_bytes(2, 'big')
 
 def initRC4(key:bytes):
@@ -156,3 +158,13 @@ def initRC4(key:bytes):
         S=swapPos(S,i,j)
 
     return S
+=======
+    r = 0
+
+    if(dir == 0):
+        r = (((arrInt << n)|(arrInt >> (nB - n))) & size)
+    else:
+        r = (((arrInt >> n)|(arrInt << (nB - n))) & size)
+
+    return r.to_bytes(len(arr), 'big')
+>>>>>>> 786aa982851f9ce0939ac1e973cf6d23303132fe

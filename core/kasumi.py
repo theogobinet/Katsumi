@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from core.bytesManager import b_op, splitBytes, leftRotate, zfill_b
+from core.bytesManager import b_op, splitBytes, circularRotation, zfill_b
 
 #################################################
 ############ Key Schedule #######################
@@ -23,11 +23,11 @@ def set_key(km="y/B?E(H+MbQeThVm".encode()):
     skm, skp = splitBytes (km,2), splitBytes (kp,2)
 
 
-    KL1 = [bytearray(leftRotate (skm[x],1)) for x in range (0,8)]
+    KL1 = [bytearray(circularRotation (skm[x], 0, 1)) for x in range (0,8)]
     KL2 = [skp[(x+2) % 8] for x in range (0,8)]
-    KO1 = [bytearray(leftRotate (skm[(x + 1) % 8], 5)) for x in range (0,8)]
-    KO2 = [bytearray(leftRotate (skm[(x + 5) % 8], 8)) for x in range (0,8)]
-    KO3 = [bytearray(leftRotate (skm[(x + 6) % 8], 13)) for x in range (0,8)]
+    KO1 = [bytearray(circularRotation (skm[(x + 1) % 8], 0, 5)) for x in range (0,8)]
+    KO2 = [bytearray(circularRotation (skm[(x + 5) % 8], 0, 8)) for x in range (0,8)]
+    KO3 = [bytearray(circularRotation (skm[(x + 6) % 8], 0, 13)) for x in range (0,8)]
     KI1 = [skp[(x + 4) % 8] for x in range (0,8)]
     KI2 = [skp[(x + 3) % 8] for x in range (0,8)]
     KI3 = [skp[(x + 7) % 8] for x in range (0,8)]
@@ -81,8 +81,8 @@ def FL(KL, arr):
         l = arr[0]
         r = arr[1]
 
-        rp = b_op(leftRotate(b_op(l,KL[0],"AND"),1), r, "XOR")
-        lp = b_op(leftRotate(b_op(rp,KL[1],"OR"),1), l, "XOR")
+        rp = b_op(circularRotation(b_op(l,KL[0],"AND"), 0, 1), r, "XOR")
+        lp = b_op(circularRotation(b_op(rp,KL[1],"OR"), 0, 1), l, "XOR")
 
         return rp + lp
 
@@ -90,7 +90,7 @@ def FL(KL, arr):
 #######
 ###FO
 #######
-def FO(KO, KL, arr):
+def FO(KO, KI, arr):
     if(len(arr) != 4):
         return "Error: FO takes 32 bits as 4 bytes array in input"
     else:
@@ -100,7 +100,7 @@ def FO(KO, KL, arr):
 
         for i in range (0,3):
             l = r
-            r = b_op(r, FI(b_op(l, KO[i], "XOR"), KL[i]),"XOR")
+            r = b_op(r, FI(b_op(l, KO[i], "XOR"), KI[i]),"XOR")
         
         return l + r
 
@@ -108,11 +108,11 @@ def FO(KO, KL, arr):
 #######
 ###FI
 #######
-def FI(b1, b2):
+def FI(b1, KI):
      ''' '''
-     b1 = (int.from_bytes(b1,"big") >> 2).to_bytes(2,"big")
+     b1 = circularRotation(b1, 1, 2)
 
-     z = splitBytes(b2,1)
+     z = splitBytes(KI,1)
 
      subZ1 =S1[int.from_bytes(z[0],"big")].to_bytes(1,"big")
      subZ2 =S2[int.from_bytes(z[1],"big")].to_bytes(1,"big")
