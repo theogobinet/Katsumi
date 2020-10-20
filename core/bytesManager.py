@@ -3,6 +3,7 @@
 
 import os
 from math import log
+from core.utils import swapPos
 
 THIS_FOLDER = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -137,3 +138,21 @@ def leftRotate(arr, n=1):
     # & size                remove from left the oversize bits
 
     return (((arrInt << n)|(arrInt >> (nB - n))) & size).to_bytes(2, 'big')
+
+def initRC4(key:bytes):
+    """Create a shaked array with a key of length between 8 and 24 bytes."""
+
+    # To be sure to use a bytearrayed key
+    K=bytearray(key)
+
+    if len(K)<8 or len(K)>24:
+        return "Error: key need to be between 8 and 24 bytes."
+
+    S=[i for i in range(0,256)]
+
+    j=0
+    for i in range(0,256):
+        j=(j+S[i]+K[i%len(K)])%256
+        S=swapPos(S,i,j)
+
+    return S

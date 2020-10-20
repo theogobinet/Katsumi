@@ -3,6 +3,13 @@
 from math import sqrt, floor
 import random
 
+
+
+def swapPos(list, pos1, pos2): 
+    """Swap two elements in list."""
+    list[pos1], list[pos2] = list[pos2], list[pos1] 
+    return list
+
 def euclid(a:int,b:int):  
     
     """Find the Greatest Common Divisor of number a and b."""
