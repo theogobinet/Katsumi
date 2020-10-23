@@ -86,33 +86,7 @@ def gen_GL(poly,degree,p=2,Zn=2):
 
     return goodGen
 
-### Pas fini ne marche pas
-def irreductiblePoly(P,degree):
-    """
-    Test all factor polynomials over GF of degree higher than
-    zero and lower than given degree to see if p has no factor polynomial and
-    thus is irreducible ofer GF(2).
-    """
 
-    for elt in config.ELEMENTS:
-            if not (0 < len(elt) < degree):
-                continue
-
-            remainder=np.polydiv(P,elt)
-
-            if np.count_nonzero(remainder) == 0:
-                return False
-
-    return True
-
-def primitivePoly(P,degree):
-    """Test of polynomial is primitive (and hence also irreductible)."""
-
-    if not irreductiblePoly(P,degree):
-        return False
-    else: #irreductible
-        return True
-        
 def invertGalois(A,bytes=True):
     """
     Invert given Array in a Galois Field degree in Zn.
