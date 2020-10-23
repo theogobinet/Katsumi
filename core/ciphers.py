@@ -3,6 +3,9 @@
 
 from core.kasumi import kasumi, set_key
 from core.bytesManager import b_op, splitBytes, zfill_b, findFile, bytes_needed
+import time
+import core.config as config
+
 
 #################################################
 ############ Main Method  #######################
@@ -10,18 +13,23 @@ from core.bytesManager import b_op, splitBytes, zfill_b, findFile, bytes_needed
 
 def cipher(arr,method=3,encrypt=True):
     """Algorithm that uses a block cipher to provide information security such as confidentiality or authenticity."""
+    
+    import core.config as config
 
     # Dealing with possible last elt < 8 bytes
     if len(arr[-1]) < 8:
         arr[-1] = zfill_b(arr[-1],8)
 
     if method==1: #ECB
+        config.WATCH_CIPHER_TYPE = "ECB"
         return ECB(arr, encrypt)
     
     elif method==2: #CBC
+        config.WATCH_CIPHER_TYPE = "CBC"
         return CBC(arr, encrypt)
 
     elif method==3: #PCBC
+        config.WATCH_CIPHER_TYPE = "PCBC"
         return PCBC(arr, encrypt)
     else:
         return "Error: Not implemented cipher mode. (Not yet ?) "
@@ -41,14 +49,23 @@ def run(input=findFile(".kat"),inFile=True,encrypt=False,method=3):
     method: Block cyphering method
     """
     from core.bytesManager import fileToBytes, codeOut
-
-    # Keys initialisation
-    set_key()
+    from core.watch import watch
+    from threading import Thread
     
     data=bytearray()
 
     if inFile:
+        readTime = time.time()
+
         data=fileToBytes(input)
+
+        if len(data) > 200000:
+            thread = Thread(target = watch)
+            thread.daemon = True
+            config.WATCH_EXEC_STATUS = True
+            thread.start()
+
+        config.WATCH_READ_TIME = time.time() - readTime
     else:
         if encrypt:
             data=bytearray(input.encode())
@@ -60,6 +77,9 @@ def run(input=findFile(".kat"),inFile=True,encrypt=False,method=3):
 
             except ValueError:
                 print('ERROR : Unable to decode the message, the format of the encrypted message does not correspond to the expected one (hexadecimal).\n')
+
+    # Keys initialisation
+    set_key()
 
     if(len(data) > 0):
         splitted=splitBytes(data)
@@ -76,18 +96,20 @@ def run(input=findFile(".kat"),inFile=True,encrypt=False,method=3):
 
 def ECB(arr,encrypt=True):
     """The message is divided into blocks, and each block is encrypted separately."""
-    blocks=[]
-    uncrypted=[]
+    res=[]
     
-    if encrypt:
-        for elt in arr:
-            blocks.append(kasumi(elt,encrypt))
-        return blocks
-    else:
-        for elt in arr:
-            uncrypted.append(kasumi(elt,encrypt))
+    for i, elt in enumerate(arr):
 
-        return uncrypted
+        config.WATCH_PERCENTAGE = ((len(arr) - (len(arr) - i)) / len(arr)) * 100
+        exTime = time.time()
+
+        res.append(kasumi(elt,encrypt))
+
+        config.WATCH_GLOBAL_CIPHER += time.time() - exTime
+        config.WATCH_BLOC_CIPHER = config.WATCH_GLOBAL_CIPHER / (i + 1)
+        config.WATCH_BLOC_KASUMI = config.WATCH_GLOBAL_KASUMI / (i + 1)
+    
+    return res
 
 
 
@@ -108,6 +130,9 @@ def CBC(arr,encrypt=True):
 
     for i, message in enumerate(arr):
 
+        config.WATCH_PERCENTAGE = ((len(arr) - (len(arr) - i)) / len(arr)) * 100
+        exTime = time.time()
+
         if i == 0:
             # Initialization
             if encrypt:
@@ -119,6 +144,10 @@ def CBC(arr,encrypt=True):
                 res.append(kasumi(b_op(res[i-1],message,"XOR")))
             else:
                 res.append(b_op(kasumi(message,False),arr[i-1],"XOR"))
+
+        config.WATCH_GLOBAL_CIPHER += time.time() - exTime
+        config.WATCH_BLOC_CIPHER = config.WATCH_GLOBAL_CIPHER / (i + 1)
+        config.WATCH_BLOC_KASUMI = config.WATCH_GLOBAL_KASUMI / (i + 1)
     
 
     if encrypt:
@@ -134,6 +163,7 @@ def CBC(arr,encrypt=True):
 
 def PCBC(arr,encrypt=True):
     """In CBC mode, each block of plaintext is XORed with the previous ciphertext block before being encrypted. """
+
     # Initialisation Vector
     if encrypt:
         iv=IV(arr)
@@ -144,6 +174,9 @@ def PCBC(arr,encrypt=True):
 
     for i,message in enumerate(arr):
 
+        config.WATCH_PERCENTAGE = ((len(arr) - (len(arr) - i)) / len(arr)) * 100
+        exTime = time.time()
+
         if i == 0:
             # Initialization (same as CBC)
             if encrypt:
@@ -151,24 +184,27 @@ def PCBC(arr,encrypt=True):
             else:
                 res.append(b_op(kasumi(message,False),iv,"XOR"))
         else:
-            if encrypt:
+            if encrypt:            
                 # XORing past clear message and ciphered one
                 buffer=b_op(arr[i-1],res[i-1],"XOR")
                 # XORing buffer and current clear message
                 res.append(kasumi(b_op(buffer,message,"XOR")))
             else:
+
                 # XORing past ciphered and past clear message
                 buffer=b_op(arr[i-1],res[i-1],"XOR")
                 # XORing buffer and current ciphered message
                 res.append(b_op(buffer,kasumi(message,False),"XOR"))
 
+        config.WATCH_GLOBAL_CIPHER += time.time() - exTime
+        config.WATCH_BLOC_CIPHER = config.WATCH_GLOBAL_CIPHER / (i + 1)
+        config.WATCH_BLOC_KASUMI = config.WATCH_GLOBAL_KASUMI / (i + 1)
+
     if encrypt:
         # Adding the IV to the encrypted data
         IV_action(res,iv,"store")
-        return res
-    else:
-        return res
-
+    
+    return res
 
 #################### Initialization Vector #################################
 #https://en.wikipedia.org/wiki/Initialization_vector#Block_ciphers

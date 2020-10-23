@@ -2,25 +2,16 @@
 # -*- coding: utf-8 -*-
 
 from core.bytesManager import b_op, splitBytes, circularRotation, zfill_b, swapPos
-
+import time
+import core.config as config
 
 #################################################
 ############ Key Schedule #######################
 #################################################
 
-KL1 = []
-KL2 = []
-KO1 = [] 
-KO2 = [] 
-KO3 = []
-KI1 = [] 
-KI2 = []
-KI3 = []
-
 def set_key(km="y/B?E(H+MbQeThVm".encode()):
     '''Kasumi's keyscheduler.'''
 
-    global KL1, KL2, KO1, KO2, KO3, KI1, KI2, KI3
     # Chosen as a "nothing up my sleeve" number
     nums = b'\x124Vx\x9a\xbc\xde\xff\xed\xcb\xa9\x87eC!\x00'
 
@@ -31,14 +22,14 @@ def set_key(km="y/B?E(H+MbQeThVm".encode()):
     skm, skp = splitBytes (km,2), splitBytes (kp,2)
 
 
-    KL1 = [bytearray(circularRotation (skm[x], 0, 1)) for x in range (0,8)]
-    KL2 = [skp[(x+2) % 8] for x in range (0,8)]
-    KO1 = [bytearray(circularRotation (skm[(x + 1) % 8], 0, 5)) for x in range (0,8)]
-    KO2 = [bytearray(circularRotation (skm[(x + 5) % 8], 0, 8)) for x in range (0,8)]
-    KO3 = [bytearray(circularRotation (skm[(x + 6) % 8], 0, 13)) for x in range (0,8)]
-    KI1 = [skp[(x + 4) % 8] for x in range (0,8)]
-    KI2 = [skp[(x + 3) % 8] for x in range (0,8)]
-    KI3 = [skp[(x + 7) % 8] for x in range (0,8)]
+    config.KL1 = [bytearray(circularRotation (skm[x], 0, 1)) for x in range (0,8)]
+    config.KL2 = [skp[(x+2) % 8] for x in range (0,8)]
+    config.KO1 = [bytearray(circularRotation (skm[(x + 1) % 8], 0, 5)) for x in range (0,8)]
+    config.KO2 = [bytearray(circularRotation (skm[(x + 5) % 8], 0, 8)) for x in range (0,8)]
+    config.KO3 = [bytearray(circularRotation (skm[(x + 6) % 8], 0, 13)) for x in range (0,8)]
+    config.KI1 = [skp[(x + 4) % 8] for x in range (0,8)]
+    config.KI2 = [skp[(x + 3) % 8] for x in range (0,8)]
+    config.KI3 = [skp[(x + 7) % 8] for x in range (0,8)]
 
     # SBoxes initialization considering the given master key !
     initRC4(km)
@@ -52,9 +43,13 @@ def set_key(km="y/B?E(H+MbQeThVm".encode()):
 #################################################
 def kasumi (arr, encrypt=True):
 
+
     if(len(arr) > 8):
         return "Error: Kasumi takes 64 bits as 8 bytes array in input"
     else:
+
+        exTime = time.time()
+
         arr = splitBytes(arr,4)
         l = arr[0]
         r = arr[1]
@@ -64,9 +59,9 @@ def kasumi (arr, encrypt=True):
             if not encrypt:
                 i = 7 - i
             
-            KO = [KO1[i], KO2[i], KO3[i]]
-            KI = [KI1[i], KI2[i], KI3[i]]
-            KL = [KL1[i], KL2[i]]
+            KO = [config.KO1[i], config.KO2[i], config.KO3[i]]
+            KI = [config.KI1[i], config.KI2[i], config.KI3[i]]
+            KL = [config.KL1[i], config.KL2[i]]
             lp = l
 
             if(i % 2 == 0):
@@ -76,7 +71,9 @@ def kasumi (arr, encrypt=True):
 
             l = b_op(l, r, "XOR")
             r = lp
-                
+        
+        config.WATCH_GLOBAL_KASUMI += time.time() - exTime
+
         return r+l
 
 #######

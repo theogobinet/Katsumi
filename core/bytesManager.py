@@ -65,6 +65,10 @@ def codeOut(thing,coded=True,inFile=True):
 
     thing : Array of bytesArrays
     '''
+
+    import core.config as config
+    import time
+
     # Pack and remove null bytes added by z_filling.
     if not coded:
         thing[-1]=thing[-1].replace(b'\x00',b'')
@@ -72,6 +76,9 @@ def codeOut(thing,coded=True,inFile=True):
     packed=packSplittedBytes(thing)
 
     if inFile:
+        
+        wTime = time.time()
+
         if coded:
             #Let's write byte per byte into a .kat file
             katFile=open(file_name+".kat","wb")
@@ -81,7 +88,11 @@ def codeOut(thing,coded=True,inFile=True):
             katFile.write(bytes(packed))
         
         katFile.close()
-        return None
+
+        config.WATCH_WRITE_TIME = time.time() - wTime
+        config.WATCH_EXEC_STATUS = False
+        
+        return ""
 
     else:
         if coded:
