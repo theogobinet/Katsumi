@@ -246,7 +246,6 @@ def menu():
     work_with_selection(selection)
 
 
-
 def main():
     clear()
     menu()

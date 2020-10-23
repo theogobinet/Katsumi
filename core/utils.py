@@ -76,10 +76,13 @@ def primeFactors(n:int):
     ####
     
     phi_of_n=1
+    coprimes=[1]
     
     # a and b are said to be coprime if the only positive integer (factor) that divides both of them is 1.
     for i in range(2,n):
-        if euclid(i,n) == 1 : phi_of_n+=1
+        if euclid(i,n) == 1 :
+            coprimes.append(i)
+            phi_of_n+=1
     
     
     res=[]
@@ -107,7 +110,7 @@ def primeFactors(n:int):
     if n > 2: 
         res.append(int(n))
     
-    return res,phi_of_n
+    return res,phi_of_n,coprimes
         
 def exp_mod(a,exp,mod):
     """General method for fast computation of large positive integer powers of a number"""
@@ -130,8 +133,22 @@ def exp_mod(a,exp,mod):
     
     return res
 
-def poly_exp_mod(P,exp,mod):
-    """General method for fast computation of polynomials powers of a number"""
+#### Polynomials 
+
+def poly_mult(A,B,nZ):
+    """Polynomial multiplication in nZ."""
+    return np.poly1d([elt%2 for elt in A*B])
+
+
+def poly_exp_mod(P,exp,mod,nZ=2):
+    """
+    General method for fast computation of polynomials powers of a number.
+    
+    P: Polynomial
+    exp: exposant
+    mod: polynial to be coungruent to
+    nZ: into Zn
+    """
 
     if mod == np.poly1d([1]):
         return 0
@@ -141,18 +158,60 @@ def poly_exp_mod(P,exp,mod):
 
     while (exp>0) :
         if(exp%2==1):
-            res=np.polydiv(P*res,mod)[1]
+            res=np.polydiv(poly_mult(P,res,nZ),mod)[1]
         
         # Deleting LSB
         exp=floor((exp/2))
         # Updating P
-        P=np.polydiv(P*P,mod)[1]
+        P=np.polydiv(poly_mult(P,P,nZ),mod)[1]
+
+    #inZn=np.poly1d([elt%2 for elt in res])
 
     return res
 
+def gen_GL(poly,degree,p=2,Zn=2):
+    """Return generator of Galois Field's GF(p^degree) in Zn."""
+    # Order of multiplicative subgroup
+    pn1=(p**degree)-1
+    q=None
 
+    un=np.poly1d([1])
+
+    if millerR(pn1):
+        q=[1]
+    else:
+        q=primeFactors(pn1)[0]
+
+    genList=[]
+    goodGen=None
+
+    for i in range(1,p**degree):
+        bits=[int(b) for b in '{value:0{size}b}'.format(value=i,size=degree)]
+        genList.append(bits)
+
+    for gen in genList:
+        buffGen=gen.copy()
+        gen=np.poly1d(gen)
+
+        # α(x)^(p^n-1) % f(x) == 1
+        firstTest=poly_exp_mod(gen,pn1,poly,Zn)
+        if firstTest==un:
+            isGood=True  
+            for elt in q:
+                # α(x)^((p^n-1)/q) % f(x) != 1, for all q that are prime factors of p^n-1
+                secondTest=poly_exp_mod(gen,pn1/elt,poly,Zn)
+                if secondTest == un:
+                    isGood=False
+            if isGood:
+                goodGen=buffGen
+                break
+
+    return goodGen
+
+
+#######
     
-def millerR (n:int, s=5):
+def millerR (n:int, s=40):
 
     """Use Rabin-Miller algorithm to return True (n is probably prime) or False (n is definitely composite)."""
 
