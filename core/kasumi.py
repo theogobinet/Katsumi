@@ -4,6 +4,7 @@
 from core.bytesManager import b_op, splitBytes, circularRotation, zfill_b, swapPos
 import time
 import core.config as config
+from core.galois import invertGalois 
 
 #################################################
 ############ Key Schedule #######################
@@ -42,8 +43,6 @@ def set_key(km="y/B?E(H+MbQeThVm".encode()):
 ############### Algorithm #######################
 #################################################
 def kasumi (arr, encrypt=True):
-
-
     if(len(arr) > 8):
         return "Error: Kasumi takes 64 bits as 8 bytes array in input"
     else:
@@ -91,6 +90,8 @@ def FL(pKL, arr):
         lp = b_op(circularRotation(b_op(rp,pKL[1],"OR"), 0, 1), l, "XOR")
 
         # Inverted in Galois Field
+        rp = invertGalois(rp)
+        lp = invertGalois(lp)
 
         return rp + lp
 

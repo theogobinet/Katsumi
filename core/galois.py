@@ -5,10 +5,39 @@ from math import floor
 from core.utils import millerR, primeFactors
 import core.config as config
 
-def poly_mult(A,B,nZ):
-    """Polynomial multiplication in nZ."""
-    return np.poly1d([elt%2 for elt in A*B])
 
+def poly_mult(A,B,nZ=2):
+    """Polynomial multiplication in nZ."""
+
+    A,B=np.poly1d(A),np.poly1d(B)
+
+    if  not isinstance(nZ, int) :
+        print("[INFO] nZ wasn't an integer, it'll be converted to an integer.")
+
+    return np.poly1d([round(elt%nZ) for elt in A*B])
+
+def poly_mult_mod(A,B,mod,nZ=2):
+    """Polynomial multiplication in nZ with modular output."""
+
+    remainder=np.polydiv(poly_mult(A,B,nZ),mod)[1]
+
+    return np.poly1d(positive_nZ(remainder,nZ))
+
+def positive_nZ(poly,nZ=2):
+    """
+    To avoid negative elt and being always in nZ.
+    
+    poly: np.poly1d type's needed.
+    """
+    inZn=[]
+
+    for elt in poly:
+        elt=round(elt)
+        if elt < 0 :
+            elt+=nZ
+        inZn.append(elt)
+
+    return np.poly1d(inZn)
 
 def poly_exp_mod(P,exp,mod,nZ=2):
     """
@@ -19,6 +48,8 @@ def poly_exp_mod(P,exp,mod,nZ=2):
     mod: polynial to be coungruent to
     nZ: into Zn
     """
+
+    P=np.poly1d(P)
 
     if mod == np.poly1d([1]):
         return 0
@@ -35,14 +66,7 @@ def poly_exp_mod(P,exp,mod,nZ=2):
         # Updating P
         P=np.polydiv(poly_mult(P,P,nZ),mod)[1]
 
-    inZn=[]
-    # To avoid negative elt and being always in positive modulo
-    for elt in res:
-        if elt < 0 :
-            elt+=nZ
-        inZn.append(elt)
-
-    return np.poly1d(inZn)
+    return np.poly1d(positive_nZ(res,nZ))
 
 
 def gen_GL(poly,degree,p=2,Zn=2):
@@ -74,6 +98,7 @@ def gen_GL(poly,degree,p=2,Zn=2):
         # α(x)^(p^n-1) % f(x) == 1
         firstTest=poly_exp_mod(gen,pn1,poly,Zn)
         if firstTest==un:
+            config.INVERT_EXPO=pn1
             isGood=True  
             for elt in q:
                 # α(x)^((p^n-1)/q) % f(x) != 1, for all q that are prime factors of p^n-1
@@ -87,13 +112,13 @@ def gen_GL(poly,degree,p=2,Zn=2):
     return goodGen
 
 
-def invertGalois(A,bytes=True):
+def invertGalois(A):
     """
     Invert given Array in a Galois Field degree in Zn.
 
-    /!\ You need to initialize the Galois_Field with GF(degree).git/
+    /!\ You need to initialize the Galois_Field with GF(degree)
 
-    bytes : Enter True if you treat a bytearray.
+    NB: If A is a bytearray, it'll be treated as one - don't worry.
     
     """
 
@@ -103,12 +128,14 @@ def invertGalois(A,bytes=True):
     import numpy as np
 
     bits=A
+    res = None
 
-    if bytes:
+    if isinstance(A,bytearray):
         bits=[int(b) for b in ''.join(['{:08b}'.format(x) for x in A])]
 
     A=np.poly1d(bits)
     gen=config.GENERATOR
+
 
     for i in range(1,config.NBR_ELEMENTS):
 
@@ -119,17 +146,19 @@ def invertGalois(A,bytes=True):
             # alpha ^ exposant = inverted
             res = poly_exp_mod(gen,exposant,config.IRRED_POLYNOMIAL)
             
-            return [elt for elt in res]
+            print(res)
+
+            res = [elt for elt in res]
 
     
-    return None
+    return res
 
 
 def GF(degree,p=2,Zn=2):
     """Initialize the Galois Field GF(p^degree) in Zn."""
-    config.NBR_ELEMENTS = degree ** p 
+    config.NBR_ELEMENTS = p ** degree 
     config.GENERATOR = gen_GL(config.IRRED_POLYNOMIAL,degree,p,Zn)
     return None
-    
+
 
 
