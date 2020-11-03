@@ -8,6 +8,7 @@ def initVar():
     config.WATCH_WRITE_TIME = 0
     config.WATCH_BLOC_KASUMI = 0
     config.WATCH_GLOBAL_KASUMI = 0
+    config.WATCH_GALOIS_INVERSION = 0
     config.WATCH_BLOC_CIPHER = 0
     config.WATCH_GLOBAL_CIPHER = 0
     config.WATCH_PERCENTAGE = 0.001

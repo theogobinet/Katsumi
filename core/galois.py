@@ -4,7 +4,14 @@ import numpy as np
 from math import floor
 from core.utils import millerR, primeFactors
 import core.config as config
+from core.bytesManager import bits_compactor, bits_extractor
 
+def polydiv_mod(A,B,nZ=2):
+    """Polynomial division in nZ"""
+    
+    buffer=np.polydiv(A,B)
+
+    return (np.poly1d([round(elt%nZ) for elt in buffer[0]]) , np.poly1d([round(elt%nZ) for elt in buffer[1] ]) )
 
 def poly_mult(A,B,nZ=2):
     """Polynomial multiplication in nZ."""
@@ -49,24 +56,24 @@ def poly_exp_mod(P,exp,mod,nZ=2):
     nZ: into Zn
     """
 
-    P=np.poly1d(P)
+    P,mod=np.poly1d(P),np.poly1d(mod)
 
     if mod == np.poly1d([1]):
         return 0
 
     res=np.poly1d([1])
-    P=np.polydiv(P,mod)[1]
+    P=polydiv_mod(P,mod,nZ)[1]
 
     while (exp>0) :
         if(exp%2==1):
-            res=np.polydiv(poly_mult(P,res,nZ),mod)[1]
+            res=polydiv_mod(poly_mult_mod(P,res,mod,nZ),mod,nZ)[1]
         
         # Deleting LSB
         exp=floor((exp/2))
         # Updating P
-        P=np.polydiv(poly_mult(P,P,nZ),mod)[1]
+        P=polydiv_mod(poly_mult_mod(P,P,mod,nZ),mod,nZ)[1]
 
-    return np.poly1d(positive_nZ(res,nZ))
+    return positive_nZ(res,nZ)
 
 
 def gen_GL(poly,degree,p=2,Zn=2):
@@ -98,7 +105,6 @@ def gen_GL(poly,degree,p=2,Zn=2):
         # α(x)^(p^n-1) % f(x) == 1
         firstTest=poly_exp_mod(gen,pn1,poly,Zn)
         if firstTest==un:
-            config.INVERT_EXPO=pn1
             isGood=True  
             for elt in q:
                 # α(x)^((p^n-1)/q) % f(x) != 1, for all q that are prime factors of p^n-1
@@ -112,13 +118,17 @@ def gen_GL(poly,degree,p=2,Zn=2):
     return goodGen
 
 
-def invertGalois(A):
+def invertGalois(A,output=1):
     """
     Invert given Array in a Galois Field degree in Zn.
 
     /!\ You need to initialize the Galois_Field with GF(degree)
 
-    NB: If A is a bytearray, it'll be treated as one - don't worry.
+    output: 0 for an array
+            1 for a polynomial
+            2 for bytes
+
+    NB: If A is a bytearray or bytes, it'll be treated as one - don't worry.
     
     """
 
@@ -127,31 +137,27 @@ def invertGalois(A):
 
     import numpy as np
 
-    bits=A
-    res = None
+    bits=np.poly1d(A)
 
-    if isinstance(A,bytearray):
+    if isinstance(A,bytearray) or isinstance(A,bytes):
         bits=[int(b) for b in ''.join(['{:08b}'.format(x) for x in A])]
 
     A=np.poly1d(bits)
-    gen=config.GENERATOR
-
-
-    for i in range(1,config.NBR_ELEMENTS):
-
-        test=poly_exp_mod(gen,i,config.IRRED_POLYNOMIAL)
-
-        if test == A:
-            exposant=config.NBR_ELEMENTS-1-i
-            # alpha ^ exposant = inverted
-            res = poly_exp_mod(gen,exposant,config.IRRED_POLYNOMIAL)
             
-            print(res)
+    # alpha ^ p^n - 2 = inverted
+    res = poly_exp_mod(config.GENERATOR,config.NBR_ELEMENTS-2,config.IRRED_POLYNOMIAL)
 
-            res = [elt for elt in res]
+    if output==0:
+        return list(res)
+    elif output==1:
+        return res
+    elif output==2:
+        return bits_compactor(list(res))
+    else:
+        return None
 
     
-    return res
+
 
 
 def GF(degree,p=2,Zn=2):

@@ -18,6 +18,16 @@ def bytes_needed(n):
         return 1
     return int(log(n, 256)) + 1
 
+def bits_extractor(byteA):
+    """Take ether bytes or bytearray and return an array of bits."""
+    return [int(b) for b in ''.join(['{:08b}'.format(x) for x in byteA])]
+
+def bits_compactor(bits:list):
+    """Take an array of bits as input and return bytes."""
+
+    s=''.join(['{:01b}'.format(x) for x in bits])
+    return int(s, 2).to_bytes(len(s) // 8, byteorder='big')
+
 
 def findFile(ext=""):
     """To find a file given extension and return is name."""
@@ -61,7 +71,8 @@ def fileToBytes(file,message=True):
         return data
 
 def codeOut(thing,coded=True,inFile=True):
-    '''Choose what to do with the text (ciphered or not) and deal with it.
+    '''
+    Choose what to do with the text (ciphered or not) and deal with it.
 
     thing : Array of bytesArrays
     '''
@@ -119,7 +130,11 @@ def zfill_b(byteA,n:int):
     return byteA
 
 def b_op(b1,b2,ope="XOR"):
-    """Bitwise operation between two bytes arrays (XOR, AND, OR available)"""
+    """
+    Bitwise operation between two bytes arrays (XOR, AND, OR available)
+    
+    Output: bytes
+    """
     
     by=0
     m=max(len(b1),len(b2))
@@ -147,7 +162,11 @@ def splitBytes(data,n=8):
     return [data[i:i+n] for i in range(0, len(data), n)]
 
 def packSplittedBytes(pSplitted):
-    """Unsplit splitted array of bytes."""
+    """
+    Unsplit splitted array of bytes.
+
+    Output: byterarray
+    """
     
     packed=bytearray()
     for elt in pSplitted:
@@ -156,7 +175,11 @@ def packSplittedBytes(pSplitted):
     return packed
 
 def circularRotation(arr, dir=0,n=1): 
-    '''Circular shift to dir (left=0, right=1) of n (=1 by default) bits'''
+    '''
+    Circular shift to dir (left=0, right=1) of n (=1 by default) bits
+    
+    Output: bytes
+    '''
 
     nB = len(arr)*8
     arrInt = int.from_bytes(arr,'big')
@@ -165,9 +188,9 @@ def circularRotation(arr, dir=0,n=1):
     size = int("0x" + "".join(["FF" for _ in range(0,len(arr))]),16)
 
     # ((arrInt << n)        shift to left, create 0 to the right
-    # (arrInt >> (nB - n))) get all bytes from left who needs to go right to the right, rest is 0
+    # (arrInt >> (nB - n))) get all bytes from left who needs to go right to the right, remainder is 0
     # AND                   the two bytes
-    # & size                remove from left the oversize bits
+    # & size                remove from left the oversized bits
 
     r = 0
 

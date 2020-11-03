@@ -90,8 +90,9 @@ def FL(pKL, arr):
         lp = b_op(circularRotation(b_op(rp,pKL[1],"OR"), 0, 1), l, "XOR")
 
         # Inverted in Galois Field
-        rp = invertGalois(rp)
-        lp = invertGalois(lp)
+        rp = invertGalois(rp,2)
+        lp = invertGalois(lp,2)
+
 
         return rp + lp
 
