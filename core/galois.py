@@ -39,7 +39,7 @@ def positive_nZ(poly,nZ=2):
     inZn=[]
 
     for elt in poly:
-        elt=round(elt)
+        elt=int(round(elt))
         if elt < 0 :
             elt+=nZ
         inZn.append(elt)
@@ -139,23 +139,21 @@ def invertGalois(A,output=1):
             1 for a polynomial
             2 for bytes
 
-    NB: If A is a bytearray or bytes, it'll be treated as one - don't worry.
+    NB: input of bytearray and bytes acccepted. 
     
     """
 
     # A(x) . A(x)^-1 congruent to 1 mod P(x)
     # where P(x) irreductible polynomial of given degree
 
-    import numpy as np
-
-    bits=np.poly1d(A)
-
     if isinstance(A,bytearray) or isinstance(A,bytes):
         bits=[int(b) for b in ''.join(['{:08b}'.format(x) for x in A])]
+    else:
+        bits=np.poly1d(A)
 
     A=np.poly1d(bits)
             
-    # alpha ^ p^n - 2 = inverted
+    # A ^ p^n - 2 = inverted
     res = poly_exp_mod(A,config.NBR_ELEMENTS-2,config.IRRED_POLYNOMIAL)
 
     if output==0:
@@ -173,6 +171,3 @@ def GF(degree,p=2,Zn=2):
     config.NBR_ELEMENTS = p ** degree 
     config.GENERATOR = gen_GL(config.IRRED_POLYNOMIAL,degree,p,Zn)
     return None
-
-
-
