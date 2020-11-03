@@ -28,7 +28,7 @@ def bits_compactor(bits:list):
 
     s=''.join(['{:01b}'.format(x) for x in bits])
     i=int(s,2)
-    
+
     return i.to_bytes(bytes_needed(i), byteorder='big')
 
 
@@ -134,7 +134,7 @@ def zfill_b(byteA,n:int):
 
 def b_op(b1,b2,ope="XOR"):
     """
-    Bitwise operation between two bytes arrays (XOR, AND, OR available)
+    Bitwise operation between two bytes (XOR, AND, OR available)
     
     Output: bytes
     """
