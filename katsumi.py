@@ -142,13 +142,13 @@ def work_with_selection(pSelection):
 
         if fchoice:
             print("Please enter the filename (without .kat ext) to decrypt.")
-            answer=input("E.g: encrypted-pic.jpg (leave blank by default) : ")+".kat"
+            answer=input("E.g: encrypted-pic.jpg (leave blank by default) : ")
             
             if answer=="":
                 # Find the first .kat file in the folder
-                answer=findFile(".kat")
+                answer=findFile("kat")
         else:
-            answer=readFromUser()
+            answer=readFromUser()+".kat"
 
         print("Decryption started....")
 
@@ -247,6 +247,7 @@ def menu():
 
 
 def main():
+    #Galois field's initialization
     GF(16)
     clear()
     menu()

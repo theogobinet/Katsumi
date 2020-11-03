@@ -122,7 +122,7 @@ def invertGalois(A,output=1):
     """
     Invert given Array in a Galois Field degree in Zn.
 
-    /!\ You need to initialize the Galois_Field with GF(degree)
+    \! You need to initialize the Galois_Field with GF(degree)
 
     output: 0 for an array
             1 for a polynomial

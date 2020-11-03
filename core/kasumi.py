@@ -93,7 +93,6 @@ def FL(pKL, arr):
         rp = invertGalois(rp,2)
         lp = invertGalois(lp,2)
 
-
         return rp + lp
 
 

@@ -8,10 +8,9 @@ def initVar():
     config.WATCH_WRITE_TIME = 0
     config.WATCH_BLOC_KASUMI = 0
     config.WATCH_GLOBAL_KASUMI = 0
-    config.WATCH_GALOIS_INVERSION = 0
     config.WATCH_BLOC_CIPHER = 0
     config.WATCH_GLOBAL_CIPHER = 0
-    config.WATCH_PERCENTAGE = 0.001
+    config.WATCH_PERCENTAGE = 0.01
 
 
 def display():
@@ -32,7 +31,7 @@ def display():
         print("-- Stats --")
         print(("Total time : {:.3f} seconds").format((time.time() - config.WATCH_GLOBAL_TIME)))
         print(("Done : {:.2f}%").format(config.WATCH_PERCENTAGE))
-        print(("Time left : {:.0f} seconds").format(((100/config.WATCH_PERCENTAGE) * (time.time() - config.WATCH_GLOBAL_TIME)) - (time.time() - config.WATCH_GLOBAL_TIME)))
+        print(("Time left : {:.3f} seconds").format(((100/config.WATCH_PERCENTAGE) * (time.time() - config.WATCH_GLOBAL_TIME)) - (time.time() - config.WATCH_GLOBAL_TIME)))
         print(("Kasumi's total runtime : {:.2f}%").format((config.WATCH_GLOBAL_KASUMI/(time.time() - config.WATCH_GLOBAL_TIME)) * 100))
 
 def watch():
@@ -43,8 +42,7 @@ def watch():
     while config.WATCH_EXEC_STATUS:
 
         clear()
+        # To avoid error of Division by 0
+        if config.WATCH_PERCENTAGE == 0: config.WATCH_PERCENTAGE=0.01
         display()
         time.sleep(0.5)
-
-    clear()
-    display()

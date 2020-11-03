@@ -59,7 +59,7 @@ def run(input=findFile(".kat"),inFile=True,encrypt=False,method=3):
 
         data=fileToBytes(input)
 
-        if len(data) > 200000:
+        if len(data) > 100000:
             thread = Thread(target = watch)
             thread.daemon = True
             config.WATCH_EXEC_STATUS = True

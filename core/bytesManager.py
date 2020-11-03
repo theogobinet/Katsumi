@@ -37,7 +37,7 @@ def findFile(ext=""):
     if ext=="":
         # Return the first file in the directory that is not crypted
         for f in os.listdir(os.path.join(THIS_FOLDER,"share/")):
-            if not(f.endswith(".kat")):
+            if not(f.endswith("kat")):
                 name=f
     else:
         for f in os.listdir(os.path.join(THIS_FOLDER,"share/")):
