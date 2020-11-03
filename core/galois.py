@@ -39,7 +39,7 @@ def positive_nZ(poly,nZ=2):
     inZn=[]
 
     for elt in poly:
-        elt=int(round(elt))
+        elt=int(round(elt%nZ))
         if elt < 0 :
             elt+=nZ
         inZn.append(elt)
