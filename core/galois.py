@@ -118,6 +118,17 @@ def gen_GL(poly,degree,p=2,Zn=2):
     return goodGen
 
 
+def genElts():
+    """Generate the list of elements sorted by alpha^n."""
+    # When you get the generator, use it to generate proper list of elements
+    config.ALPHA_ELEMENTS=[]
+    for expo in range(0,config.NBR_ELEMENTS):
+        config.ALPHA_ELEMENTS.append(poly_exp_mod(config.GENERATOR,expo,config.IRRED_POLYNOMIAL))
+    
+    return True
+
+
+
 def invertGalois(A,output=1):
     """
     Invert given Array in a Galois Field degree in Zn.
@@ -145,7 +156,7 @@ def invertGalois(A,output=1):
     A=np.poly1d(bits)
             
     # alpha ^ p^n - 2 = inverted
-    res = poly_exp_mod(config.GENERATOR,config.NBR_ELEMENTS-2,config.IRRED_POLYNOMIAL)
+    res = poly_exp_mod(A,config.NBR_ELEMENTS-2,config.IRRED_POLYNOMIAL)
 
     if output==0:
         return list(res)
@@ -155,9 +166,6 @@ def invertGalois(A,output=1):
         return bits_compactor(list(res))
     else:
         return None
-
-    
-
 
 
 def GF(degree,p=2,Zn=2):

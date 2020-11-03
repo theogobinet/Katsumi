@@ -13,7 +13,8 @@ def swapPos(list, pos1, pos2):
     list[pos1], list[pos2] = list[pos2], list[pos1] 
     return list
 
-def bytes_needed(n):
+def bytes_needed(n:int):
+    """Return bytes needed to encode an integer."""
     if n == 0:
         return 1
     return int(log(n, 256)) + 1
@@ -26,7 +27,9 @@ def bits_compactor(bits:list):
     """Take an array of bits as input and return bytes."""
 
     s=''.join(['{:01b}'.format(x) for x in bits])
-    return int(s, 2).to_bytes(len(s) // 8, byteorder='big')
+    i=int(s,2)
+    
+    return i.to_bytes(bytes_needed(i), byteorder='big')
 
 
 def findFile(ext=""):
