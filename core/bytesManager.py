@@ -9,6 +9,14 @@ THIS_FOLDER = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 file_name=""
 without_ext=""
 
+
+
+def int_to_bits(i:int):
+    """Take an integer as input and return the bits written version."""
+    nOfBits=bytes_needed(i)
+
+    return "{:0{}b}".format(i,nOfBits)
+
 def swapPos(list, pos1, pos2): 
     list[pos1], list[pos2] = list[pos2], list[pos1] 
     return list
