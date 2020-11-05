@@ -5,6 +5,7 @@ from math import floor
 from core.utils import millerR, primeFactors
 import core.config as config
 from core.bytesManager import bits_compactor, bits_extractor, bytes_to_int, zfill_b, bytes_needed, int_to_bytes
+import time
 
 #### Operations
 
@@ -245,11 +246,11 @@ def GF2(degree):
     config.IRRED_POLYNOMIAL = int.from_bytes(bits_compactor(config.IRRED_POLYNOMIAL),"big")
     config.GENERATOR = gen_GL_2(config.IRRED_POLYNOMIAL,degree)
 
-    from core.interactions import query_yn
+    from core.interactions import query_yn, clear
 
     if query_yn("- Do you want to generate the inverse dictionary's ? (No if file exist) "):
         
-        from core.interactions import clear
+        
         import threading
         import time
         import sys
@@ -265,4 +266,5 @@ def GF2(degree):
 
     else:
         from core.interactions import extractVarFromFile
+        clear()
         config.INVERSIONS_DICT=extractVarFromFile("inversion_dict")
