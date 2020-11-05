@@ -4,6 +4,7 @@
 from core.galois import *
 from core.bytesManager import *
 from core.utils import *
+from interactions import *
 import matplotlib.pyplot as plt
 import sys
 import sympy as sym
@@ -160,11 +161,9 @@ def tablesOpe(GF,mod,Zn=2):
     plus[0][0]="(x)"
 
     for i,u in enumerate(elts):
-        pU=printPoly(u)
         i+=1
         for j,d in enumerate(elts):
             j+=1
-            pD=printPoly(d)
             calc=poly_mult_mod(u,d,mod)
             pCalc=printPoly(calc)
             plus[i][j]=pCalc

@@ -4,7 +4,7 @@
 from math import floor
 from core.utils import millerR, primeFactors
 import core.config as config
-from core.bytesManager import bits_compactor, bits_extractor, zfill_b, bytes_needed
+from core.bytesManager import bits_compactor, bits_extractor, bytes_to_int, zfill_b, bytes_needed, int_to_bytes
 
 #### Operations
 
@@ -153,6 +153,31 @@ def genElts_2():
     
     return True
 
+
+def lookUpInverse2(key:object):
+    """
+    Invert given {array of bits, bytes, int} in GF()
+
+    ! You need to initialize the Galois_Field before !
+    ! You need to have a dictionary file available !
+
+    Output: bytes
+    
+    """
+
+    if isinstance(key,list):
+        toInv=bits_compactor(key)
+    elif isinstance(key,int):
+        toInv=int_to_bytes(key)
+    else:
+        toInv=key
+
+    inv=config.INVERSIONS_DICT.get(bytes_to_int(toInv))
+    d=int(config.DEGREE/8)
+
+    return zfill_b(inv,d)
+
+
 def invertGalois2_alpha(A):
     """Inversion method with lookup table."""
     A=int.from_bytes(A,"big")
@@ -178,13 +203,26 @@ def invertGalois2(A:bytes):
     # where P(x) irreductible polynomial of given degree
     # A ^ p^n - 2 = inverted
 
-    inv=poly_exp_mod_2(int.from_bytes(A,"big"),config.NBR_ELEMENTS-2,config.IRRED_POLYNOMIAL)
+    inv=poly_exp_mod_2(bytes_to_int(A),config.NBR_ELEMENTS-2,config.IRRED_POLYNOMIAL)
     inv=inv.to_bytes(bytes_needed(inv),"big")
     d=int(config.DEGREE/8)
 
     return zfill_b(inv,d)
 
+def genInverses():
+    """Generates a list of elements and their respective inverses."""
+    from core.interactions import writeVartoFile
 
+    print("\n Inverses are going to be generated.")
+
+    # Iterator (key,values)
+    zip_iterator = zip(config.ELEMENTS, [invertGalois2(int_to_bytes(elt)) for elt in config.ELEMENTS])
+
+    config.INVERSIONS_DICT = dict(zip_iterator)
+    writeVartoFile(config.INVERSIONS_DICT,"inversion_dict")
+
+    print("\n\t || Inverses are generated || \n")
+    
 
 
 def GF2(degree):
@@ -193,4 +231,25 @@ def GF2(degree):
     config.NBR_ELEMENTS = 2 ** degree
     config.IRRED_POLYNOMIAL = int.from_bytes(bits_compactor(config.IRRED_POLYNOMIAL),"big")
     config.GENERATOR = gen_GL_2(config.IRRED_POLYNOMIAL,degree)
-    return True
+
+    from core.interactions import query_yn
+
+    if query_yn("- Do you want to generate the inverse dictionary's ? (No if file exist) "):
+        
+        from core.interactions import clear
+        import threading
+        import time
+        import sys
+
+        th=threading.Thread(target=genInverses)
+        clear()
+        
+        # This thread dies when main thread (only non-daemon thread) exits.
+        th.daemon = True
+
+        th.start()
+        time.sleep(2)
+
+    else:
+        from core.interactions import extractVarFromFile
+        config.INVERSIONS_DICT=extractVarFromFile("inversion_dict")

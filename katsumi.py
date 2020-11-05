@@ -1,98 +1,17 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import os
-import sys
-import time
 from datetime import datetime
+from core.interactions import *
+import core.config as config
 
 from core.kasumi import kasumi
 from core.ciphers import run
-from core.bytesManager import findFile
 from core.galois_Z2 import GF2
-
-#################################################
-############ Interact Methods  ##################
-#################################################
-
-def query_yn(question, default="yes"):
-    """Ask a yes/no question via input() and return their answer."""
-
-    valid = {"yes": True, "y": True, "ye": True, "no": False, "n": False}
-
-    if default is None:
-        prompt = " [y/n] "
-    elif default == "yes":
-        prompt = " [Y/n] "
-    elif default == "no":
-        prompt = " [y/N] "
-    else:
-        raise ValueError("invalid default answer: '%s'" % default)
-
-    while True:
-        choice = input(question + prompt).lower()
-        if default is not None and choice == '':
-            return valid[default]
-        elif choice in valid:
-            return valid[choice]
-        else:
-            print("Please respond with 'yes' or 'no' (or 'y' or 'n').\n")
-
-
-def clear():
-    """Clearing the screen."""
-    if os.name == 'nt':
-        os.system("cls")
-    else:
-        os.system("clear")
-
-
-def readFromUser():
-    from sys import stdin
-
-    phrase=""
-
-    print("Enter the message there:")
-    
-    for line in stdin:
-        if line == '\n': # If empty string is read then stop the loop
-            break
-        phrase+=line
-
-    clear()
-
-    return phrase
-
 
 #################################################
 ################## Selection  ###################
 #################################################
-
-def cipher_choice():
-    clear()
-    print(" Choice cypher method : ")
-    print(" 1 - ECB \n 2 - CBC \n 3 - PCBC (Recommended)")
-
-    pCipher=select()
-
-    # Cipher verification
-    if pCipher > 3 :
-        print("Error: You didn't choose a cipher properly.")
-        time.sleep(1)
-        menu()
-
-    elif pCipher == 1:
-        answer=query_yn(" ECB is not recommended for use in cryptographic protocols. Are you sure ?")
-        if answer:
-            clear()
-            return pCipher
-        else: 
-            clear()
-            return cipher_choice()
-
-    clear()
-    return pCipher
-
 
 def work_with_selection(pSelection):
     """Interact with others py functions depending on user choice."""
@@ -196,17 +115,6 @@ def work_with_selection(pSelection):
     
     return None
 
-def select():
-    while True :
-        try:
-            selection=int(input("\n - Please enter your choice: "))
-        except ValueError:
-            print("Hmm.. Nope. Repeat please !")
-            continue
-        else:
-            return selection
-
-
 #################################################
 ################## MENU  ########################
 #################################################
@@ -247,9 +155,11 @@ def menu():
 
 
 def main():
+    clear()
+
     #Galois field's initialization
     GF2(16)
-    clear()
+
     menu()
 
 

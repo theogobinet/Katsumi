@@ -4,23 +4,26 @@
 import os
 from math import log
 
-THIS_FOLDER = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+import core.config as config
 
-file_name=""
-without_ext=""
-
-
+def bytes_to_int(b:bytes):
+    """Take bytes as input and return associated integer."""
+    return int().from_bytes(b,"big")
 
 def int_to_bits(i:int):
     """Take an integer as input and return the bits written version."""
     return "{:0{}b}".format(i,i.bit_length())
+
+def int_to_bytes(i:int):
+    """Take an integer as input and return the bytes written version"""
+    return i.to_bytes(bytes_needed(i),"big")
 
 def swapPos(list, pos1, pos2): 
     list[pos1], list[pos2] = list[pos2], list[pos1] 
     return list
 
 def bytes_needed(n:int):
-    """Return bytes needed to encode an integer."""
+    """Return BYTES needed to encode an integer."""
     if n == 0:
         return 1
     return int(log(n, 256)) + 1
@@ -38,23 +41,8 @@ def bits_compactor(bits:list):
     return i.to_bytes(bytes_needed(i), byteorder='big')
 
 
-def findFile(ext=""):
-    """To find a file given extension and return is name."""
-
-    name=""
-
-    if ext=="":
-        # Return the first file in the directory that is not crypted
-        for f in os.listdir(os.path.join(THIS_FOLDER,"share/")):
-            if not(f.endswith("kat")):
-                name=f
-    else:
-        for f in os.listdir(os.path.join(THIS_FOLDER,"share/")):
-            if f.endswith(ext):
-                name=f
-
-    return name
-
+file_name=""
+without_ext=""
 
 def fileToBytes(file,message=True):
     """
@@ -63,7 +51,7 @@ def fileToBytes(file,message=True):
     """
 
     global file_name, without_ext
-    file_name=os.path.join(THIS_FOLDER, "share/"+file)
+    file_name=os.path.join(config.THIS_FOLDER, "share/"+file)
     without_ext=os.path.splitext(file)[0]
 
     print(f"Opening the {file} file.")
@@ -79,6 +67,8 @@ def fileToBytes(file,message=True):
     else:
         return data
 
+###################### - File Manager
+
 def codeOut(thing,coded=True,inFile=True):
     '''
     Choose what to do with the text (ciphered or not) and deal with it.
@@ -86,8 +76,7 @@ def codeOut(thing,coded=True,inFile=True):
     thing : Array of bytesArrays
     '''
 
-    import core.config as config
-    import time
+    import time 
 
     # Pack and remove null bytes added by z_filling.
     if not coded:
@@ -104,7 +93,7 @@ def codeOut(thing,coded=True,inFile=True):
             katFile=open(file_name+".kat","wb")
             katFile.write(bytes(packed))
         else:
-            katFile=open(os.path.join(THIS_FOLDER,"share/decrypted-"+without_ext),"wb")
+            katFile=open(os.path.join(config.THIS_FOLDER,"share/decrypted-"+without_ext),"wb")
             katFile.write(bytes(packed))
         
         katFile.close()

@@ -1,3 +1,7 @@
+import os
+
+THIS_FOLDER = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
 # Keys
 KL1 = []
 KL2 = []
@@ -22,10 +26,11 @@ WATCH_GLOBAL_TIME = 0
 
 
 # Galois Field
+DEGREE = 0
 ALPHA_ELEMENTS = []
 ELEMENTS = []
 NBR_ELEMENTS = 0
 # GF(2^16) [1,0,0,0,1,0,0,0,0,1,0,0,0,0,1,0,1] -> 
 IRRED_POLYNOMIAL= [1,0,0,0,1,0,0,0,0,1,0,0,0,0,1,0,1]
 GENERATOR = 0
-DEGREE = 0
+INVERSIONS_DICT = None

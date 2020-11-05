@@ -2,7 +2,8 @@
 # -*- coding: utf-8 -*-
 
 from core.kasumi import kasumi, set_key
-from core.bytesManager import b_op, splitBytes, zfill_b, findFile, bytes_needed
+from core.bytesManager import b_op, splitBytes, zfill_b, bytes_needed
+from core.interactions import findFile
 import time
 import core.config as config
 

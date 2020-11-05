@@ -4,7 +4,7 @@
 from core.bytesManager import b_op, splitBytes, circularRotation, zfill_b, swapPos
 import time
 import core.config as config
-from core.galois_Z2 import invertGalois2
+from core.galois_Z2 import lookUpInverse2
 
 #################################################
 ############ Key Schedule #######################
@@ -94,8 +94,8 @@ def FL(pKL, arr):
         lp = b_op(circularRotation(b_op(rp,pKL[1],"OR"), 0, 1), l, "XOR")
 
         # Inverted in Galois Field
-        lp=invertGalois2(lp)
-        rp=invertGalois2(rp)
+        lp=lookUpInverse2(lp)
+        rp=lookUpInverse2(rp)
 
         return lp+rp
 
@@ -172,3 +172,5 @@ def initRC4(masterKey):
 
 
     return True
+
+
