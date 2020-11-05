@@ -28,6 +28,7 @@ def poly_mult_mod_2(a:int, b:int, mod:int):
         Return the modular multiplication in Z2
     '''
     return (poly_mod_2(poly_mult_2(a, b), mod))
+    
 
 def poly_mod_2(a:int, mod:int):
     '''

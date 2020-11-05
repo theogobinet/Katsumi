@@ -10,23 +10,28 @@ def swapPos(list, pos1, pos2):
     list[pos1], list[pos2] = list[pos2], list[pos1] 
     return list
 
-def euclid(a:int,b:int):  
+def euclid(a:int,b:int,Verbose=False):  
     
     """Find the Greatest Common Divisor of number a and b."""
     
     # The GCD of two relative integers is equal to the GCD of their absolute values.
     a,b=abs(a),abs(b) 
-    # The GCD of two relative integers is equal to the GCD of their absolute values.
-    
+
     # The largest of the two numbers is replaced by the remainder of the Euclidean division of the larger 
     # number by the smaller one. 
     if (b==0) :
         return a
     elif (b>a) :
-        return euclid(b,a)
+        return euclid(b,a,Verbose)
     else:
         r=a%b
-        return euclid(b,r)
+
+        if Verbose:
+            q=a//b
+            print(f"{a} = {b}*{q} + {r}")
+        
+        return euclid(b,r,Verbose)
+
 
 def euclid_ext(a:int,b:int):
     
@@ -62,8 +67,11 @@ def inv(a:int,m:int):
     
 def primeFactors(n:int):
     
-    """Decomposes an integer n into prime factors and calculates Euler’s Totient Function."""
+    """
+    Decomposes an integer n into prime factors and calculates Euler’s Totient Function.
     
+    Output: prime factors , Totient Function , Coprimes numbers
+    """
     
     if n < 2 : 
         print("By definition, A prime number (or prime) is a natural number greater than 1 that has no positive divisors other than 1 and itself.")
@@ -109,8 +117,20 @@ def primeFactors(n:int):
     # number greater than 2 
     if n > 2: 
         res.append(int(n))
+
+    prime_decompo = dict()
+
+    # Return unique numbers in list.
+    unique = []
+    for number in res:
+        if number not in unique:
+            unique.append(number)
+
+    for elt in unique:
+        prime_decompo[elt]=prime_decompo.get(elt,res.count(elt))
     
-    return res,phi_of_n,coprimes
+
+    return prime_decompo,phi_of_n,coprimes
         
 def exp_mod(a,exp,mod):
     """General method for fast computation of large positive integer powers of a number"""

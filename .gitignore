@@ -1,4 +1,4 @@
-*.ipynb
+Worksheet.ipynb
 .vscode
 __pycache__/*
 core/__pycache__/*

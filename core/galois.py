@@ -6,12 +6,31 @@ from core.utils import millerR, primeFactors
 import core.config as config
 from core.bytesManager import bits_compactor, bits_extractor
 
+
 def polydiv_mod(A,B,nZ=2):
     """Polynomial division in nZ"""
-    
     buffer=np.polydiv(A,B)
 
     return (np.poly1d([round(elt%nZ) for elt in buffer[0]]) , np.poly1d([round(elt%nZ) for elt in buffer[1] ]) )
+
+
+def poly_add(A,B,nZ=2):
+    """Polynomial multiplication in nZ."""
+
+    A,B=np.poly1d(A),np.poly1d(B)
+
+    if  not isinstance(nZ, int) :
+        print("[INFO] nZ wasn't an integer, it'll be converted to an integer.")
+
+    return np.poly1d([round(elt%nZ) for elt in A+B])
+
+
+def poly_add_mod(A,B,mod,nZ=2):
+    """Polynomial multiplication in nZ with modular output."""
+
+    remainder=np.polydiv(poly_add(A,B,nZ),mod)[1]
+
+    return np.poly1d(positive_nZ(remainder,nZ))
 
 def poly_mult(A,B,nZ=2):
     """Polynomial multiplication in nZ."""
@@ -22,6 +41,7 @@ def poly_mult(A,B,nZ=2):
         print("[INFO] nZ wasn't an integer, it'll be converted to an integer.")
 
     return np.poly1d([round(elt%nZ) for elt in A*B])
+
 
 def poly_mult_mod(A,B,mod,nZ=2):
     """Polynomial multiplication in nZ with modular output."""
@@ -80,12 +100,11 @@ def gen_GL(poly,degree,p=2,Zn=2):
     """Return generator of Galois Field's GF(p^degree) based on primitive polynomial poly in Zn."""
     # Order of multiplicative subgroup
     pn1=(p**degree)-1
-    q=None
 
     un=np.poly1d([1])
 
     if millerR(pn1):
-        q=[1]
+        q=[pn1]
     else:
         q=primeFactors(pn1)[0]
 
@@ -94,7 +113,7 @@ def gen_GL(poly,degree,p=2,Zn=2):
 
     for i in range(1,p**degree):
         bits=[int(b) for b in '{value:0{size}b}'.format(value=i,size=degree)]
-        genList.append(bits)
+        genList.append(np.poly1d(bits))
 
     config.ELEMENTS=genList
 
