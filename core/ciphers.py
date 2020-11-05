@@ -17,8 +17,10 @@ def cipher(arr,method=3,encrypt=True):
     import core.config as config
 
     # Dealing with possible last elt < 8 bytes
-    if len(arr[-1]) < 8:
-        arr[-1] = zfill_b(arr[-1],8)
+    last=arr[-1]
+
+    if len(last) < 8:
+        arr[-1] = zfill_b(last,8)
 
     if method==1: #ECB
         config.WATCH_CIPHER_TYPE = "ECB"
@@ -59,7 +61,7 @@ def run(input=findFile(".kat"),inFile=True,encrypt=False,method=3):
 
         data=fileToBytes(input)
 
-        if len(data) > 100000:
+        if len(data) > 9100000:
             thread = Thread(target = watch)
             thread.daemon = True
             config.WATCH_EXEC_STATUS = True

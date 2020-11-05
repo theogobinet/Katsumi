@@ -130,6 +130,7 @@ def gen_GL(poly,degree,p=2,Zn=2):
                 secondTest=poly_exp_mod(gen,pn1/elt,poly,Zn)
                 if secondTest == un:
                     isGood=False
+       
             if isGood:
                 goodGen=gen
                 break
@@ -187,6 +188,7 @@ def invertGalois(A,output=1):
 
 def GF(degree,p=2,Zn=2):
     """Initialize the Galois Field GF(p^degree) in Zn."""
+    config.DEGREE=degree
     config.NBR_ELEMENTS = p ** degree 
     config.GENERATOR = gen_GL(config.IRRED_POLYNOMIAL,degree,p,Zn)
     return None

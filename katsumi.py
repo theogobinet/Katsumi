@@ -9,7 +9,7 @@ from datetime import datetime
 from core.kasumi import kasumi
 from core.ciphers import run
 from core.bytesManager import findFile
-from core.galois import GF
+from core.galois_Z2 import GF2
 
 #################################################
 ############ Interact Methods  ##################
@@ -248,7 +248,7 @@ def menu():
 
 def main():
     #Galois field's initialization
-    GF(16)
+    GF2(16)
     clear()
     menu()
 

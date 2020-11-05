@@ -4,7 +4,7 @@
 from core.bytesManager import b_op, splitBytes, circularRotation, zfill_b, swapPos
 import time
 import core.config as config
-from core.galois import invertGalois 
+from core.galois_Z2 import invertGalois2
 
 #################################################
 ############ Key Schedule #######################
@@ -79,21 +79,25 @@ def kasumi (arr, encrypt=True):
 ### FL
 #######
 def FL(pKL, arr):
+   
     if(len(arr) != 4):
-        return "Error: FL takes 32 bits as 4 bytes array in input"
+        print("Error: FL takes 32 bits as 4 bytes array in input")
+        return None
     else:
         arr = splitBytes(arr,2)
         l = arr[0]
         r = arr[1]
 
+
+
         rp = b_op(circularRotation(b_op(l,pKL[0],"AND"), 0, 1), r, "XOR")
         lp = b_op(circularRotation(b_op(rp,pKL[1],"OR"), 0, 1), l, "XOR")
 
         # Inverted in Galois Field
-        rp = invertGalois(rp,2)
-        lp = invertGalois(lp,2)
+        lp=invertGalois2(lp)
+        rp=invertGalois2(rp)
 
-        return rp + lp
+        return lp+rp
 
 
 #######
@@ -102,7 +106,8 @@ def FL(pKL, arr):
 def FO(pKO, pKI, arr):
 
     if(len(arr) != 4):
-        return "Error: FO takes 32 bits as 4 bytes array in input"
+        print("Error: FO takes 32 bits as 4 bytes array in input")
+        return None
     else:
         arr = splitBytes(arr,2)
         l = arr[0]

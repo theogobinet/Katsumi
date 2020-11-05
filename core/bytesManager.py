@@ -13,7 +13,7 @@ without_ext=""
 
 def int_to_bits(i:int):
     """Take an integer as input and return the bits written version."""
-    return "{:0{}b}".format(i,i.bit_length)
+    return "{:0{}b}".format(i,i.bit_length())
 
 def swapPos(list, pos1, pos2): 
     list[pos1], list[pos2] = list[pos2], list[pos1] 
@@ -126,17 +126,20 @@ def codeOut(thing,coded=True,inFile=True):
 
 
 def zfill_b(byteA,n:int):
-    """Fill ByteArray till length n."""
+    """
+    Fill byte till length n.
 
-    try:
+    Output: bytes
+    
+    """
+
+    if not isinstance(byteA,bytearray):
         byteA = bytearray(byteA)
-    except TypeError:
-        print(byteA)
 
     while n > len(byteA) :
         byteA.insert(0,0)
 
-    return byteA
+    return bytes(byteA)
 
 def b_op(b1,b2,ope="XOR"):
     """
@@ -151,7 +154,7 @@ def b_op(b1,b2,ope="XOR"):
     if len(b1) != len(b2):
         b1 = zfill_b(b1,m)
         b2 = zfill_b(b2,m)
-    
+
     b1 = int().from_bytes(b1,"big")
     b2 = int().from_bytes(b2,"big")
 

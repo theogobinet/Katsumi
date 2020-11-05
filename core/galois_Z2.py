@@ -1,6 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+from math import floor
+from core.utils import millerR, primeFactors
+import core.config as config
+from core.bytesManager import bits_compactor, bits_extractor, zfill_b, bytes_needed
+
+#### Operations
+
 def poly_mult_2(a:int , b:int):
     '''
         Return binary multplication in Z2
@@ -73,3 +80,116 @@ def poly_mod_2(a:int, mod:int):
         for i in range(len(c)):
             c[i] = c[i] % 2
         return  int("".join([str(x) for x in reversed(c)]),2)
+
+#######
+def poly_exp_mod_2(P:int,exp:int,mod:int):
+    """
+    General method for fast computation of polynomials powers of a number.
+    
+    P: Polynomial
+    exp: exposant
+    mod: polynial to be coungruent to
+    """
+    if mod == 1:
+        return 0
+
+    res=1
+    P=poly_mod_2(P,mod)
+
+    while (exp>0) :
+        if(exp%2==1):
+            res=poly_mod_2(poly_mult_mod_2(P,res,mod),mod)
+        
+        # Deleting LSB
+        exp=floor((exp/2))
+        # Updating P
+        P=poly_mod_2(poly_mult_mod_2(P,P,mod),mod)
+
+    return res
+#######
+def gen_GL_2(poly,degree):
+    """Return generator of Galois Field's GF(p^degree) based on primitive polynomial poly in Zn."""
+    # Order of multiplicative subgroup
+    pn1=(2**degree)-1
+
+    if millerR(pn1):
+        q=[pn1]
+    else:
+        q=primeFactors(pn1)[0]
+
+    config.ELEMENTS=[i for i in range(2**degree)]
+    genList=config.ELEMENTS
+
+    goodGen=None
+
+    for gen in genList:
+
+        # α(x)^(p^n-1) % f(x) == 1
+        firstTest=poly_exp_mod_2(gen,pn1,poly)
+
+        if firstTest == 1:
+            isGood=True 
+            for elt in q:
+                # α(x)^((p^n-1)/q) % f(x) != 1, for all q that are prime factors of p^n-1
+                secondTest=poly_exp_mod_2(gen,pn1/elt,poly)
+
+                # DO NOT REPLACE WITH 'if secondTest', i don't know why but it doesn't work otherwise.
+                if secondTest == 1:
+                    isGood=False
+
+            if isGood:
+                goodGen=gen
+                break
+
+    return goodGen
+
+
+def genElts_2():
+    """Generate the list of elements sorted by alpha^n."""
+    # When you get the generator, use it to generate proper list of elements
+    config.ALPHA_ELEMENTS=[]
+    for expo in range(0,config.NBR_ELEMENTS):
+        config.ALPHA_ELEMENTS.append(poly_exp_mod_2(config.GENERATOR,expo,config.IRRED_POLYNOMIAL))
+    
+    return True
+
+def invertGalois2_alpha(A):
+    """Inversion method with lookup table."""
+    A=int.from_bytes(A,"big")
+    i=config.ALPHA_ELEMENTS.index(A)
+    expo=2**config.DEGREE - 1 - i
+
+    inv=poly_exp_mod_2(config.GENERATOR,expo,config.IRRED_POLYNOMIAL)
+    inv=inv.to_bytes(bytes_needed(inv),"big")
+    d=int(config.DEGREE/8)
+
+    return zfill_b(inv,d)
+
+def invertGalois2(A:bytes):
+    """
+    Invert given bytes in GF(2^degree)
+
+    ! You need to initialize the Galois_Field with GF2(degree)
+
+    Output: bytes
+    
+    """
+    # A(x) . A(x)^-1 congruent to 1 mod P(x)
+    # where P(x) irreductible polynomial of given degree
+    # A ^ p^n - 2 = inverted
+
+    inv=poly_exp_mod_2(int.from_bytes(A,"big"),config.NBR_ELEMENTS-2,config.IRRED_POLYNOMIAL)
+    inv=inv.to_bytes(bytes_needed(inv),"big")
+    d=int(config.DEGREE/8)
+
+    return zfill_b(inv,d)
+
+
+
+def GF2(degree):
+    """Initialize the Galois Field GF(p^degree) in Zn."""
+    config.DEGREE=degree
+    config.NBR_ELEMENTS = 2 ** degree
+    config.IRRED_POLYNOMIAL = int.from_bytes(bits_compactor(config.IRRED_POLYNOMIAL),"big")
+    config.GENERATOR = gen_GL_2(config.IRRED_POLYNOMIAL,degree)
+    return True
