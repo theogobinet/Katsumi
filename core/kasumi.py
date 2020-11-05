@@ -47,6 +47,7 @@ def kasumi (arr, encrypt=True):
         return "Error: Kasumi takes 64 bits as 8 bytes array in input"
     else:
 
+        config.WATCH_KASUMI_NUMBER += 1
         exTime = time.time()
 
         arr = splitBytes(arr,4)
