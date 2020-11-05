@@ -34,7 +34,14 @@ def poly_mult_mod_2(a:int, b:int, mod:int):
     '''
         Return the modular multiplication in Z2
     '''
-    return (poly_mod_2(poly_mult_2(a, b), mod))
+    config.WATCH_MULT_NUMBER += 1
+    exTime = time.time()
+
+    result = poly_mod_2(poly_mult_2(a, b), mod)
+
+    config.WATCH_GLOBAL_MULT += time.time() - exTime
+
+    return result
     
 
 def poly_mod_2(a:int, mod:int):
@@ -199,6 +206,10 @@ def invertGalois2(A:bytes):
     Output: bytes
     
     """
+
+    config.WATCH_INVERSION_NUMBER += 1
+    exTime = time.time()
+
     # A(x) . A(x)^-1 congruent to 1 mod P(x)
     # where P(x) irreductible polynomial of given degree
     # A ^ p^n - 2 = inverted
@@ -206,6 +217,8 @@ def invertGalois2(A:bytes):
     inv=poly_exp_mod_2(bytes_to_int(A),config.NBR_ELEMENTS-2,config.IRRED_POLYNOMIAL)
     inv=inv.to_bytes(bytes_needed(inv),"big")
     d=int(config.DEGREE/8)
+
+    config.WATCH_GLOBAL_INVERSION += time.time() - exTime
 
     return zfill_b(inv,d)
 
