@@ -98,12 +98,12 @@ def poly_exp_mod_2(P:int,exp:int,mod:int):
 
     while (exp>0) :
         if(exp%2==1):
-            res=poly_mod_2(poly_mult_mod_2(P,res,mod),mod)
+            res=poly_mult_mod_2(P,res,mod)
         
         # Deleting LSB
         exp=floor((exp/2))
         # Updating P
-        P=poly_mod_2(poly_mult_mod_2(P,P,mod),mod)
+        P=poly_mult_mod_2(P,P,mod)
 
     return res
 #######
@@ -183,6 +183,7 @@ def invertGalois2(A:bytes):
     d=int(config.DEGREE/8)
 
     return zfill_b(inv,d)
+
 
 
 
