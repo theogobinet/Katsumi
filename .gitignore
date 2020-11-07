@@ -1,4 +1,9 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+
 Worksheet.ipynb
 .vscode
-__pycache__/*
 share/*
+
+
