@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from core.kasumi import kasumi, set_key
-from core.bytesManager import b_op, splitBytes, zfill_b, bytes_needed
-from core.interactions import findFile
-import time
-import core.config as config
+import core.cipher.kasumi as kasu
 
+import ressources.config as config
+import ressources.bytesManager as bm
+import ressources.interactions as it
+from core.cipher.watch import watch
+
+import time
 
 #################################################
 ############ Main Method  #######################
@@ -14,14 +16,12 @@ import core.config as config
 
 def cipher(arr,method=3,encrypt=True):
     """Algorithm that uses a block cipher to provide information security such as confidentiality or authenticity."""
-    
-    import core.config as config
 
     # Dealing with possible last elt < 8 bytes
     last=arr[-1]
 
     if len(last) < 8:
-        arr[-1] = zfill_b(last,8)
+        arr[-1] = bm.zfill_b(last,8)
 
     if method==1: #ECB
         config.WATCH_CIPHER_TYPE = "ECB"
@@ -41,7 +41,7 @@ def cipher(arr,method=3,encrypt=True):
 
 ###### Running method to run everything:
 
-def run(input=findFile(".kat"),inFile=True,encrypt=False,method=3):
+def run(input=it.findFile(".kat"),inFile=True,encrypt=False,method=3):
 
     """
     Run encryption of decryption.
@@ -51,8 +51,6 @@ def run(input=findFile(".kat"),inFile=True,encrypt=False,method=3):
     encrypt: False to decrypte
     method: Block cyphering method
     """
-    from core.bytesManager import fileToBytes, codeOut
-    from core.watch import watch
     from threading import Thread
     
     data=bytearray()
@@ -60,7 +58,7 @@ def run(input=findFile(".kat"),inFile=True,encrypt=False,method=3):
     if inFile:
         readTime = time.time()
 
-        data=fileToBytes(input)
+        data=bm.fileToBytes(input)
 
         if len(data) > 100000:
             thread = Thread(target = watch)
@@ -75,20 +73,20 @@ def run(input=findFile(".kat"),inFile=True,encrypt=False,method=3):
         else:
             try:
                 first=int(input,16)
-                bits=bytes_needed(first)
+                bits=bm.bytes_needed(first)
                 data=first.to_bytes(bits,"big")
 
             except ValueError:
                 print('ERROR : Unable to decode the message, the format of the encrypted message does not correspond to the expected one (hexadecimal).\n')
 
     # Keys initialisation
-    set_key()
+    kasu.set_key()
 
     if(len(data) > 0):
-        splitted=splitBytes(data)
+        splitted=bm.splitBytes(data)
         ciphered=cipher(splitted,method,encrypt)
     
-        return codeOut(ciphered,encrypt,inFile)
+        return bm.codeOut(ciphered,encrypt,inFile)
     
     return "Encoding failed"
 
@@ -106,7 +104,7 @@ def ECB(arr,encrypt=True):
         config.WATCH_PERCENTAGE = ((len(arr) - (len(arr) - i)) / len(arr)) * 100
         exTime = time.time()
 
-        res.append(kasumi(elt,encrypt))
+        res.append(kasu.kasumi(elt,encrypt))
 
         config.WATCH_GLOBAL_CIPHER += time.time() - exTime
         config.WATCH_BLOC_CIPHER = config.WATCH_GLOBAL_CIPHER / (i + 1)
@@ -139,14 +137,14 @@ def CBC(arr,encrypt=True):
         if i == 0:
             # Initialization
             if encrypt:
-                res.append(kasumi(b_op(iv,message,"XOR")))
+                res.append(kasu.kasumi(bm.b_op(iv,message,"XOR")))
             else:
-                res.append(b_op(kasumi(message,False),iv,"XOR"))
+                res.append(bm.b_op(kasu.kasumi(message,False),iv,"XOR"))
         else:
             if encrypt:
-                res.append(kasumi(b_op(res[i-1],message,"XOR")))
+                res.append(kasu.kasumi(bm.b_op(res[i-1],message,"XOR")))
             else:
-                res.append(b_op(kasumi(message,False),arr[i-1],"XOR"))
+                res.append(bm.b_op(kasu.kasumi(message,False),arr[i-1],"XOR"))
 
         config.WATCH_GLOBAL_CIPHER += time.time() - exTime
         config.WATCH_BLOC_CIPHER = config.WATCH_GLOBAL_CIPHER / (i + 1)
@@ -183,21 +181,21 @@ def PCBC(arr,encrypt=True):
         if i == 0:
             # Initialization (same as CBC)
             if encrypt:
-                res.append(kasumi(b_op(iv,message,"XOR")))
+                res.append(kasu.kasumi(bm.b_op(iv,message,"XOR")))
             else:
-                res.append(b_op(kasumi(message,False),iv,"XOR"))
+                res.append(bm.b_op(kasu.kasumi(message,False),iv,"XOR"))
         else:
             if encrypt:            
                 # XORing past clear message and ciphered one
-                buffer=b_op(arr[i-1],res[i-1],"XOR")
+                buffer=bm.b_op(arr[i-1],res[i-1],"XOR")
                 # XORing buffer and current clear message
-                res.append(kasumi(b_op(buffer,message,"XOR")))
+                res.append(kasu.kasumi(bm.b_op(buffer,message,"XOR")))
             else:
 
                 # XORing past ciphered and past clear message
-                buffer=b_op(arr[i-1],res[i-1],"XOR")
+                buffer=bm.b_op(arr[i-1],res[i-1],"XOR")
                 # XORing buffer and current ciphered message
-                res.append(b_op(buffer,kasumi(message,False),"XOR"))
+                res.append(bm.b_op(buffer,kasu.kasumi(message,False),"XOR"))
 
         config.WATCH_GLOBAL_CIPHER += time.time() - exTime
         config.WATCH_BLOC_CIPHER = config.WATCH_GLOBAL_CIPHER / (i + 1)

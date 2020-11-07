@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from math import floor
-from core.utils import millerR, primeFactors
-import core.config as config
-from core.bytesManager import bits_compactor, bits_extractor, bytes_to_int, zfill_b, bytes_needed, int_to_bytes
 import time
+
+import ressources.utils as utils
+import ressources.config as config
+import ressources.bytesManager as bm
+import ressources.interactions as it
+
+from math import floor
 
 #### Operations
 
@@ -120,10 +123,10 @@ def gen_GL_2(poly,degree):
     # Order of multiplicative subgroup
     pn1=(2**degree)-1
 
-    if millerR(pn1):
+    if utils.millerR(pn1):
         q=[pn1]
     else:
-        q=primeFactors(pn1)[0]
+        q=utils.primeFactors(pn1)[0]
 
     config.ELEMENTS=[i for i in range(2**degree)]
     genList=config.ELEMENTS
@@ -152,6 +155,7 @@ def gen_GL_2(poly,degree):
     return goodGen
 
 
+
 def genElts_2():
     """Generate the list of elements sorted by alpha^n."""
     # When you get the generator, use it to generate proper list of elements
@@ -161,8 +165,19 @@ def genElts_2():
     
     return True
 
+def invertGalois2_alpha(A):
+    """Inversion method with generator table."""
+    A=int.from_bytes(A,"big")
+    i=config.ALPHA_ELEMENTS.index(A)
+    expo=2**config.DEGREE - 1 - i
 
-def lookUpInverse2(key:object):
+    inv=poly_exp_mod_2(config.GENERATOR,expo,config.IRRED_POLYNOMIAL)
+    inv=inv.to_bytes(bm.bytes_needed(inv),"big")
+    d=int(config.DEGREE/8)
+
+    return bm.zfill_b(inv,d)
+
+def invertGalois2(toInv:object):
     """
     Invert given {array of bits, bytes, int} in GF()
 
@@ -173,98 +188,94 @@ def lookUpInverse2(key:object):
     
     """
 
-    if isinstance(key,list):
-        toInv=bits_compactor(key)
-    elif isinstance(key,int):
-        toInv=int_to_bytes(key)
+    d=int(config.DEGREE/8)
+    toInv=bm.mult_to_bytes(toInv)
+    
+    if config.GALOIS_WATCH or config.IN_CREATION:
+        config.WATCH_INVERSION_NUMBER += 1
+        exTime = time.time()
+
+        # A(x) . A(x)^-1 congruent to 1 mod P(x)
+        # where P(x) irreductible polynomial of given degree
+        # A ^ p^n - 2 = inverted
+
+        inv=poly_exp_mod_2(bm.bytes_to_int(toInv),config.NBR_ELEMENTS-2,config.IRRED_POLYNOMIAL)
+        inv=inv.to_bytes(bm.bytes_needed(inv),"big")
+
+        config.WATCH_GLOBAL_INVERSION += time.time() - exTime
+
     else:
-        toInv=key
+        inv=config.INVERSIONS_BOX[bm.bytes_to_int(toInv)]
 
-    inv=config.INVERSIONS_DICT.get(bytes_to_int(toInv))
-    d=int(config.DEGREE/8)
+    return bm.zfill_b(inv,d)
 
-    return zfill_b(inv,d)
-
-
-def invertGalois2_alpha(A):
-    """Inversion method with lookup table."""
-    A=int.from_bytes(A,"big")
-    i=config.ALPHA_ELEMENTS.index(A)
-    expo=2**config.DEGREE - 1 - i
-
-    inv=poly_exp_mod_2(config.GENERATOR,expo,config.IRRED_POLYNOMIAL)
-    inv=inv.to_bytes(bytes_needed(inv),"big")
-    d=int(config.DEGREE/8)
-
-    return zfill_b(inv,d)
-
-def invertGalois2(A:bytes):
-    """
-    Invert given bytes in GF(2^degree)
-
-    ! You need to initialize the Galois_Field with GF2(degree)
-
-    Output: bytes
-    
-    """
-
-    config.WATCH_INVERSION_NUMBER += 1
-    exTime = time.time()
-
-    # A(x) . A(x)^-1 congruent to 1 mod P(x)
-    # where P(x) irreductible polynomial of given degree
-    # A ^ p^n - 2 = inverted
-
-    inv=poly_exp_mod_2(bytes_to_int(A),config.NBR_ELEMENTS-2,config.IRRED_POLYNOMIAL)
-    inv=inv.to_bytes(bytes_needed(inv),"big")
-    d=int(config.DEGREE/8)
-
-    config.WATCH_GLOBAL_INVERSION += time.time() - exTime
-
-    return zfill_b(inv,d)
-
-def genInverses():
+def genInverses2():
     """Generates a list of elements and their respective inverses."""
-    from core.interactions import writeVartoFile
 
-    print("\n Inverses are going to be generated.")
+    print("\n\t || Inverses are going to be generated || \n")
+    config.IN_CREATION = True
 
-    # Iterator (key,values)
-    zip_iterator = zip(config.ELEMENTS, [invertGalois2(int_to_bytes(elt)) for elt in config.ELEMENTS])
+    config.INVERSIONS_BOX = [invertGalois2(bm.int_to_bytes(elt)) for elt in config.ELEMENTS]
+    it.writeVartoFile(config.INVERSIONS_BOX,"inversion_Sbox")
 
-    config.INVERSIONS_DICT = dict(zip_iterator)
-    writeVartoFile(config.INVERSIONS_DICT,"inversion_dict")
-
+    config.IN_CREATION = False
     print("\n\t || Inverses are generated || \n")
+
+def handleInvBox():
+
+    if not it.isFileHere("inversion_Sbox.txt"):
+
+        print("A necessary file for the substitution has been deleted from the system.\n")
+
+        if it.query_yn("- Do you want to generate the inverse substitution box (No if you want to compute each time needed) ? "):
+   
+            import threading
+            import time
+            import sys
+
+            th=threading.Thread(target=genInverses2)
+            
+            # This thread dies when main thread (only non-daemon thread) exits.
+            th.daemon = True
+
+            th.start()
+            time.sleep(2)
+
+        else:
+            config.GALOIS_WATCH = True
     
+    else:
+
+        config.INVERSIONS_BOX=it.extractVarFromFile("inversion_Sbox")
+
+        if len(config.INVERSIONS_BOX) != config.NBR_ELEMENTS:
+            it.rmFile("inversion_Sbox.txt")
+            print("WARNING - Wrong Inversion Substition box ! \n")
+            it.clear()
+            handleInvBox()
+
+
 
 
 def GF2(degree):
     """Initialize the Galois Field GF(p^degree) in Zn."""
     config.DEGREE=degree
     config.NBR_ELEMENTS = 2 ** degree
-    config.IRRED_POLYNOMIAL = int.from_bytes(bits_compactor(config.IRRED_POLYNOMIAL),"big")
+    config.IRRED_POLYNOMIAL = int.from_bytes(bm.bits_compactor(config.IRRED_POLYNOMIAL),"big")
     config.GENERATOR = gen_GL_2(config.IRRED_POLYNOMIAL,degree)
 
-    from core.interactions import query_yn, clear
+    handleInvBox()
 
-    if query_yn("- Do you want to generate the inverse dictionary's ? (No if file exist) "):
-        
-        
-        import threading
+    if config.IN_CREATION:
         import time
-        import sys
+        start=time.time()
 
-        th=threading.Thread(target=genInverses)
-        clear()
-        
-        # This thread dies when main thread (only non-daemon thread) exits.
-        th.daemon = True
+        while config.IN_CREATION:
+            it.clear()
+            print(" --- Wait for the creation please --- ")
+            print((" --- Time elapsed : {:.1f} seconds").format(time.time()-start))
+            time.sleep(1)
 
-        th.start()
-        time.sleep(2)
 
-    else:
-        from core.interactions import extractVarFromFile
-        clear()
-        config.INVERSIONS_DICT=extractVarFromFile("inversion_dict")
+
+    

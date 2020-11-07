@@ -2,12 +2,18 @@
 # -*- coding: utf-8 -*-
 
 from datetime import datetime
-from core.interactions import *
-import core.config as config
 
-from core.kasumi import kasumi
-from core.ciphers import run
-from core.galois_Z2 import GF2
+from ressources.interactions import clear
+
+import ressources.interactions as it
+import ressources.config as config
+import core.cipher.kasumi as kasu
+
+from core.cipher.ciphers import run
+from core.cipher.galois_Z2 import GF2
+
+import sys
+import time
 
 #################################################
 ################## Selection  ###################
@@ -20,8 +26,8 @@ def work_with_selection(pSelection):
 
     if pSelection == 1 :
         # Encryption
-        cipher=cipher_choice()
-        fchoice=query_yn("Do you want to encrypt a file ?")
+        cipher=it.cipher_choice()
+        fchoice=it.query_yn("Do you want to encrypt a file ?")
         answer=""
 
         if fchoice:
@@ -30,9 +36,9 @@ def work_with_selection(pSelection):
             answer=input("E.g: pic.jpg (leave blank by default): ")
             
             if answer=="":
-                answer=findFile()
+                answer=it.findFile()
         else:
-            answer=readFromUser()
+            answer=it.readFromUser()
 
 
         print("Encryption started....")
@@ -42,21 +48,21 @@ def work_with_selection(pSelection):
         end=datetime.now() - begin_time
         input(f"Encryption finished in {end} seconds !\n")
 
-        clear()
+        it.clear()
 
 
-        answer=query_yn("Do you want to do something else ?")
+        answer=it.query_yn("Do you want to do something else ?")
         if answer:
-            clear()
+            it.clear()
             return menu()
         else: 
-            clear()
+            it.clear()
             return work_with_selection(11)
 
     elif pSelection == 2 :
         # Decryption
-        cipher=cipher_choice()
-        fchoice=query_yn("Do you want to decrypt a file ?")  
+        cipher=it.cipher_choice()
+        fchoice=it.query_yn("Do you want to decrypt a file ?")  
         answer=""
 
         if fchoice:
@@ -65,9 +71,9 @@ def work_with_selection(pSelection):
             
             if answer=="":
                 # Find the first .kat file in the folder
-                answer=findFile("kat")
+                answer=it.findFile("kat")
         else:
-            answer=readFromUser()+".kat"
+            answer=it.readFromUser()+".kat"
 
         print("Decryption started....")
 
@@ -76,15 +82,15 @@ def work_with_selection(pSelection):
         end=datetime.now() - begin_time
         input(f"Decryption finished in {end} seconds !\n")
 
-        clear()
+        it.clear()
 
-        answer=query_yn("Do you want to do something else ?")
+        answer=it.query_yn("Do you want to do something else ?")
 
         if answer:
-            clear()
+            it.clear()
             return menu()
         else: 
-            clear()
+            it.clear()
             return work_with_selection(11)
 
     elif pSelection == 3 :
@@ -104,11 +110,11 @@ def work_with_selection(pSelection):
     elif pSelection == 10 :
         print("Test")
     elif pSelection == 11 :
-        clear()
+        it.clear()
         print("\t --- Goodbye M'Lord. --- \n")
         sys.exit
     else:
-        clear()
+        it.clear()
         print("\n That's not available in the given menu lad !")
         time.sleep(1)
         menu()
@@ -149,13 +155,13 @@ def menu():
     for i,elt in enumerate(choices):
         print(f"\t({i+1}) - {elt}")
 
-    selection=select()
+    selection=it.select()
 
     work_with_selection(selection)
 
 
 def main():
-    clear()
+    it.clear()
 
     #Galois field's initialization
     GF2(16)

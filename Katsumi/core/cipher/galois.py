@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
+# This ensure that you are just importing things into the __init__.py
+__all__=[]
+from core.cipher import *
+
 import numpy as np
 from math import floor
-from core.utils import millerR, primeFactors
-import core.config as config
-from core.bytesManager import bits_compactor, bits_extractor
 
 
 def polydiv_mod(A,B,nZ=2):
@@ -103,10 +105,10 @@ def gen_GL(poly,degree,p=2,Zn=2):
 
     un=np.poly1d([1])
 
-    if millerR(pn1):
+    if utils.millerR(pn1):
         q=[pn1]
     else:
-        q=primeFactors(pn1)[0]
+        q=utils.primeFactors(pn1)[0]
 
     genList=[]
     goodGen=None
@@ -181,7 +183,7 @@ def invertGalois(A,output=1):
     elif output==1:
         return res
     elif output==2:
-        return bits_compactor(list(res))
+        return bm.bits_compactor(list(res))
     else:
         return None
 

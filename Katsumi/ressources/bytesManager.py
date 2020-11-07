@@ -4,7 +4,7 @@
 import os
 from math import log
 
-import core.config as config
+import ressources.config as config
 
 def bytes_to_int(b:bytes):
     """Take bytes as input and return associated integer."""
@@ -17,6 +17,20 @@ def int_to_bits(i:int):
 def int_to_bytes(i:int):
     """Take an integer as input and return the bytes written version"""
     return i.to_bytes(bytes_needed(i),"big")
+
+def mult_to_bytes(obj:object):
+    """Convert given {array of bits, bytes, int} to bytes"""
+
+    if isinstance(obj,list):
+        res=bits_compactor(obj)
+    elif isinstance(obj,int):
+        res=int_to_bytes(obj)
+    elif isinstance(obj,bytes):
+        res=obj
+    else:
+        res=bytes(obj)
+
+    return res
 
 def swapPos(list, pos1, pos2): 
     list[pos1], list[pos2] = list[pos2], list[pos1] 
@@ -44,14 +58,14 @@ def bits_compactor(bits:list):
 file_name=""
 without_ext=""
 
-def fileToBytes(file,message=True):
+def fileToBytes(file,message=True,directory="processing/"):
     """
     Read a file and convert to bytearray.
     True if it's a .txt file with a message.
     """
 
     global file_name, without_ext
-    file_name=os.path.join(config.THIS_FOLDER, "share/"+file)
+    file_name=os.path.join(config.THIS_FOLDER, directory+file)
     without_ext=os.path.splitext(file)[0]
 
     print(f"Opening the {file} file.")
@@ -69,7 +83,7 @@ def fileToBytes(file,message=True):
 
 ###################### - File Manager
 
-def codeOut(thing,coded=True,inFile=True):
+def codeOut(thing,coded=True,inFile=True,directory="processing/"):
     '''
     Choose what to do with the text (ciphered or not) and deal with it.
 
@@ -93,7 +107,7 @@ def codeOut(thing,coded=True,inFile=True):
             katFile=open(file_name+".kat","wb")
             katFile.write(bytes(packed))
         else:
-            katFile=open(os.path.join(config.THIS_FOLDER,"share/decrypted-"+without_ext),"wb")
+            katFile=open(os.path.join(config.THIS_FOLDER,directory+"decrypted-"+without_ext),"wb")
             katFile.write(bytes(packed))
         
         katFile.close()
@@ -102,7 +116,7 @@ def codeOut(thing,coded=True,inFile=True):
         config.WATCH_EXEC_STATUS = False
         
         return ""
-
+        
     else:
         if coded:
             return packed.hex()

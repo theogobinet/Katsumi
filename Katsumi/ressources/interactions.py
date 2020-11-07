@@ -81,8 +81,8 @@ def cipher_choice():
         print("Error: You didn't choose a cipher properly.")
         time.sleep(1)
 
-        import katsumi
-        katsumi.menu()
+        from katsumi import menu
+        menu()
 
     elif pCipher == 1:
         answer=query_yn(" ECB is not recommended for use in cryptographic protocols. Are you sure ?")
@@ -100,40 +100,50 @@ def cipher_choice():
 
 ###################### - File Manager
 
-from core.config import THIS_FOLDER
+from .config import THIS_FOLDER
 
 
-def findFile(ext=""):
+def findFile(ext="",directory="processing/"):
     """To find a file given extension and return is name."""
 
     name=""
 
     if ext=="":
         # Return the first file in the directory that is not crypted
-        for f in os.listdir(os.path.join(THIS_FOLDER,"share/")):
+        for f in os.listdir(os.path.join(THIS_FOLDER,directory)):
             if not(f.endswith("kat")):
                 name=f
     else:
-        for f in os.listdir(os.path.join(THIS_FOLDER,"share/")):
+        for f in os.listdir(os.path.join(THIS_FOLDER,directory)):
             if f.endswith(ext):
                 name=f
 
     return name
 
-def writeVartoFile(var:object,name:str):
+def isFileHere(name:str,directory="ressources/"):
+    """Return if given name file's is here or is not."""
+    import os
+    return os.path.exists(os.path.join(THIS_FOLDER,directory)+name)
+
+def rmFile(name:str,directory="ressources/"):
+    """Remove named file."""
+    import os
+    return os.remove(os.path.join(THIS_FOLDER,directory)+name)
+
+def writeVartoFile(var:object,name:str,directory="ressources/"):
     """Write given variable into a file with variable name"""
-    from core.config import INVERSIONS_DICT
     # r+ for reading and writing
+    name=os.path.join(THIS_FOLDER,directory)+name
     with open(name+".txt","w+") as f:
         f.truncate(0)
-        f.write(f"{INVERSIONS_DICT}")
+        f.write(f"{var}")
 
     return True
 
-def extractVarFromFile(fileName:str):
+def extractVarFromFile(fileName:str,directory="ressources/"):
     """Extract variable contenant's from txt file."""
     import ast
-    with open(fileName+".txt","r+") as f:
+    with open(os.path.join(THIS_FOLDER,directory)+fileName+".txt","r+") as f:
         contents=f.read()
         extracted=ast.literal_eval(contents)
 
