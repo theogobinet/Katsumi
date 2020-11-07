@@ -1,4 +1,1 @@
-###### Requirements without Version Specifiers ######`
-
-
-###### Requirements with Version Specifiers ######`
+certifi==2020.6.20

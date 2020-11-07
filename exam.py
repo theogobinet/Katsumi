@@ -3,6 +3,7 @@
 
 from core.cipher.galois import *
 from ressources.utils import *
+
 import ressources.config as config
 import numpy as np
 import matplotlib.pyplot as plt
