@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from core.galois import *
-from core.bytesManager import *
-from core.utils import *
-from interactions import *
+from core.cipher.galois import *
+from ressources.utils import *
+import ressources.config as config
+import numpy as np
 import matplotlib.pyplot as plt
 import sys
 import sympy as sym

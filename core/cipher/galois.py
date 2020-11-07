@@ -2,11 +2,13 @@
 # -*- coding: utf-8 -*-
 
 # This ensure that you are just importing things into the __init__.py
-__all__=[]
-from core.cipher import *
 
 import numpy as np
 from math import floor
+import ressources.utils as utils
+import ressources.config as config
+import ressources.bytesManager as bm
+
 
 
 def polydiv_mod(A,B,nZ=2):
