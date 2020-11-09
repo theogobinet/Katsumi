@@ -66,7 +66,7 @@ def euclid_poly(a:np.poly1d,b:np.poly1d,Verbose=False):
     elif (b.order>a.order) :
         return euclid_poly(b,a,Verbose)
     else:
-        div=np.polydiv(a,b)
+        div=polydiv_mod(a,b)
         q,r=div[0],div[1]
 
         if Verbose:
