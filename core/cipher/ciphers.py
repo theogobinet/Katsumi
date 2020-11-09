@@ -34,6 +34,10 @@ def cipher(arr,method=3,encrypt=True):
     elif method==3: #PCBC
         config.WATCH_CIPHER_TYPE = "PCBC"
         return PCBC(arr, encrypt)
+
+    elif method==4: #CTR
+        config.WATCH_CIPHER_TYPE = "CTR"
+        return CTR(arr, encrypt)
     else:
         return "Error: Not implemented cipher mode. (Not yet ?) "
 
@@ -212,6 +216,28 @@ def PCBC(arr,encrypt=True):
 #https://www.cryptofails.com/post/70059609995/crypto-noobs-1-initialization-vectors
 #https://defuse.ca/cbcmodeiv.htm
 ############################################################################
+
+def CTR(arr, encrypt=True):
+
+    if encrypt:
+        iv=IV(arr)
+    else:
+        iv=IV_action(arr)
+
+    res = []
+
+    for i, message in enumerate(arr):
+        noc = bm.b_op(iv, (i + 1).to_bytes(8,"big"), "XOR")
+        kas = kasu.kasumi(noc, True)
+        coded = bm.b_op(message, kas, "XOR")
+
+        res.append(coded)
+    
+    if encrypt:
+        # Adding the IV to the encrypted data
+        IV_action(res,iv,"store")
+    
+    return res
 
 def IV_action(arr,iv=None,action="extract"):
     """Extract or store IV at the end of the arr."""

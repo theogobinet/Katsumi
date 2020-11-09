@@ -73,12 +73,12 @@ def select():
 def cipher_choice():
     clear()
     print(" Choice cypher method : ")
-    print(" 1 - ECB \n 2 - CBC \n 3 - PCBC (Recommended)")
+    print(" 1 - ECB \n 2 - CBC \n 3 - PCBC (Recommended) \n 4 - CTR (Stream)")
 
     pCipher=select()
 
     # Cipher verification
-    if pCipher > 3 :
+    if pCipher > 4 :
         print("Error: You didn't choose a cipher properly.")
         time.sleep(1)
 

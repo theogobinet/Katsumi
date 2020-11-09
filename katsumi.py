@@ -73,7 +73,7 @@ def work_with_selection(pSelection):
                 # Find the first .kat file in the folder
                 answer=it.findFile("kat")
         else:
-            answer=it.readFromUser()+".kat"
+            answer=it.readFromUser()
 
         print("Decryption started....")
 

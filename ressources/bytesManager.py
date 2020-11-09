@@ -122,8 +122,9 @@ def codeOut(thing,coded=True,inFile=True,directory="processing/"):
             return packed.hex()
         else:
             try:
+                decoded = packed.decode()
                 print("Here is your ciphered message, copy it and send it !\n")
-                return packed.decode()
+                return decoded
             except UnicodeDecodeError:
                 print("ERROR : Unable to decode the message, the decryption method does not match the encryption method or the encrypted message has been corrupted.\n")
 
