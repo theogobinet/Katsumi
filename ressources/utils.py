@@ -142,12 +142,18 @@ def exp_mod(a,exp,mod):
     a=a%mod
     
     while (exp>0) :
-        
-        if(exp%2==1):
+
+        # (exp%2==1)
+        # same as : (exp & 1) == 0
+        # least significant bit of any decimal odd number is one
+
+        if exp & 1:
             res=(res*a)%mod
         
         # Deleting LSB
-        exp=floor((exp/2))
+        # exp=floor((exp/2))
+        exp >>=1
+
         # Updating a
         a=(a*a)%mod
     

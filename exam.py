@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from core.cipher.galois import *
-from ressources.utils import *
+from ressources import *
 
 import ressources.config as config
 import numpy as np
