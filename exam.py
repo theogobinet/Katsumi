@@ -242,10 +242,10 @@ def primeF(n:int,Verbose=True):
             if k == list(prime_decompo.keys())[-1]:
                 verbose+=f"{k}^{v}"
             else:
-                verbose+=f"{k}^{v} + "
+                verbose+=f"{k}^{v} x "
 
         print(f" n = {buffer} se décompose en {verbose} avec Phi({buffer}) = {phi_of_n} .\n")
         print(f" Les éléments suivants sont coprimes avec {buffer} : {coprimes} ")
     else:
         return prime_decompo,phi_of_n,coprimes
-        
+    
