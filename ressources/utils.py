@@ -149,12 +149,13 @@ def exp_mod(a,exp,mod):
         # same as : (exp & 1) == 0
         # least significant bit of any decimal odd number is one
 
-        if exp & 1:
+        if (exp%2==1):
             res=(res*a)%mod
         
         # Deleting LSB
         # exp=floor((exp/2))
-        exp >>=1
+        # exp >>=1
+        exp=floor((exp/2))
 
         # Updating a
         a=(a*a)%mod
@@ -174,8 +175,8 @@ def fastPower(a,n):
 def millerR (n:int, s=40):
 
     """Use Rabin-Miller algorithm to return True (n is probably prime) or False (n is definitely composite)."""
-
-    if n<4 or n%2 :
+    
+    if n<4 or not n%2 :
         print("Error: n>3 and n need to be odd.")
         return -1
 
