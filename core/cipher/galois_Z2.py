@@ -18,6 +18,8 @@ def poly_mult_2(a:int , b:int):
     '''
 
     def multbiggest(a, b):
+        # nonlocal keyword is used to work with variables inside nested functions, where the variable should not belong to the inner function.
+        nonlocal r
         r = 0
         for i in range(a.bit_length()):
 

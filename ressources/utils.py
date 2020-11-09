@@ -153,15 +153,25 @@ def exp_mod(a,exp,mod):
     
     return res
 
+def fastPower(a,n):
+    if(n==0):
+      return 1
+    x=a**(n/2)
+    x=x*x
+    if(n%2==1):
+      x=x*a
+    return x
 
     
 def millerR (n:int, s=40):
 
     """Use Rabin-Miller algorithm to return True (n is probably prime) or False (n is definitely composite)."""
 
-    if n<4 or n%2 == 0 : return "Error: n>3 and need to be an odd number."
+    if n<4 or n%2 :
+        print("Error: n>3 and n need to be odd.")
+        return -1
 
-    def millerT(n):
+    def millerT(n:int):
         if n<6: # Shortcut for small cases here
             return [False,False,True,True,False,True][n]
 
@@ -184,7 +194,7 @@ def millerR (n:int, s=40):
             return False
         else:
             for _ in range(0,power):
-                x = m.pow(x,2) % n
+                x = fastPower(x,2) % n
                 if(x == n - 1):
                     return False
             return True

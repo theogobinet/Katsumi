@@ -4,6 +4,7 @@
 import os
 import sys
 import time
+import ressources.config as config
 
 ################################################
 ###############- Console Interactions - ########
@@ -120,30 +121,30 @@ def findFile(ext="",directory="processing/"):
 
     return name
 
-def isFileHere(name:str,directory="ressources/"):
+def isFileHere(name:str,directory=config.DIRECTORY_GEN):
     """Return if given name file's is here or is not."""
     import os
-    return os.path.exists(os.path.join(THIS_FOLDER,directory)+name)
+    return os.path.exists(directory+name)
 
 def rmFile(name:str,directory="ressources/"):
     """Remove named file."""
     import os
-    return os.remove(os.path.join(THIS_FOLDER,directory)+name)
+    return os.remove(directory+name)
 
-def writeVartoFile(var:object,name:str,directory="ressources/"):
+def writeVartoFile(var:object,name:str,directory=config.DIRECTORY_GEN):
     """Write given variable into a file with variable name"""
     # r+ for reading and writing
-    name=os.path.join(THIS_FOLDER,directory)+name
+    name=directory+name
     with open(name+".txt","w+") as f:
         f.truncate(0)
         f.write(f"{var}")
 
     return True
 
-def extractVarFromFile(fileName:str,directory="ressources/"):
+def extractVarFromFile(fileName:str,directory=config.DIRECTORY_GEN):
     """Extract variable contenant's from txt file."""
     import ast
-    with open(os.path.join(THIS_FOLDER,directory)+fileName+".txt","r+") as f:
+    with open(directory+fileName+".txt","r+") as f:
         contents=f.read()
         extracted=ast.literal_eval(contents)
 
