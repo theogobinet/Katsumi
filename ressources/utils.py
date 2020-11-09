@@ -33,7 +33,7 @@ def euclid(a:int,b:int,Verbose=False):
         return euclid(b,r,Verbose)
 
 
-def euclid_ext(a:int,b:int):
+def euclid_ext(a:int, b:int, Verbose=False):
     
     """Extension to the Euclidean algorithm, and computes, in addition to the greatest common divisor of integers a and b, also the coefficients of Bézout's identity, which are integers x and y such that a x + b y = gcd ( a , b )."""
     x0, x1, y0, y1 = 0, 1, 1, 0
@@ -44,9 +44,11 @@ def euclid_ext(a:int,b:int):
         (q, a), b = divmod(b, a), a
         y0, y1 = y1, (y0 - q * y1)
         x0, x1 = x1, (x0 - q * x1)
+        if Verbose and a!=0:
+            print(f"{a}= {a_buffer}×{x1} + {b_buffer}×{y1}")
         n+=1
     
-    s=f"gcd({a_buffer},{b_buffer})={a_buffer}.{x0}+{b_buffer}.{y0}"
+    s=f"gcd({a_buffer},{b_buffer})= {a_buffer}×{x0} + {b_buffer}×{y0}"
     
     return b, x0, y0, s, n
     
