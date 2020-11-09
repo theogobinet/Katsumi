@@ -215,3 +215,14 @@ def millerR (n:int, s=40):
             return False
 
     return True
+
+def order(n,p):
+    """Order of n in p is the smallest number M or n^M = 1 mod p"""
+    m=n
+    k=1
+    for _ in range(p-1):
+        m*=n%p
+        print(f"m = {m} , iterations: {k}")
+        k+=1
+        if m:
+            break

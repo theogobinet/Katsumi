@@ -15,7 +15,7 @@ def polydiv_mod(A,B,nZ=2):
     """Polynomial division in nZ"""
     buffer=np.polydiv(A,B)
 
-    return (np.poly1d([round(elt%nZ) for elt in buffer[0]]) , np.poly1d([round(elt%nZ) for elt in buffer[1] ]) )
+    return (np.poly1d([elt%nZ for elt in buffer[0]]) , np.poly1d([elt%nZ for elt in buffer[1] ]) )
 
 
 def poly_add(A,B,nZ=2):
