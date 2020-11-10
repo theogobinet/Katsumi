@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import core.cipher.kasumi as kasu
+import core.cipher.galois_Z2 as gz2
 
 import ressources.config as config
 import ressources.bytesManager as bm
@@ -9,12 +10,14 @@ import ressources.interactions as it
 from core.cipher.watch import watch
 
 import time
+import base64
+import binascii
 
 #################################################
 ############ Main Method  #######################
 #################################################
 
-def cipher(arr,method=3,encrypt=True):
+def cipher(arr,method=3,encrypt=True,aad=""):
     """Algorithm that uses a block cipher to provide information security such as confidentiality or authenticity."""
 
     # Dealing with possible last elt < 8 bytes
@@ -38,6 +41,9 @@ def cipher(arr,method=3,encrypt=True):
     elif method==4: #CTR
         config.WATCH_CIPHER_TYPE = "CTR"
         return CTR(arr, encrypt)
+    elif method==5: #CTR
+        config.WATCH_CIPHER_TYPE = "GCM"
+        return GCM(arr, encrypt, aad)
     else:
         return "Error: Not implemented cipher mode. (Not yet ?) "
 
@@ -45,7 +51,7 @@ def cipher(arr,method=3,encrypt=True):
 
 ###### Running method to run everything:
 
-def run(input=it.findFile(".kat"),inFile=True,encrypt=False,method=3):
+def run(input=it.findFile(".kat"),inFile=True,encrypt=False,method=3,aad=""):
 
     """
     Run encryption of decryption.
@@ -76,19 +82,17 @@ def run(input=it.findFile(".kat"),inFile=True,encrypt=False,method=3):
             data=bytearray(input.encode())
         else:
             try:
-                first=int(input,16)
-                bits=bm.bytes_needed(first)
-                data=first.to_bytes(bits,"big")
+                data = base64.b64decode(input)
 
-            except ValueError:
-                print('ERROR : Unable to decode the message, the format of the encrypted message does not correspond to the expected one (hexadecimal).\n')
+            except binascii.Error:
+                print('ERROR : Unable to decode the message, the format of the encrypted message does not correspond to the expected one (base64).\n')
 
     # Keys initialisation
     kasu.set_key()
 
     if(len(data) > 0):
         splitted=bm.splitBytes(data)
-        ciphered=cipher(splitted,method,encrypt)
+        ciphered=cipher(splitted,method,encrypt,aad)
     
         return bm.codeOut(ciphered,encrypt,inFile)
     
@@ -211,13 +215,9 @@ def PCBC(arr,encrypt=True):
     
     return res
 
-#################### Initialization Vector #################################
-#https://en.wikipedia.org/wiki/Initialization_vector#Block_ciphers
-#https://www.cryptofails.com/post/70059609995/crypto-noobs-1-initialization-vectors
-#https://defuse.ca/cbcmodeiv.htm
-############################################################################
-
 def CTR(arr, encrypt=True):
+
+    '''Commentaire'''
 
     if encrypt:
         iv=IV(arr)
@@ -239,7 +239,111 @@ def CTR(arr, encrypt=True):
     
     return res
 
-def IV_action(arr,iv=None,action="extract"):
+# https://blkcipher.pl/assets/pdfs/gcm-spec.pdf
+
+def GCM(arr, encrypt=True, aad=""):
+
+    '''Commentaire'''
+
+    if encrypt:
+        iv=IV(arr)
+    else:
+        iv=IV_action(arr)
+        # Integrity Check Balue
+        icv=IV_action(arr)
+
+    # Additional authenticated data (AAD), which is denoted as A
+    A = []
+
+    if(encrypt and aad != ""):
+        aadc = aad.encode()
+
+        if len(aadc) > 2^64:
+            return "Too much AAD"
+
+        A = bm.splitBytes(aadc,8)
+        A[-1] = bm.zfill_b(A[-1], 8)
+    else:
+        header = arr[0]
+        epos = int.from_bytes(header, "big")
+        A = arr[1:epos]
+        arr = arr[epos:]
+
+    # Encrypted message
+    C = []
+
+    # 1 + α + α3 + α4 + α64 - 64 field polynomial
+    p = int("10000000000000000000000000000000000000000000000000000000000001111",2)
+
+    def bti(b):
+        return int.from_bytes(b, "big")
+
+    def lenb(i):
+        return (len(i)*8).to_bytes(8, "big")
+
+    def GHASH64(H, A, C, X, i):
+        n = len(C)
+        m = len(A)
+
+        if i == 0:
+            return b'\x00'
+        elif i <= m:
+            return gz2.poly_mult_mod_2(bti(bm.b_op(X, A[i - 1], "XOR")), H, p)
+        elif i <= m + n:
+            return gz2.poly_mult_mod_2(bti(bm.b_op(X, C[i - m - 1], "XOR")), H, p)
+        elif i == m + n + 1:
+            return gz2.poly_mult_mod_2(bti(bm.b_op(gz2.poly_mult_mod_2(bti(bm.b_op(X, lenb(A), "XOR")), H, p).to_bytes(8,"big"), lenb(C), "XOR")), H, p)
+
+    H = bti(kasu.kasumi(b'\x00' * 8))
+
+    #Y = GHASH64(H ,b'', iv)
+    Y = GHASH64(H, b'', [iv], b'\x00', 1).to_bytes(8,"big")
+    E0 = kasu.kasumi(Y)
+
+    n = len(arr)
+    m = len(A)
+
+    for i in range(n):
+        
+        Y = Y[:4] + ((int.from_bytes(Y[-4:],"big") + 1) % 2^16).to_bytes(4,"big")
+        E = kasu.kasumi(Y)
+
+        C.append(bm.b_op(arr[i], E, "XOR"))
+
+    res = C
+
+    # plaintext is in C when we decrypt, me must replace it with the ciphertext
+    if not encrypt:
+        C = arr
+
+    X = b'\x00'
+
+    for i in range(n + m + 1):
+        X = GHASH64(H, A, C, X, i+1).to_bytes(8,"big")
+
+    icvc = bm.b_op(E0, X, "XOR")
+
+    if not encrypt:
+        if icv != icvc:
+            print("WARNING: INTEGRITY CHECK CONTROL INCORRECT, AAD HAVE BEEN MODIFIED !!")
+
+    if encrypt:
+        IV_action(res,icvc,"store")
+        # Adding the IV to the encrypted data
+        IV_action(res,iv,"store")
+
+        header = (1 + len(A)).to_bytes(8,"big")
+        res = [header] + A + res
+
+    return res
+
+#################### Initialization Vector #################################
+#https://en.wikipedia.org/wiki/Initialization_vector#Block_ciphers
+#https://www.cryptofails.com/post/70059609995/crypto-noobs-1-initialization-vectors
+#https://defuse.ca/cbcmodeiv.htm
+############################################################################
+
+def IV_action(arr, iv=None, action="extract"):
     """Extract or store IV at the end of the arr."""
 
     if action == "store" and iv != None:

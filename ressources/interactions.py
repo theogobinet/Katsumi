@@ -5,6 +5,7 @@ import os
 import sys
 import time
 import ressources.config as config
+import ressources.interactions as it
 
 ################################################
 ###############- Console Interactions - ########
@@ -73,12 +74,12 @@ def select():
 def cipher_choice():
     clear()
     print(" Choice cypher method : ")
-    print(" 1 - ECB \n 2 - CBC \n 3 - PCBC (Recommended) \n 4 - CTR (Stream)")
+    print(" 1 - ECB \n 2 - CBC \n 3 - PCBC (Recommended) \n 4 - CTR (Stream) \n 5 - CGM (Authentification)")
 
     pCipher=select()
 
     # Cipher verification
-    if pCipher > 4 :
+    if pCipher > 5 :
         print("Error: You didn't choose a cipher properly.")
         time.sleep(1)
 
@@ -93,7 +94,7 @@ def cipher_choice():
         else: 
             clear()
             return cipher_choice()
-
+        
     clear()
     return pCipher
 

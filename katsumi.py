@@ -3,7 +3,7 @@
 
 from datetime import datetime
 
-from ressources.interactions import clear
+from ressources.interactions import clear, query_yn
 
 import ressources.interactions as it
 import ressources.config as config
@@ -26,9 +26,19 @@ def work_with_selection(pSelection):
 
     if pSelection == 1 :
         # Encryption
-        cipher=it.cipher_choice()
-        fchoice=it.query_yn("Do you want to encrypt a file ?")
-        answer=""
+        cipher = it.cipher_choice()
+        
+        aad=""
+
+        if cipher == 5:
+            answer=query_yn(" GCM allows to store authentified additional data (not encrypted), do you want to store some AAD ?")
+            if answer:
+                aad = it.readFromUser()
+            else: 
+                clear()
+
+        fchoice = it.query_yn("Do you want to encrypt a file ?")
+        answer = ""
 
         if fchoice:
             print("Please enter the filename (with extension) to encrypt.")
@@ -44,7 +54,7 @@ def work_with_selection(pSelection):
         print("Encryption started....")
 
         begin_time = datetime.now()
-        print(run(answer,fchoice,True,cipher))
+        print(run(answer,fchoice,True,cipher,aad))
         end=datetime.now() - begin_time
         input(f"Encryption finished in {end} seconds !\n")
 

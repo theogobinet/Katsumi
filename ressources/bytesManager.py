@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+import base64
 from math import log
 
 import ressources.config as config
@@ -119,7 +120,7 @@ def codeOut(thing,coded=True,inFile=True,directory="processing/"):
         
     else:
         if coded:
-            return packed.hex()
+            return base64.b64encode(packed)
         else:
             try:
                 decoded = packed.decode()
