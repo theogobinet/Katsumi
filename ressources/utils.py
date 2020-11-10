@@ -134,87 +134,134 @@ def primeFactors(n:int):
 
     return prime_decompo,phi_of_n,coprimes
         
-def exp_mod(a,exp,mod):
-    """General method for fast computation of large positive integer powers of a number"""
+def square_and_multiply(x, k, p=None):
+    """
+    Square and Multiply Algorithm
+    Parameters: positive integer x and integer exponent k,
+                optional modulus p
+    Returns: x**k or x**k mod p when p is given
+    """
+    b = bin(k).lstrip('0b')
+    r = 1
+    for i in b:
+        r = r**2
+        if i == '1':
+            r = r * x
+        if p:
+            r %= p
+    return r
 
-    if mod == 1:
-        return 0
+def millerRabin(p, s=40):
+    """Determines whether a given number is likely to be prime."""
+    if p == 2: # 2 is the only prime that is even
+        return True
+    if not (p & 1): # n is a even number and can't be prime
+        return False
 
-    res=1
-    a=a%mod
-    
-    while (exp>0) :
+    p1 = p - 1
+    u = 0
+    r = p1  # p-1 = 2**u * r
 
-        # (exp%2==1)
-        # same as : (exp & 1) == 0
-        # least significant bit of any decimal odd number is one
+    while r % 2 == 0:
+        r >>= 1
+        u += 1
 
-        if (exp%2==1):
-            res=(res*a)%mod
-        
-        # Deleting LSB
-        # exp=floor((exp/2))
-        # exp >>=1
-        exp=floor((exp/2))
+    # at this stage p-1 = 2**u * r  holds
+    assert p-1 == 2**u * r
 
-        # Updating a
-        a=(a*a)%mod
-    
-    return res
-
-def fastPower(a,n):
-    if(n==0):
-      return 1
-    x=a**(n/2)
-    x=x*x
-    if(n%2==1):
-      x=x*a
-    return x
-
-    
-def millerR (n:int, s=40):
-
-    """Use Rabin-Miller algorithm to return True (n is probably prime) or False (n is definitely composite)."""
-    
-    if n<4 or not n%2 :
-        print("Error: n>3 and n need to be odd.")
-        return -1
-
-    def millerT(n:int):
-        if n<6: # Shortcut for small cases here
-            return [False,False,True,True,False,True][n]
-
-        # Initialisation -> 2^0*d=n-1
-        d = n - 1
-        power = 0
-
-        while d%2 == 0:
-            d = d/2
-            # c factors of 2
-            power+=1
-
-        import random as r
-        import math as m
-
-        a = r.randint(2, n-2)
-        x = exp_mod(a,d,n)
-
-        if(x == 1 or x == n - 1):
+    def witness(a):
+        """
+        Returns: True, if there is a witness that p is not prime.
+                False, when p might be prime
+        """
+        z = square_and_multiply(a, r, p)
+        if z == 1:
             return False
-        else:
-            for _ in range(0,power):
-                x = fastPower(x,2) % n
-                if(x == n - 1):
-                    return False
-            return True
 
-    # Trying s times to check
+        for i in range(u):
+            z = square_and_multiply(a, 2**i * r, p)
+            if z == p1:
+                return False
+        return True
 
-    for _ in range(1, s):
-        if millerT(n):
+    for _ in range(s):
+        a = random.randrange(2, p-2)
+        if witness(a):
             return False
 
     return True
+
+
+def coprime(a:int,b:int):
+    """Two values are said to be coprime if they have no common prime factors."""
+    
+    a,b=primeFactors(a)[0],primeFactors(b)[0]
+    
+    return not any(item in a for item in b)
+
+def pairwise_coprime(listing):
+    """ Check if elements of a list are pairwise coprime."""
+    
+    size=len(listing)
+    
+    for i in range(0,size-1):
+        for j in range(i+1,size):
+            if not coprime(listing[i],listing[j]) : return False
+    
+    return True
+
+def ChineseRemainder(*args):
+    
+    """ [n1,..,nk , -1 , a1,..,ak] return result of Chinese Remainder. /n '-1' is the separator. """
+    
+    modulis,integers=[],[]
+    product=1
+    i=None
+    
+    
+    for i,elt in enumerate(args):
+        
+        # Separator detection
+        if elt == -1 : 
+            i=i; # Separator is at position i
+            break
+        
+        
+        # Before separtor -> modulis
+        if elt <=1: return f"Error: '{elt}' lesser than 2."
+        
+        modulis.append(elt)
+        
+        product*=elt
+
+    for elt in range(i+1,len(args)):
+        # After separator -> integers
+        elt=int(args[elt])
+        integers.append(elt)
+        
+    # Condition one
+    if not pairwise_coprime(modulis): return "Error: n elements aren't pairwise coprime."
+    
+    solution=0
+    
+    for a,n in zip(integers,modulis):
+        
+        if not ((a>=0) and (a<n)) : return "Error: '0 <= ai < ni' is not respected."
+        
+        print(f" - x congruent to {a} modulo {n}")
+        
+        # According to the extended Euclid algorithm :
+        Mk=int(product/n)
+        yk=inv(Mk,n)[0]
+        
+        print(f" - y congruent to {yk} modulo {n}\n")
+        
+        solution += a*yk*Mk
+    
+    
+    
+    return (solution%product,product,f" x congruent to {solution%product} mod {product}")
+    
 
 def order(n,p):
     """Order of n in p is the smallest number M or n^M = 1 mod p"""
