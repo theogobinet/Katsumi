@@ -10,7 +10,7 @@ from random import randrange as rd
 #############################################
 
 
-def findGen():
+def findGen(p,q):
     """
     Easy way of selecting a random generator :
     select a random value h between 2 and p−1
@@ -26,7 +26,7 @@ def findGen():
 def key_gen():
     s=safePrime(512)
     p,q=s[0],s[1]
-    
+
 
         
 
