@@ -124,7 +124,7 @@ def gen_GL_2(poly,degree):
     # Order of multiplicative subgroup
     pn1=(2**degree)-1
 
-    if utils.millerR(pn1):
+    if utils.millerRabin(pn1):
         q=[pn1]
     else:
         q=utils.primeFactors(pn1)[0]

@@ -8,6 +8,7 @@
 import os
 from .bytesManager import bytes_to_int, circularRotation, int_to_bytes, int_to_bits, bytes_needed
 from ressources.utils import millerRabin
+from secrets import randbits, SystemRandom
 
 def xorshiftperso(evenOrodd=0,nBits:int=512):
     '''
@@ -18,8 +19,9 @@ def xorshiftperso(evenOrodd=0,nBits:int=512):
     return even or odd number:
          - 0 odd
          - 1 even
+         - both
     '''
-
+    assert nBits > 23 
     bytes=int(nBits/8)
 
     # Unpredictable random seed 
@@ -51,16 +53,40 @@ def xorshiftperso(evenOrodd=0,nBits:int=512):
     return r
 
 
-def randomPrime(nBits:int=512,condition=True,k:int=1):
+def randomInt(evenOrodd:int=0,n:int=512):
+    """
+    Return a random integer using secrets module.
+    
+    For even or odd number:
+         - 0 odd
+         - 1 even
+         - 2 both
+    """
+    r=randbits(n)
+
+    if evenOrodd and r & 1 :
+        # Bitwsing and with "-2" (number with all bits set to one except lowest one)
+        # always kills just the LSB of your number and forces it to be even
+        r&=-2
+    elif not evenOrodd and not (r & 1):
+        # Force the number to the next odd
+        r|=1
+    
+    return r
+
+def randomPrime(nBits:int=512,gen=randomInt,condition = lambda p : p == p,k:int=1):
     """
     Generates prime numbers with bitlength nBits.
     Stops after the generation of k prime numbers.
 
     You can verify a condition with condition method.
     """
-    
+
     # Generate random odd number of nBits
-    maybe=xorshiftperso(0,nBits)
+    assert nBits > 0 and nBits < 4096
+
+    maybe=gen(0,nBits)
+
     b=k
     primes=[]
 
@@ -68,7 +94,7 @@ def randomPrime(nBits:int=512,condition=True,k:int=1):
         if millerRabin(maybe) and condition(maybe):
             primes.append(maybe)
             k-=1
-        maybe=xorshiftperso(0,nBits)
+        maybe=gen(0,nBits)
 
     if b:
         return primes[0]
@@ -78,7 +104,8 @@ def randomPrime(nBits:int=512,condition=True,k:int=1):
 
 def safePrime(nBits:int=1024):
     """
-    A number p is a sage prime if both p and (p-1)/2 are prime.
+    The number 2p + 1 associated with a Sophie Germain prime is called a safe prime.
+    In number theory, a prime number p is a Sophie Germain prime if 2p + 1 is also prime
 
     nBits: number of bits wanted for output prime number.
 
@@ -86,12 +113,14 @@ def safePrime(nBits:int=1024):
     https://eprint.iacr.org/2003/186.pdf
 
     The primes to be generated need to be 1024 bit to 2048 bit long for good cryptographical uses.
+
+    Return (safe_prime,sophieGermain_prime) tuple's
     """
 
     p_filter = lambda p : p % 3 == 2
 
     while 1:
-        p = randomPrime(nBits,p_filter)
-
-        if millerRabin(2*p+1):
-            return p
+        sophieGermain_prime = randomPrime(nBits,randomInt,p_filter)
+        safe_prime = 2 * sophieGermain_prime + 1
+        if millerRabin(safe_prime):
+            return (safe_prime,sophieGermain_prime)

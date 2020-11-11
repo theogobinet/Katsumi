@@ -7,10 +7,10 @@ from ressources.interactions import clear, query_yn
 
 import ressources.interactions as it
 import ressources.config as config
-import core.cipher.kasumi as kasu
+import core._cipher.kasumi as kasu
 
-from core.cipher.ciphers import run
-from core.cipher.galois_Z2 import GF2
+from core._cipher.ciphers import run
+from core._cipher.galois_Z2 import GF2
 
 import sys
 import time

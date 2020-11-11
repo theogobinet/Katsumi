@@ -107,7 +107,7 @@ def gen_GL(poly,degree,p=2,Zn=2):
 
     un=np.poly1d([1])
 
-    if utils.millerR(pn1):
+    if utils.millerRabin(pn1):
         q=[pn1]
     else:
         q=utils.primeFactors(pn1)[0]

@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import core.cipher.kasumi as kasu
-import core.cipher.galois_Z2 as gz2
+import core._cipher.kasumi as kasu
+import core._cipher.galois_Z2 as gz2
 
 import ressources.config as config
 import ressources.bytesManager as bm
 import ressources.interactions as it
-from core.cipher.watch import watch
+from core._cipher.watch import watch
 
 import time
 import base64
@@ -44,8 +44,6 @@ def cipher(arr,method=3,encrypt=True,aad=""):
     elif method==5: #CTR
         config.WATCH_CIPHER_TYPE = "GCM"
         return GCM(arr, encrypt, aad)
-    else:
-        return "Error: Not implemented cipher mode. (Not yet ?) "
 
     return None
 
@@ -96,7 +94,7 @@ def run(input=it.findFile(".kat"),inFile=True,encrypt=False,method=3,aad=""):
     
         return bm.codeOut(ciphered,encrypt,inFile)
     
-    return "Encoding failed"
+
 
     
 #################################################
@@ -365,8 +363,11 @@ def IV(arr,key="y/B?E(H+MbQeThVm".encode()):
     """
 
     # Select a random encrypted message as initial vector to transform.
-    import random as rd
-    message=arr[rd.randrange(0,len(arr))]
+    import secrets as sr
+    r1=sr.randbelow(len(arr))
+    r2=sr.randbits(8)
+    message=bm.bytes_to_int(arr[r1]) ^ r2
+    message=bm.int_to_bytes(message)
 
     # Let's use the principle of hmac
     # The basic idea is to concatenate the key and the message, and hash them together. 
