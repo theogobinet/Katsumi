@@ -93,7 +93,7 @@ def run(input=it.findFile(".kat"),inFile=True,encrypt=False,method=3,aad=""):
     if(len(data) > 0):
         splitted=bm.splitBytes(data)
         ciphered=cipher(splitted,method,encrypt,aad)
-    
+        
         return bm.codeOut(ciphered,encrypt,inFile)
     
     return "Encoding failed"
@@ -255,14 +255,15 @@ def GCM(arr, encrypt=True, aad=""):
     # Additional authenticated data (AAD), which is denoted as A
     A = []
 
-    if(encrypt and aad != ""):
-        aadc = aad.encode()
+    if encrypt:
+        if(aad != ""):
+            aadc = aad.encode()
 
-        if len(aadc) > 2^64:
-            return "Too much AAD"
+            if len(aadc) > 2**64:
+                raise Exception("Too much AAD")
 
-        A = bm.splitBytes(aadc,8)
-        A[-1] = bm.zfill_b(A[-1], 8)
+            A = bm.splitBytes(aadc,8)
+            A[-1] = bm.zfill_b(A[-1], 8)
     else:
         header = arr[0]
         epos = int.from_bytes(header, "big")

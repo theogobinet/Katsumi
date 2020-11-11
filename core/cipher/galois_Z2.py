@@ -123,8 +123,7 @@ def gen_GL_2(poly,degree):
     """Return generator of Galois Field's GF(p^degree) based on primitive polynomial poly in Zn."""
     # Order of multiplicative subgroup
     pn1=(2**degree)-1
-
-    if utils.millerR(pn1):
+    if utils.millerRabin(pn1):
         q=[pn1]
     else:
         q=utils.primeFactors(pn1)[0]
