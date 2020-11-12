@@ -73,7 +73,7 @@ def select():
 
 def cipher_choice():
     clear()
-    print(" Choice cypher method : ")
+    print("Choice cypher method : ")
     print(" 1 - ECB \n 2 - CBC \n 3 - PCBC (Recommended) \n 4 - CTR (Stream) \n 5 - CGM (Authentification)")
 
     pCipher=select()
@@ -87,7 +87,7 @@ def cipher_choice():
         menu()
 
     elif pCipher == 1:
-        answer=query_yn(" ECB is not recommended for use in cryptographic protocols. Are you sure ?")
+        answer=query_yn("ECB is not recommended for use in cryptographic protocols. Are you sure ?")
         if answer:
             clear()
             return pCipher
@@ -151,3 +151,32 @@ def extractVarFromFile(fileName:str,directory=config.DIRECTORY_GEN):
 
     return extracted
 
+def askForKey():
+    import base64
+    import binascii
+    clear()
+    answer=query_yn("You have not yet defined a key, you want to enter one?","no")
+
+    key = bytearray()
+
+    if answer:
+        while len(key) != 16:
+            try:
+                sKey = input()
+                key = base64.b64decode(sKey)
+                if(len(key) != 16):
+                    print("Invalid key, key must be 16 bytes long!")
+            except (binascii.Error, UnicodeEncodeError):
+                print("Invalid key, key must be encoded in base64!")
+
+    else:
+        import secrets as sr
+        key = sr.randbits(128).to_bytes(16,"big")
+        print("Your key was randomly generated:", base64.b64encode(key).decode())
+    
+    answer=query_yn("Do you want to keep your key in cache ?")
+    
+    if answer:
+        config.KEY = key
+
+    return key

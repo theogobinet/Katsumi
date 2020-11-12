@@ -120,14 +120,14 @@ def codeOut(thing,coded=True,inFile=True,directory="processing/"):
         
     else:
         if coded:
-            return base64.b64encode(packed)
+            return base64.b64encode(packed).decode()
         else:
             try:
                 decoded = packed.decode()
                 print("Here is your ciphered message, copy it and send it !\n")
                 return decoded
             except UnicodeDecodeError:
-                print("ERROR : Unable to decode the message, the decryption method does not match the encryption method or the encrypted message has been corrupted.\n")
+                print("ERROR : Unable to decode the message, the decryption method does not match the encryption method, the wrong key is used or the encrypted message has been corrupted.\n")
 
 
 def zfill_b(byteA,n:int):

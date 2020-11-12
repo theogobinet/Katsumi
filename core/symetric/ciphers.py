@@ -17,7 +17,7 @@ import binascii
 ############ Main Method  #######################
 #################################################
 
-def cipher(arr,method=3,encrypt=True,aad=""):
+def cipher(arr, method=3, encrypt=True, aad=""):
     """Algorithm that uses a block cipher to provide information security such as confidentiality or authenticity."""
 
     # Dealing with possible last elt < 8 bytes
@@ -49,7 +49,7 @@ def cipher(arr,method=3,encrypt=True,aad=""):
 
 ###### Running method to run everything:
 
-def run(input=it.findFile(".kat"),inFile=True,encrypt=False,method=3,aad=""):
+def run(input=it.findFile(".kat"), inFile=True, encrypt=False, method=3, aad="", key=config.KEY):
 
     """
     Run encryption of decryption.
@@ -86,13 +86,13 @@ def run(input=it.findFile(".kat"),inFile=True,encrypt=False,method=3,aad=""):
                 print('ERROR : Unable to decode the message, the format of the encrypted message does not correspond to the expected one (base64).\n')
 
     # Keys initialisation
-    kasu.set_key()
+    kasu.set_key(key)
 
     if(len(data) > 0):
         splitted=bm.splitBytes(data)
-        ciphered=cipher(splitted,method,encrypt,aad)
+        ciphered=cipher(splitted, method, encrypt, aad)
         
-        return bm.codeOut(ciphered,encrypt,inFile)
+        return bm.codeOut(ciphered, encrypt, inFile)
     
 
 
@@ -215,7 +215,12 @@ def PCBC(arr,encrypt=True):
 
 def CTR(arr, encrypt=True):
 
-    '''Commentaire'''
+    '''
+    Counter Mode is xoring the message with a encrypted counter (IV + incr(0))
+
+    arr: data to encrypt/decrypt
+    encrypt: true to encrypt
+    '''
 
     if encrypt:
         iv=IV(arr)
@@ -225,11 +230,19 @@ def CTR(arr, encrypt=True):
     res = []
 
     for i, message in enumerate(arr):
+
+        config.WATCH_PERCENTAGE = ((len(arr) - (len(arr) - i)) / len(arr)) * 100
+        exTime = time.time()
+
         noc = bm.b_op(iv, (i + 1).to_bytes(8,"big"), "XOR")
         kas = kasu.kasumi(noc, True)
         coded = bm.b_op(message, kas, "XOR")
 
         res.append(coded)
+
+        config.WATCH_GLOBAL_CIPHER += time.time() - exTime
+        config.WATCH_BLOC_CIPHER = config.WATCH_GLOBAL_CIPHER / (i + 1)
+        config.WATCH_BLOC_KASUMI = config.WATCH_GLOBAL_KASUMI / (i + 1)
     
     if encrypt:
         # Adding the IV to the encrypted data
@@ -241,7 +254,13 @@ def CTR(arr, encrypt=True):
 
 def GCM(arr, encrypt=True, aad=""):
 
-    '''Commentaire'''
+    '''
+    GCM is CTR mode with authentification of additional data (AAD) authenticated with multiplication in a Galois Field
+
+    data: bytearray of data to encrypt/decrypt
+    encrypt: boolean, true to encypt
+    aad: string of additional authenticated data
+    '''
 
     if encrypt:
         iv=IV(arr)
@@ -303,11 +322,17 @@ def GCM(arr, encrypt=True, aad=""):
     m = len(A)
 
     for i in range(n):
+        config.WATCH_PERCENTAGE = (((n*2 + m + 1) - ((n*2 + m + 1) - i)) / (n*2 + m + 1)) * 100
+        exTime = time.time()
         
         Y = Y[:4] + ((int.from_bytes(Y[-4:],"big") + 1) % 2^16).to_bytes(4,"big")
         E = kasu.kasumi(Y)
 
         C.append(bm.b_op(arr[i], E, "XOR"))
+
+        config.WATCH_GLOBAL_CIPHER += time.time() - exTime
+        config.WATCH_BLOC_CIPHER = config.WATCH_GLOBAL_CIPHER / (i + 1)
+        config.WATCH_BLOC_KASUMI = config.WATCH_GLOBAL_KASUMI / (i + 1)
 
     res = C
 
@@ -318,7 +343,13 @@ def GCM(arr, encrypt=True, aad=""):
     X = b'\x00'
 
     for i in range(n + m + 1):
+        config.WATCH_PERCENTAGE = (((n*2 + m + 1) - ((n*2 + m + 1) - (i + n))) / (n*2 + m + 1)) * 100
+        exTime = time.time()
+
         X = GHASH64(H, A, C, X, i+1).to_bytes(8,"big")
+
+        config.WATCH_GLOBAL_CIPHER += time.time() - exTime
+        config.WATCH_BLOC_CIPHER = config.WATCH_GLOBAL_CIPHER / (i + 1)
 
     icvc = bm.b_op(E0, X, "XOR")
 

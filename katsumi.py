@@ -24,6 +24,12 @@ def work_with_selection(pSelection):
 
     # Selection orientation 
 
+    if pSelection in [1,2]:
+        if not config.KEY:
+            key = it.askForKey()
+        else:
+            key = config.KEY
+
     if pSelection == 1 :
         # Encryption
         cipher = it.cipher_choice()
@@ -31,7 +37,7 @@ def work_with_selection(pSelection):
         aad=""
 
         if cipher == 5:
-            answer=query_yn(" GCM allows to store authentified additional data (not encrypted), do you want to store some AAD ?")
+            answer=query_yn("GCM allows to store authentified additional data (not encrypted), do you want to store some AAD ?")
             if answer:
                 aad = it.readFromUser()
             else: 
@@ -54,7 +60,7 @@ def work_with_selection(pSelection):
         print("Encryption started....")
 
         begin_time = datetime.now()
-        print(run(answer,fchoice,True,cipher,aad))
+        print(run(answer, fchoice, True, cipher, aad, key))
         end=datetime.now() - begin_time
         input(f"Encryption finished in {end} seconds !\n")
 
@@ -88,7 +94,7 @@ def work_with_selection(pSelection):
         print("Decryption started....")
 
         begin_time = datetime.now()
-        print(run(answer,fchoice,False,cipher))
+        print(run(answer, fchoice, False, cipher, "", key))
         end=datetime.now() - begin_time
         input(f"Decryption finished in {end} seconds !\n")
 

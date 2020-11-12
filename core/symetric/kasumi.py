@@ -13,9 +13,9 @@ import time
 ############ Key Schedule #######################
 #################################################
 
-def set_key(km="y/B?E(H+MbQeThVm".encode()):
+def set_key(km=config.KEY):
     '''Kasumi's keyscheduler.'''
-
+    
     # Chosen as a "nothing up my sleeve" number
     nums = b'\x124Vx\x9a\xbc\xde\xff\xed\xcb\xa9\x87eC!\x00'
 
