@@ -43,3 +43,6 @@ NBR_ELEMENTS = 0
 IRRED_POLYNOMIAL= [1,0,0,0,1,0,0,0,0,1,0,0,0,0,1,0,1]
 GENERATOR = 0
 INVERSIONS_BOX = []
+
+# Key
+KEY = bytearray()

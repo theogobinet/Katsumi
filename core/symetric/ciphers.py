@@ -17,7 +17,7 @@ import binascii
 ############ Main Method  #######################
 #################################################
 
-def cipher(arr,method=3,encrypt=True,aad=""):
+def cipher(arr, method=3, encrypt=True, aad=""):
     """Algorithm that uses a block cipher to provide information security such as confidentiality or authenticity."""
 
     # Dealing with possible last elt < 8 bytes
@@ -49,7 +49,7 @@ def cipher(arr,method=3,encrypt=True,aad=""):
 
 ###### Running method to run everything:
 
-def run(input=it.findFile(".kat"),inFile=True,encrypt=False,method=3,aad=""):
+def run(input=it.findFile(".kat"), inFile=True, encrypt=False, method=3, aad="", key=config.KEY):
 
     """
     Run encryption of decryption.
@@ -86,13 +86,13 @@ def run(input=it.findFile(".kat"),inFile=True,encrypt=False,method=3,aad=""):
                 print('ERROR : Unable to decode the message, the format of the encrypted message does not correspond to the expected one (base64).\n')
 
     # Keys initialisation
-    kasu.set_key()
+    kasu.set_key(key)
 
     if(len(data) > 0):
         splitted=bm.splitBytes(data)
-        ciphered=cipher(splitted,method,encrypt,aad)
+        ciphered=cipher(splitted, method, encrypt, aad)
         
-        return bm.codeOut(ciphered,encrypt,inFile)
+        return bm.codeOut(ciphered, encrypt, inFile)
     
 
 
