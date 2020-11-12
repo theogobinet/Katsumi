@@ -5,7 +5,7 @@
 import ressources.config as config
 import ressources.bytesManager as bm
 import ressources.interactions as it
-from core._cipher.galois_Z2 import invertGalois2
+from core.symetric.galois_Z2 import invertGalois2
 
 import time
 

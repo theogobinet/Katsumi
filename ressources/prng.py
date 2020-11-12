@@ -8,7 +8,7 @@
 import os
 from .bytesManager import bytes_to_int, circularRotation, int_to_bytes, int_to_bits, bytes_needed
 from ressources.utils import millerRabin
-from secrets import randbits, SystemRandom
+from secrets import randbits
 
 def xorshiftperso(evenOrodd=0,nBits:int=512):
     '''
