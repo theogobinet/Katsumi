@@ -160,8 +160,9 @@ def b_op(b1,b2,ope="XOR"):
         b1 = zfill_b(b1,m)
         b2 = zfill_b(b2,m)
 
-    b1 = int().from_bytes(b1,"big")
-    b2 = int().from_bytes(b2,"big")
+    
+    b1 = bytes_to_int(b1) 
+    b2 = bytes_to_int(b2)
 
     if ope == "XOR":
         by = b1 ^ b2
@@ -172,7 +173,7 @@ def b_op(b1,b2,ope="XOR"):
     else:
         return None 
 
-    return by.to_bytes(m,"big")
+    return int_to_bytes(by)
 
 def splitBytes(data,n=8):
     """Split BytesArray into chunks of n (=8 by default) bytes."""
