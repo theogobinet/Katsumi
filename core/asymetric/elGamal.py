@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from ressources.prng import safePrime
-from ressources.utils import square_and_multiply, euclid
+from ressources.utils import square_and_multiply, euclid, inv
 from random import randrange as rd
 
 import ressources.bytesManager as bm
@@ -23,11 +23,8 @@ def mapper(msg,pKey):
     e.g: mapping a message M to an element m of G.
     """
 
-    # B creation
-    B=0
-    for i,e in enumerate(pKey):
-        j=int((i+1)%len(pKey))
-        B+=e^pKey[j]
+    un,deux,trois=pKey[0],pKey[1],pKey[2]
+    B=un^deux^trois
 
     return (msg ^ B)
 
@@ -73,21 +70,22 @@ def key_gen(n:int=512):
     # When p=2q+1, they are the exact same group as Gq.
     # This means, by using Gq, you don't have to worry about an adversary testing if certain numbers are quadratic residues or not.
     
-    private_key = rd(1,q-1) # gcd(private_key,q) = 1
+    x = rd(1,q-1) # gcd(x,q) = 1
 
-    h = square_and_multiply(gen,private_key,p)
+    h = square_and_multiply(gen,x,p)
 
-    import base64
-    to64 = lambda x : base64.b64encode(bm.int_to_bytes(x))
+    # The private key consists of the values (G,q,g,x).
+    private_key = (p,q,gen,x)
+    it.writeVartoFile(private_key,"private_key")
 
-    private_key = to64(private_key)
-    input(f"This is your private key Alice, keep it safe: {private_key}")
+    print(f"Your private key has been generated Alice, keep it safe !")
+
 
     # The public key consists of the values (G,q,g,h).
     public_key = (p,q,gen,h)
     it.writeVartoFile(public_key,"public_key")
 
-    print(f"The public key : {public_key} has been generated and saved.")
+    print(f"The public key : {public_key} has been generated too and saved.")
 
     return None
 
@@ -99,26 +97,44 @@ def key_gen(n:int=512):
 ########### -   Encryption   - ##############
 #############################################
 
-def encrypt(msg,pKey=it.extractVarFromFile("public_key")):
+def encrypt(msg,pKey):
 
     p,q,g,h = pKey[0],pKey[1],pKey[2],pKey[3]
 
-    mapped = mapper(msg,pKey) # (G,q,g,h)
+    #mapped = mapper(msg,pKey) # (p,q,g,h)
 
     y=rd(1,q-1)
 
-    
+    # In Zq
+    #shared secret -> g^xy
+    s=square_and_multiply(h,y,q)
+    c1=square_and_multiply(g,y,q)
+    c2=(msg*s)%q
 
-
-
-
-
+    return (c1,c2)
 
 
 #############################################
 ########### -   Decryption   - ##############
 #############################################
 
+def decrypt(ciphertext,sK):
+
+    x,q=sK[-1],sK[1]
+
+    c1,c2=ciphertext[0],ciphertext[-1]
+
+    first = square_and_multiply(c1,x,q)
+    inverse = inv(first,q)[0]
+
+    m = (c2 * inverse) % q
+
+    m = (square_and_multiply(c1,sK[0]-1-x,q)*c2)%q
+
+    print("m : ",m)
+
+    # c2/c1^x = (h^y.m)/(g^y)^x =(g^xy . m)/ g^xy = m
+    return m
 
 
 
