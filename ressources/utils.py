@@ -54,18 +54,22 @@ def euclid_ext(a:int, b:int, Verbose=False):
     
 def inv(a:int,m:int):
     """If a and m are prime to each other, then there is an a^(-1) such that a^(-1) * a is congruent to 1 mod m."""
-    
     if euclid(a,m) != 1 :
         print(f"gcd({a},{m}) != 1 thus you cannot get an invert of a.")
         return None
-    
-    # Modular inverse u solves the given equation: a.u+m.v=1 
-    # n number of iterations
-    _,u,_,_,_=euclid_ext(a,m)
-    
-    if u < 0 : u+=m
-    
-    return u,f"u = {u} + {m}k, k in Z"    
+    elif millerRabin(m):
+        # A simple consequence of Fermat's little theorem is that if p is prime
+        # then a^−1 ≡ a^(p − 2) (mod p) is the multiplicative 
+        u = square_and_multiply(a,m-2,m)
+
+    else:
+        # Modular inverse u solves the given equation: a.u+m.v=1 
+        # n number of iterations
+        _,u,_,_,_=euclid_ext(a,m)
+        
+        if u < 0 : u+=m
+        
+    return u,f"u = {u} + {m}k, k in Z"
     
 def primeFactors(n:int):
     
@@ -210,58 +214,51 @@ def pairwise_coprime(listing):
     
     return True
 
-def ChineseRemainder(*args):
+def ChineseRemainder(integers:list,modulis:list,Verbose=False):
     
-    """ [n1,..,nk , -1 , a1,..,ak] return result of Chinese Remainder. /n '-1' is the separator. """
+    """
+    x congruent to a modulo n 
+    [a1,..,ak] - integers
+    [n1,..,nk] - modulis
+    return result of Chinese Remainder.
+    """
     
-    modulis,integers=[],[]
     product=1
+    
+    for elt in modulis:
+        product *= elt
+
     i=None
     
-    
-    for i,elt in enumerate(args):
-        
-        # Separator detection
-        if elt == -1 : 
-            i=i; # Separator is at position i
-            break
-        
-        
-        # Before separtor -> modulis
-        if elt <=1: return f"Error: '{elt}' lesser than 2."
-        
-        modulis.append(elt)
-        
-        product*=elt
-
-    for elt in range(i+1,len(args)):
-        # After separator -> integers
-        elt=int(args[elt])
-        integers.append(elt)
-        
     # Condition one
     if not pairwise_coprime(modulis): return "Error: n elements aren't pairwise coprime."
     
     solution=0
+
+    if Verbose:
+        print(integers,modulis)
     
     for a,n in zip(integers,modulis):
         
         if not ((a>=0) and (a<n)) : return "Error: '0 <= ai < ni' is not respected."
         
-        print(f" - x congruent to {a} modulo {n}")
+        if Verbose:
+            print(f" - x congruent to {a} modulo {n}")
         
         # According to the extended Euclid algorithm :
         Mk=int(product/n)
         yk=inv(Mk,n)[0]
         
-        print(f" - y congruent to {yk} modulo {n}\n")
+        if Verbose:
+            print(f" - y congruent to {yk} modulo {n}\n")
         
         solution += a*yk*Mk
     
     
-    
-    return (solution%product,product,f" x congruent to {solution%product} mod {product}")
-    
+    if Verbose:
+        return (solution%product,product,f" x congruent to {solution%product} mod {product}")
+    else:
+        return solution%product
 
 def order(n,p):
     """Order of n in p is the smallest number M or n^M = 1 mod p"""

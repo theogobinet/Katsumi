@@ -34,8 +34,9 @@ def mapper(msg,pKey):
 
 
 def findGen(p,q):
+    
     """
-    Easy way of selecting a random generator :
+    Easy way of selecting a random generator of Z*p :
     select a random value h between 2 and p−1
 
     p: Safe prime
@@ -107,9 +108,9 @@ def encrypt(msg,pKey):
 
     # In Zq
     #shared secret -> g^xy
-    s=square_and_multiply(h,y,q)
-    c1=square_and_multiply(g,y,q)
-    c2=(msg*s)%q
+    s=square_and_multiply(h,y,p)
+    c1=square_and_multiply(g,y,p)
+    c2=(msg*s)%p
 
     return (c1,c2)
 
@@ -120,21 +121,11 @@ def encrypt(msg,pKey):
 
 def decrypt(ciphertext,sK):
 
-    x,q=sK[-1],sK[1]
+    x,p=sK[-1],sK[0]
 
     c1,c2=ciphertext[0],ciphertext[-1]
 
-    first = square_and_multiply(c1,x,q)
-    inverse = inv(first,q)[0]
-
-    m = (c2 * inverse) % q
-
-    m = (square_and_multiply(c1,sK[0]-1-x,q)*c2)%q
-
-    print("m : ",m)
-
-    # c2/c1^x = (h^y.m)/(g^y)^x =(g^xy . m)/ g^xy = m
-    return m
+    return (square_and_multiply(c1,p-1-x,p)*c2)%p
 
 
 
