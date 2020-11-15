@@ -7,3 +7,7 @@ __pycache__/
 share/*
 ressources/__pycache__/*
 ressources/__pycache__/*.pyc
+ressources/__pycache__/bytesManager.cpython-37.pyc
+ressources/__pycache__/config.cpython-37.pyc
+ressources/__pycache__/utils.cpython-37.pyc
+ressources/__pycache__/interactions.cpython-37.pyc

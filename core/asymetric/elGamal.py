@@ -104,8 +104,6 @@ def encrypt(msg,pKey):
 
     #mapped = mapper(msg,pKey) # (p,q,g,h)
 
-    y=rd(1,q-1)
-
     # In Zq
     #shared secret -> g^xy
     s=square_and_multiply(h,y,p)

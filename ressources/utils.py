@@ -55,13 +55,13 @@ def euclid_ext(a:int, b:int, Verbose=False):
 def inv(a:int,m:int):
     """If a and m are prime to each other, then there is an a^(-1) such that a^(-1) * a is congruent to 1 mod m."""
     if euclid(a,m) != 1 :
-        print(f"gcd({a},{m}) != 1 thus you cannot get an invert of a.")
+        print(f"gcd({a},{m}) = {euclid(a,m)} != 1 thus you cannot get an invert of a.")
         return None
+        # a modular multiplicative inverse can be found directly
     elif millerRabin(m):
         # A simple consequence of Fermat's little theorem is that if p is prime
         # then a^−1 ≡ a^(p − 2) (mod p) is the multiplicative 
         u = square_and_multiply(a,m-2,m)
-
     else:
         # Modular inverse u solves the given equation: a.u+m.v=1 
         # n number of iterations
@@ -70,13 +70,99 @@ def inv(a:int,m:int):
         if u < 0 : u+=m
         
     return u,f"u = {u} + {m}k, k in Z"
+
+def phi(n:int,m:int=1,k:int=1,Verbose:bool=False):
+    """
+    Totient recurcive function for integer n.
+    Can compute:
+         phi(n*m) with phi(n,m).
+         phi(p^k) with phi(p,1,k)
+    """
+
+    if Verbose:
+        print(f"----------- phi(n={n},m={m},k={k})--------------")
+    ## Special cases ##
+    twoN = int(n/2)
+
+    if m != 1:
+
+        d=euclid(n,m)
+        if Verbose:
+            print(f"gcd({n},{m}) = {d}")
+            print(f"phi({n})*phi({m})*({d}/phi({d}))")
+        return phi(n,1,k,Verbose)*phi(m,1,k,Verbose)*int((d/phi(d,1,k,Verbose)))
+
+    elif k != 1:
+        # phi(n^k) = n ^(k-1) * phi(n)
+        
+        if Verbose:
+            print(f"phi(n^k) = n ^(k-1) * phi(n)")
+
+        return square_and_multiply(n,k-1) * phi(n,1,1,Verbose)
+
+    else:
+
+        if n>=0 and n<=10 :
+            # Fastest results for common totients
+            totients=[0,1,1,2,2,4,2,6,4,6,4,10]
+            r=totients[n]
+
+            if Verbose:
+                print(f"Common totient phi({n}) = {r}")
+
+            return r
+
+        elif millerRabin(n):
+            # n is a prime number so phi(p) = (p-1)
+            # p^(k-1) * phi(p) = p^(k-1) * (p-1)
+
+            if Verbose:
+                print(f"{n} is a prime number so phi(p) = (p-1)")
+
+            return (n-1)
+
+        # If even:
+        elif not twoN & 1 :
+            if Verbose:
+                print(f"2*phi({twoN})")
+            return 2*phi(twoN,m,k,Verbose)
+
+    ## Special cases ##
+
+        else:
+            result = n   # Initialize result as n 
+            
+            # Consider all prime factors 
+            # of n and for every prime 
+            # factor p, multiply result with (1 - 1 / p) 
+            p = 2
+            while p * p <= n : 
+        
+                # Check if p is a prime factor. 
+                if n % p == 0 : 
+        
+                    # If yes, then update n and result 
+                    while n % p == 0 : 
+                        n = n // p 
+                    result *=  (1 - (1 / p)) 
+                p += 1
+                
+                
+            # If n has a prime factor 
+            # greater than sqrt(n) 
+            # (There can be at-most one 
+            # such prime factor) 
+            if n > 1 : 
+                result *= (1 - (1 / n)) 
+        
+            return int(result) 
     
 def primeFactors(n:int):
     
     """
-    Decomposes an integer n into prime factors and calculates Euler’s Totient Function.
+    Decomposes an integer n into prime factors.
     
-    Output: prime factors , Totient Function , Coprimes numbers
+    Output: prime factors , Coprimes numbers
     """
     
     if n < 2 : 
@@ -84,25 +170,18 @@ def primeFactors(n:int):
         # 1 is primary with itself
         return None,1   
     
-    ####
-    # Euler’s Totient Function
-    # To do before changing n value succently 
-    ####
-    
-    phi_of_n=1
     coprimes=[1]
     
     # a and b are said to be coprime if the only positive integer (factor) that divides both of them is 1.
     for i in range(2,n):
-        if euclid(i,n) == 1 :
+        if coprime(i,n):
             coprimes.append(i)
-            phi_of_n+=1
     
     
     res=[]
     
     #While n is divisible by 2, print 2 and divide n by 2
-    while n%2 == 0:
+    while not n & 1:
         res.append(2)
         n=n/2
 
@@ -136,7 +215,7 @@ def primeFactors(n:int):
         prime_decompo[elt]=prime_decompo.get(elt,res.count(elt))
     
 
-    return prime_decompo,phi_of_n,coprimes
+    return prime_decompo,coprimes
         
 def square_and_multiply(x, k, p=None):
     """
@@ -197,11 +276,15 @@ def millerRabin(p, s=40):
 
 
 def coprime(a:int,b:int):
-    """Two values are said to be coprime if they have no common prime factors."""
+    """
+    Two values are said to be coprime if they have no common prime factors.
+    This is equivalent to their greatest common divisor (gcd) being 1.
+    """
     
-    a,b=primeFactors(a)[0],primeFactors(b)[0]
-    
-    return not any(item in a for item in b)
+    if euclid(a,b):
+        return True
+    else:
+        return False
 
 def pairwise_coprime(listing):
     """ Check if elements of a list are pairwise coprime."""
@@ -227,6 +310,8 @@ def ChineseRemainder(integers:list,modulis:list,Verbose=False):
     
     for elt in modulis:
         product *= elt
+        if Verbose:
+            print(f"Product of modulis is: {product}")
 
     i=None
     
