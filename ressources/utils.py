@@ -94,11 +94,13 @@ def phi(n:int,m:int=1,k:int=1,Verbose:bool=False):
 
     elif k != 1:
         # phi(n^k) = n ^(k-1) * phi(n)
+
+        mult=square_and_multiply(n,k-1)
         
         if Verbose:
-            print(f"phi(n^k) = n ^(k-1) * phi(n)")
+            print(f"phi(n^k) = n ^(k-1) * phi(n) = {mult} * phi({n})")
 
-        return square_and_multiply(n,k-1) * phi(n,1,1,Verbose)
+        return mult * phi(n,1,1,Verbose)
 
     else:
 
