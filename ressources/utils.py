@@ -51,25 +51,30 @@ def euclid_ext(a:int, b:int, Verbose=False):
     s=f"gcd({a_buffer},{b_buffer})= {a_buffer}×{x0} + {b_buffer}×{y0}"
     
     return b, x0, y0, s, n
+
+def coprime(a:int,b:int):
+    """
+    Two values are said to be coprime if they have no common prime factors.
+    This is equivalent to their greatest common divisor (gcd) being 1.
+    """
     
-def inv(a:int,m:int):
-    """If a and m are prime to each other, then there is an a^(-1) such that a^(-1) * a is congruent to 1 mod m."""
-    if euclid(a,m) != 1 :
-        print(f"gcd({a},{m}) = {euclid(a,m)} != 1 thus you cannot get an invert of a.")
-        return None
-        # a modular multiplicative inverse can be found directly
-    elif millerRabin(m):
-        # A simple consequence of Fermat's little theorem is that if p is prime
-        # then a^−1 ≡ a^(p − 2) (mod p) is the multiplicative 
-        u = square_and_multiply(a,m-2,m)
+    if euclid(a,b):
+        return True
     else:
-        # Modular inverse u solves the given equation: a.u+m.v=1 
-        # n number of iterations
-        _,u,_,_,_=euclid_ext(a,m)
-        
-        if u < 0 : u+=m
-        
-    return u,f"u = {u} + {m}k, k in Z"
+        return False
+
+def pairwise_coprime(listing):
+    """ Check if elements of a list are pairwise coprime."""
+    
+    size=len(listing)
+    
+    for i in range(0,size-1):
+        for j in range(i+1,size):
+            if not coprime(listing[i],listing[j]) : return False
+    
+    return True
+
+
 
 def phi(n:int,m:int=1,k:int=1,Verbose:bool=False):
     """
@@ -176,6 +181,38 @@ def phi(n:int,m:int=1,k:int=1,Verbose:bool=False):
                 result *= (1 - (1 / n)) 
         
             return int(result)
+
+def inv(a:int,m:int,Verbose=False):
+    """If a and m are prime to each other, then there is an a^(-1) such that a^(-1) * a is congruent to 1 mod m."""
+    if euclid(a,m) != 1 :
+        if Verbose:
+            print(f"gcd({a},{m}) = {euclid(a,m)} != 1 thus you cannot get an invert of a.")
+        raise ValueError("gcd(a,m) != 1 thus you cannot get an invert of a.")
+        # a modular multiplicative inverse can be found directly
+    elif millerRabin(m) and m%a != 0:
+        # A simple consequence of Fermat's little theorem is that if p is prime and does not divide a
+        # then a^−1 ≡ a^(p − 2) (mod p) is the multiplicative 
+        if Verbose: 
+            print(f"From Fermat's little theorem, because {m} is prime and does not divide {a} so: a^-1 = a^{m}-2 mod {m}")
+        u = square_and_multiply(a,m-2,m)
+    elif coprime(a,m):
+        #From Euler's theorem, if a and n are coprime, then a^−1 ≡ a^(φ(n) − 1) (mod n).
+        if Verbose:
+            print(f"From Euler's theorem, because {a} and {m} are coprime -> a^-1 = a^phi({m})-1 mod {m}")
+            u = square_and_multiply(a,phi(m)-1,m)
+    else:
+        if Verbose:
+            print(f"Modular inverse u solves the given equation: a.u+m.v=1.\n Let's use the euclid extended algorithm tho.")
+        # Modular inverse u solves the given equation: a.u+m.v=1 
+        # n number of iterations
+        _,u,_,_,_=euclid_ext(a,m)
+        
+        if u < 0 : u+=m
+    
+    if Verbose:
+        return u,f"u = {u} + {m}k, k in Z"
+    else:
+        return u
     
 def primeFactors(n:int):
     
@@ -186,7 +223,7 @@ def primeFactors(n:int):
     """
     
     if n < 2 : 
-        print("By definition, A prime number (or prime) is a natural number greater than 1 that has no positive divisors other than 1 and itself.")
+        # By definition, A prime number (or prime) is a natural number greater than 1 that has no positive divisors other than 1 and itself
         # 1 is primary with itself
         return None,1   
     
@@ -295,28 +332,6 @@ def millerRabin(p, s=40):
     return True
 
 
-def coprime(a:int,b:int):
-    """
-    Two values are said to be coprime if they have no common prime factors.
-    This is equivalent to their greatest common divisor (gcd) being 1.
-    """
-    
-    if euclid(a,b):
-        return True
-    else:
-        return False
-
-def pairwise_coprime(listing):
-    """ Check if elements of a list are pairwise coprime."""
-    
-    size=len(listing)
-    
-    for i in range(0,size-1):
-        for j in range(i+1,size):
-            if not coprime(listing[i],listing[j]) : return False
-    
-    return True
-
 def ChineseRemainder(integers:list,modulis:list,Verbose=False):
     
     """
@@ -333,37 +348,77 @@ def ChineseRemainder(integers:list,modulis:list,Verbose=False):
         if Verbose:
             print(f"Product of modulis is: {product}")
 
-    i=None
-    
-    # Condition one
-    if not pairwise_coprime(modulis): return "Error: n elements aren't pairwise coprime."
-    
-    solution=0
+    if len(integers)==2 and len(modulis)==2:
+         # Simplified chinese remainder theorem to deciphering
+         a,b=integers[0],integers[1]
+         m,n=modulis[0],modulis[1]
+         if Verbose:
+             print(f"x = [ {b} * {m}^(-1) * {m}  +  {a} * {n}^(-1) * {n} ] mod ({m*n}) ")
+             m1,n1 = inv(m,n,Verbose)[0] , inv(n,m,Verbose)[0]
+         else:
+             m1,n1 = inv(m,n,Verbose) , inv(n,m,Verbose)
 
-    if Verbose:
-        print(integers,modulis)
-    
-    for a,n in zip(integers,modulis):
+         solution = b*m1*m + a*n1*n
+
+    else: 
+
+        i=None
         
-        if not ((a>=0) and (a<n)) : return "Error: '0 <= ai < ni' is not respected."
+        # Condition one
+        if not pairwise_coprime(modulis): raise ValueError("Error: n elements aren't pairwise coprime.")
         
+        solution=0
+
         if Verbose:
-            print(f" - x congruent to {a} modulo {n}")
+            print(integers,modulis)
         
-        # According to the extended Euclid algorithm :
-        Mk=int(product/n)
-        yk=inv(Mk,n)[0]
-        
-        if Verbose:
-            print(f" - y congruent to {yk} modulo {n}\n")
-        
-        solution += a*yk*Mk
-    
-    
+        for a,n in zip(integers,modulis):
+            
+            if not ((a>=0) and (a<n)) : raise ValueError("Error: '0 <= ai < ni' is not respected.")
+            
+            if Verbose:
+                print(f" - x congruent to {a} modulo {n}")
+            
+            # According to the extended Euclid algorithm :
+            Mk=int(product/n)
+
+            if Verbose:
+                yk=inv(Mk,n,Verbose)[0]
+            else:
+                yk=inv(Mk,n,Verbose)
+            
+            if Verbose:
+                print(f" - y congruent to {yk} modulo {n}\n")
+            
+            solution += a*yk*Mk
+
     if Verbose:
         return (solution%product,product,f" x congruent to {solution%product} mod {product}")
     else:
         return solution%product
+
+def mapper(elt:int,p:int,q:int,action:bool=True):
+    """
+    Reversible mapping into/from Zpq.
+
+    Bijection : Zpq = Zp * Zq
+
+    action: 
+        True - map
+        False - unmap 
+    """
+    # Mapping
+    if action:
+        a = elt % p
+        b = elt % q
+        
+        return (a,b)
+    else:
+        x = ChineseRemainder(elt,[p,q])
+        return x
+
+
+
 
 def order(n,p):
     """Order of n in p is the smallest number M or n^M = 1 mod p"""
