@@ -80,7 +80,7 @@ def phi(n:int,m:int=1,k:int=1,Verbose:bool=False):
     """
 
     if Verbose:
-        print(f"----------- phi(n={n},m={m},k={k})--------------")
+        print(f"\n----------- phi(n={n},m={m},k={k})--------------")
     ## Special cases ##
     twoN = int(n/2)
 
@@ -104,9 +104,21 @@ def phi(n:int,m:int=1,k:int=1,Verbose:bool=False):
 
     else:
 
-        if n>=0 and n<=10 :
-            # Fastest results for common totients
-            totients=[0,1,1,2,2,4,2,6,4,6,4,10]
+        if n>=0 and n<=123 :
+            # Fastest results for common totients (sequence A000010 in the OEIS)
+            totients=[0,1,1,2,2,4,2,6,4,6,4,10,
+            4,12,6,8,8,16,6,18,8,12,10,22,
+            8,20,12,18,12,28,8,30,16,20,16,24,
+            12,36,18,24,16,40,12,42,20,24,22,46,
+            16,42,20,32,24,52,18,40,24,36,28,58,
+            16,60,30,36,32,48,20,66,32,44,24,70,
+            24,72,36,40,36,60,24,78,32,54,40,82,
+            24,64,42,56,40,88,24,72,44,60,46,72,
+            32,96,42,60,40,100,32,102,48,48,52,106,
+            36,108,40,72,48,112,36,88,56,72,58,96,
+            32,110,60,80,60,100,36,126,64,84,48,130,
+            40,108,66,72,64,136,44,138,44,138,48,92,70,120]
+
             r=totients[n]
 
             if Verbose:
@@ -126,23 +138,29 @@ def phi(n:int,m:int=1,k:int=1,Verbose:bool=False):
         # If even:
         elif not twoN & 1 :
             if Verbose:
-                print(f"2*phi({twoN})")
+                print(f"phi({n}) = phi(2*{twoN}) = 2 * phi({twoN}).")
             return 2*phi(twoN,m,k,Verbose)
 
     ## Special cases ##
 
         else:
+
+            if Verbose:
+                print(f"Let's calculate phi({n}) with prime factors way.")
+
             result = n   # Initialize result as n 
             
             # Consider all prime factors 
             # of n and for every prime 
-            # factor p, multiply result with (1 - 1 / p) 
+            # factor p, multiply result with (1 - 1 / p)
+
             p = 2
+
             while p * p <= n : 
         
                 # Check if p is a prime factor. 
                 if n % p == 0 : 
-        
+     
                     # If yes, then update n and result 
                     while n % p == 0 : 
                         n = n // p 
@@ -157,7 +175,7 @@ def phi(n:int,m:int=1,k:int=1,Verbose:bool=False):
             if n > 1 : 
                 result *= (1 - (1 / n)) 
         
-            return int(result) 
+            return int(result)
     
 def primeFactors(n:int):
     
