@@ -102,7 +102,7 @@ def randomPrime(nBits:int=512,gen=randomInt,condition = lambda p : p == p,k:int=
         return primes
     
 
-def safePrime(nBits:int=1024):
+def safePrime(nBits:int=1024,easyGenerator=False):
     """
     The number 2p + 1 associated with a Sophie Germain prime is called a safe prime.
     In number theory, a prime number p is a Sophie Germain prime if 2p + 1 is also prime
@@ -116,9 +116,11 @@ def safePrime(nBits:int=1024):
 
     Return (safe_prime,sophieGermain_prime) tuple's
     """
-
-    p_filter = lambda p : p % 3 == 2
-
+    if easyGenerator:
+        p_filter = lambda p : p % 3 == 2 and p % 4 == 1 # p = 1 mod 4 make 2 as primitive root
+    else:
+        p_filter = lambda p : p % 3 == 2
+        
     while 1:
         sophieGermain_prime = randomPrime(nBits,randomInt,p_filter)
         safe_prime = 2 * sophieGermain_prime + 1

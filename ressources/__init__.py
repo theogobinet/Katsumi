@@ -6,3 +6,4 @@ from .bytesManager import *
 from .interactions import *
 from .utils import *
 from .prng import *
+from .multGroup import *

@@ -18,7 +18,7 @@ def poly_mult_2(a:int , b:int):
     '''
 
     def multbiggest(a, b):
-        # nonlocal keyword is used to work with variables inside nested functions, where the variable should not belong to the inner function.
+        
         r = 0
         for i in range(a.bit_length()):
 
@@ -231,7 +231,6 @@ def handleInvBox():
    
             import threading
             import time
-            import sys
 
             th=threading.Thread(target=genInverses2)
             
