@@ -44,12 +44,12 @@ def clear():
         os.system("clear")
 
 
-def readFromUser():
+def readFromUser(msg="Enter the message there:"):
     from sys import stdin
 
     phrase=""
 
-    print("Enter the message there:")
+    print(msg)
     
     for line in stdin:
         if line == '\n': # If empty string is read then stop the loop

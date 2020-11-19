@@ -2,4 +2,5 @@
 # -*- coding: utf-8 -*-
 # __init__.py
 
-from .elGamal import *
+from . import elGamal as elG 
+from . import diffieHellman as dH

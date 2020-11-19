@@ -45,6 +45,43 @@ def inv(a:int,m:int,Verbose=False):
     else:
         return u
 
+# Function to calculate k for given a, b, m  
+def discreteLog(g:int, res:int, modulo:int):
+    """
+    Given a cyclic group of order 'm' a generator 'g' and a group element r, 
+    the problem is to find an integer 'k' such that g^k = r (mod m) by using
+    Meet in the Middle trick and baby-step,giant-step algorithm.
+    """
+    # https://en.wikipedia.org/wiki/Baby-step_giant-step
+
+    import math 
+    middle = int(math.sqrt(modulo) + 1);  
+  
+    value = [0] * modulo
+
+    # Store all values of g^(middle*i) of LHS
+    for i in range(middle,0,-1): # baby-step
+        value[ut.square_and_multiply(g, i * middle , modulo) ] = i 
+  
+    # Giant-Step
+    for j in range(middle):  
+          
+        # Calculate (g ^ j) * res and check  
+        # for collision  
+        cur = (ut.square_and_multiply(g, j, modulo) * res) % modulo;  
+  
+        # If collision occurs i.e., LHS = RHS  
+        if (value[cur]):  
+            ans = value[cur] * middle - j;  
+              
+            # Check whether ans lies below m or not  
+            if (ans < modulo):  
+                return ans;  
+      
+    return -1;
+
+
+
 def findPrimefactors(n:int) : 
     """
     Decomposes an integer n into prime factors and store in a set.
@@ -181,26 +218,27 @@ def phi(n:int,m:int=1,k:int=1,Verbose:bool=False):
         
             return int(result)
 
-
-
-def order(n:int,p:int,Verbose=False):
+def multiplicativeOrder(n:int,p:int,Verbose=False):
     """
     The minimum period of the sequence of powers of a is called the order of a.
     So a is a primitive root mod n if and only if the order of a is ϕ(n). 
     Order of n in p is the smallest number M or n^M = 1 mod p
     """
-    k=0
-
+    
+    k = 1
+    
     if Verbose:
             print(f"m = {n} , iterations: {k}")
 
-    for e in range(1,p-1):
+    for e in range(1,p):
         m=ut.square_and_multiply(n,e,p)
-        k+=1
-        if Verbose:
-            print(f"m = {n}^{e} mod {p} = {m} , iterations: {k}")
+        
         if m == 1:
             break
+        else:
+            k+=1
+            if Verbose:
+                print(f"m = {n}^{e} mod {p} = {m} , iterations: {k}")
 
     return k
 
@@ -218,7 +256,7 @@ def congruenceClasses(e:int):
     return elements
 
 
-def primitiveRoot(n:int,Verbose=False):
+def firstPrimitiveRoot(n:int,Verbose=False):
     """ Find primitive root modulo n. """
 
     totient=phi(n,1,1,Verbose)
@@ -228,10 +266,11 @@ def primitiveRoot(n:int,Verbose=False):
 
     if n > 3 and  ut.millerRabin(n):
 
+        if Verbose: print(f"Let's find all prime factors of {totient}:")
         s = findPrimefactors(totient)
 
         if Verbose:
-            print("-----------------------------")
+            print("\n-----------------------------")
             print(f"{n} is prime and prime factors of totient are: {s} ")
             print(f"Computing all g^(phi({n})/p_i) mod {n} with p_i prime factors.")
             print(f"If all the calculated values are different from 1, then g is a primitive root.")
@@ -264,10 +303,10 @@ def primitiveRoot(n:int,Verbose=False):
             print(f"According to Euler's theorem, a is a primitive root mod {n} if and only if the order of a is ϕ(n) = {totient}.")
 
         for e in range(1,n-1):
-            o = order(e,n,Verbose)
+            o = multiplicativeOrder(e,n,Verbose)
 
             if Verbose:
-                print(f"order({e},{n}) = {o} \n")
+                print(f"multiplicative order({e},{n}) = {o} \n")
 
             if o == totient:
                 return e
@@ -276,6 +315,27 @@ def primitiveRoot(n:int,Verbose=False):
         if Verbose:
             print(f"Since there is no number whose order is {totient}, there are no pritive roots modulo {n}.")
         return -1
+
+
+
+def findOtherGenerators(gen:int,mod:int,Verbose=False):
+    """
+    In a cyclic group of order n, with generator a, all subgroups are cyclic, generated (by definition) by some a^k,
+    and the order of a^k is equal to (n/gcd(n,k)).
+
+    Therefore a^k mod n is another generator of the group if and only if k is coprime to n.
+    """
+
+    totient = phi(mod)
+
+    if Verbose:
+        print(f"Based on the fact that {gen} is a generator of Z{mod}, the generators are {gen}^k with gcd(phi({mod}),k) = 1. ")
+        print(f"Therefore the generators of Z{mod} are {gen}^k for k coprime with {totient}.")
+        print(f"Or you can say: {gen}^k (with k elements from congruences classes of {totient}) are generators of Z{mod}.")
+
+    return [ut.square_and_multiply(gen,e,mod) for e in congruenceClasses(totient)]
+
+
 
 def isGenerator(e:int,n:int,printOther=False,Verbose=False):
     """
@@ -306,27 +366,32 @@ def isGenerator(e:int,n:int,printOther=False,Verbose=False):
             print(f"{e} is the a generator of Z{n} with elements: {elements}\n")
         return True 
 
-
-
-def findOtherGenerators(gen:int,mod:int,Verbose=False):
-    """
-    In a cyclic group of order n, with generator a, all subgroups are cyclic, generated (by definition) by some a^k,
-    and the order of a^k is equal to (n/gcd(n,k)).
-
-    Therefore a^k mod n is another generator of the group if and only if k is coprime to n.
-    """
-
-    totient = phi(mod)
-
-    if Verbose:
-        print(f"Based on the fact that {gen} is a generator of Z{mod}, the generators are {gen}^k with gcd(phi({mod}),k) = 1. ")
-        print(f"Therefore the generators of Z{mod} are {gen}^k for k coprime with {totient}.")
-        print(f"Or you can say: {gen}^k (with k elements from congruences classes of {totient}) are generators of Z{mod}.")
-
-    r = [ut.square_and_multiply(gen,e,mod) for e in congruenceClasses(totient)]
-
-    return r
         
+def quadraticsResidues(n:int):
+    """
+    For a given n a list of the quadratic residues modulo n may be obtained by simply squaring the numbers 0, 1, ..., n − 1.
+    Because a2 ≡ (n − a)2 (mod n), the list of squares modulo n is symmetrical around n/2, and the list only needs to go that high. 
+    
+    N.B: 0 and 1 are always quadratics residues by definition.
+    """
+    return sorted(set([ut.square_and_multiply(e,2,n) for e in range(n)]))
 
+def legendreSymbol(a:int,p:int,quadraticList=None):
+    """
+    https://en.wikipedia.org/wiki/Legendre_symbol
+
+    LegendreSymbol of quadratics Residues is always 1 except for 0 and 1.
+    """
+    assert ut.millerRabin(p)
+
+    if quadraticList == None:
+        quadraticList = quadraticsResidues(p)
+
+    if a%p == 0:
+        return 0
+    elif a%p != 0 and a in quadraticList:
+        return 1
+    else:
+        return -1
     
 

@@ -6,7 +6,7 @@
 # https://en.wikipedia.org/wiki/List_of_random_number_generators
 
 import os
-from .bytesManager import bytes_to_int, circularRotation, int_to_bytes, int_to_bits, bytes_needed
+from .bytesManager import bytes_to_int, circularRotation, bytes_needed
 from ressources.utils import millerRabin
 from secrets import randbits
 
@@ -83,7 +83,7 @@ def randomPrime(nBits:int=512,gen=randomInt,condition = lambda p : p == p,k:int=
     """
 
     # Generate random odd number of nBits
-    assert nBits > 0 and nBits < 4096
+    assert nBits >= 8 and nBits <= 4096
 
     maybe=gen(0,nBits)
 
@@ -102,7 +102,7 @@ def randomPrime(nBits:int=512,gen=randomInt,condition = lambda p : p == p,k:int=
         return primes
     
 
-def safePrime(nBits:int=1024,easyGenerator=False):
+def safePrime(nBits:int=1024,randomFunction=None,easyGenerator=False,Verbose=False):
     """
     The number 2p + 1 associated with a Sophie Germain prime is called a safe prime.
     In number theory, a prime number p is a Sophie Germain prime if 2p + 1 is also prime
@@ -117,12 +117,25 @@ def safePrime(nBits:int=1024,easyGenerator=False):
     Return (safe_prime,sophieGermain_prime) tuple's
     """
     if easyGenerator:
-        p_filter = lambda p : p % 3 == 2 and p % 4 == 1 # p = 1 mod 4 make 2 as primitive root
+        p_filter = lambda p : p % 3 == 2 and (p % 12 == 1 or p % 12 == 11)# p = 1 mod 12 make 11 as primitive root
     else:
         p_filter = lambda p : p % 3 == 2
         
     while 1:
-        sophieGermain_prime = randomPrime(nBits,randomInt,p_filter)
+
+        if randomFunction == None:
+            randomFunction = randomInt
+
+        sophieGermain_prime = randomPrime(nBits,randomFunction,p_filter)
         safe_prime = 2 * sophieGermain_prime + 1
-        if millerRabin(safe_prime):
+        bits = bytes_needed(safe_prime)*8
+
+        if Verbose:
+            print(f"Sophie Germain Prime {sophieGermain_prime} candidate's.")
+
+        if bits >= nBits and millerRabin(safe_prime):
             return (safe_prime,sophieGermain_prime)
+        else:
+            if Verbose:
+                print(f"But 2 * him + 1 don't seem to be prime...\n")
+            continue

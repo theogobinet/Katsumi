@@ -7,7 +7,6 @@ from ressources.interactions import clear, query_yn
 
 import ressources.interactions as it
 import ressources.config as config
-import core.symetric.kasumi as kasu
 
 from core.symetric.ciphers import run
 from core.symetric.galois_Z2 import GF2
@@ -166,7 +165,7 @@ def menu():
 ''')
     print("- Created by : Gobinet Théo && Martin Azaël ")
     print("- Free to use")
-    print()
+    print("- MIT License\n")
 
     for i,elt in enumerate(choices):
         print(f"\t({i+1}) - {elt}")
