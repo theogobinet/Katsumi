@@ -15,40 +15,46 @@ import random as rd
 # Like most public key systems, the ElGamal cryptosystem is usually used as part of a hybrid cryptosystem where
 # the message itself is encrypted using a symmetric cryptosystem and ElGamal is then used to encrypt only the symmetric key.
 ############
-
 def generator(p:int,q:int):
     """
-    Find a generator g such as g order's is q (Sophie Germain prime) with p = 2q + 1.
+    Find a generator g such as g order is q (Sophie Germain prime) with p = 2q + 1.
+    That's a generator for Gq. Not Zp* and any other subgroup. Very important point.
 
     Avoid commons attacks.
     """
-
     assert p == 2*q +1
 
+    while 1:
 
-    # Removing 0 and  1 to keep only legender symbol = 1 results
-    qResidues = multGroup.quadraticsResidues(p)[2:]
+        # Choose a random quadratic residues, thus is multiplicative order will be q.
+        # Without 0 and 1 to keep only legender symbol = 1 results
+        
+        e = rd.randrange(2,p)
+        g = ut.square_and_multiply(e,2,p)
 
-    ################################################################
-    ###################- Attacks protection's -#####################
-    ################################################################
 
-    # We must avoid g=2 because of Bleichenbacher's attack described
-    # in "Generating ElGamal signatures without knowning the secret key",
-    # 1996
-    if 2 in qResidues:
-        qResidues.remove(2)
 
-    # Discard g if it divides (p-1)
+        # We must avoid g=2 because of Bleichenbacher's attack described
+        # in "Generating ElGamal signatures without knowning the secret key",
+        # 1996
 
-    qResidues = [e for e in qResidues if (p-1)%e != 0 and (p-1) % multGroup.inv(e,p) != 0]
+        if g in (1,2):
+            continue
 
-    # g^{-1} must not divide p-1 because of Khadir's attack
-    # described in "Conditions of the generator for forging ElGamal
-    # signature", 2011
+        #Discard g if it divides p-1
+        elif (p-1) % g == 0:
+            continue
 
-    # Choose a random quadratic residues, thus is multiplicative order will be q.
-    return rd.choice(qResidues)
+
+        # g^{-1} must not divide p-1 because of Khadir's attack
+        # described in "Conditions of the generator for forging ElGamal
+        # signature", 2011
+
+        elif (p-1) % multGroup.inv(g,p) == 0:
+            continue
+
+        # Found a good candidate
+        return g
 
 #############################################
 ########### - Key Generation - ##############
@@ -75,6 +81,7 @@ def key_gen(n:int=512,easyGenerator:bool=False,randomFunction=None,Verbose=False
     if Verbose:
         print(f"Let's find the generator for p: {p} , safe prime number.")
 
+    # Generate an efficient description of a cyclic group G, of order q with generator g.
     if easyGenerator:
         # https://en.wikipedia.org/wiki/Quadratic_residue#Table_of_quadratic_residues
         if Verbose: print(f"Easy generator => gen = 12 (condition in prime generation) or (4,9) (for every prime)")
@@ -154,7 +161,7 @@ def decrypt(ciphertext,sK,asTxt=False):
     x,p = sK[-1],sK[0]
 
     def process(cipherT):
-        c1,c2 = cipherT[0],cipherT[-1]
+        c1,c2 = cipherT
 
         s = ut.square_and_multiply(c1,x,p)
         #s1 = multGroup.inv(s,p)
@@ -185,5 +192,43 @@ def decrypt(ciphertext,sK,asTxt=False):
 #############################################################
 
 
+def delog(publicKey,encrypted=None,asTxt=False):
+    """
+    Retrieve private key with publicKey.
+    And if you get the encrypted message, thus you can decrypt them.
+    """
+
+    from ressources.utils import discreteLog
+
+    def dlog_get_x(publicKey):
+        """
+        Find private key using discrete logarithmic method.
+        """
+        
+        # PublicKey format : (p,q,gen,h)
+        p,q,g,h = publicKey
+
+        x = discreteLog(g,h,p)
+
+        # Same format as private key
+        return (p,q,g,x)
+
+    private_Key = dlog_get_x(publicKey)
+
+    if encrypted == None:
+        return private_Key
+
+    else:
+        return decrypt(encrypted,private_Key,asTxt)
+        
+
+    
+
+
+
+
+
+
+    
 
 

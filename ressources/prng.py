@@ -137,5 +137,5 @@ def safePrime(nBits:int=1024,randomFunction=None,easyGenerator=False,Verbose=Fal
             return (safe_prime,sophieGermain_prime)
         else:
             if Verbose:
-                print(f"But 2 * him + 1 don't seem to be prime...\n")
+                print(f"But 2 * him + 1 doesn't seem to be prime...\n")
             continue

@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import ressources.utils as ut
+from ressources.utils import millerRabin
 
 
 def inv(a:int,m:int,Verbose=False):
@@ -29,14 +30,16 @@ def inv(a:int,m:int,Verbose=False):
         if Verbose:
             print(f"From Euler's theorem, because {a} and {m} are coprime -> a^-1 = a^phi({m})-1 mod {m}")
         
-            u = ut.square_and_multiply(a,phi(m)-1,m)
+        u = ut.square_and_multiply(a,phi(m,1,1,Verbose)-1,m)
 
     else:
+        
         if Verbose:
             print(f"Modular inverse u solves the given equation: a.u+m.v=1.\n Let's use the euclid extended algorithm tho.")
+        
         # Modular inverse u solves the given equation: a.u+m.v=1 
         # n number of iterations
-        _,u,_,_,_=ut.euclid_ext(a,m)
+        _,u,_,_,_=ut.euclid_ext(a,m,Verbose)
         
         if u < 0 : u+=m
     
@@ -44,73 +47,6 @@ def inv(a:int,m:int,Verbose=False):
         return u,f"u = {u} + {m}k, k in Z"
     else:
         return u
-
-# Function to calculate k for given a, b, m  
-def discreteLog(g:int, res:int, modulo:int):
-    """
-    Given a cyclic group of order 'm' a generator 'g' and a group element r, 
-    the problem is to find an integer 'k' such that g^k = r (mod m) by using
-    Meet in the Middle trick and baby-step,giant-step algorithm.
-    """
-    # https://en.wikipedia.org/wiki/Baby-step_giant-step
-
-    import math 
-    middle = int(math.sqrt(modulo) + 1);  
-  
-    value = [0] * modulo
-
-    # Store all values of g^(middle*i) of LHS
-    for i in range(middle,0,-1): # baby-step
-        value[ut.square_and_multiply(g, i * middle , modulo) ] = i 
-  
-    # Giant-Step
-    for j in range(middle):  
-          
-        # Calculate (g ^ j) * res and check  
-        # for collision  
-        cur = (ut.square_and_multiply(g, j, modulo) * res) % modulo;  
-  
-        # If collision occurs i.e., LHS = RHS  
-        if (value[cur]):  
-            ans = value[cur] * middle - j;  
-              
-            # Check whether ans lies below m or not  
-            if (ans < modulo):  
-                return ans;  
-      
-    return -1;
-
-
-
-def findPrimefactors(n:int) : 
-    """
-    Decomposes an integer n into prime factors and store in a set.
-    """
-    from math import sqrt
-
-    s = set()
-    # Print the number of 2s that divide n  
-
-    while (n % 2 == 0) : 
-        s.add(2)  
-        n = n // 2
-  
-    # n must be odd at this po. So we can   
-    # skip one element (Note i = i +2)  
-    for i in range(3, int(sqrt(n)), 2): 
-          
-        # While i divides n, print i and divide n  
-        while (n % i == 0) : 
-            s.add(i)  
-            n = n // i  
-          
-    # This condition is to handle the case  
-    # when n is a prime number greater than 2  
-    if (n > 2) : 
-        s.add(n)  
-
-    return s
-
 
 def phi(n:int,m:int=1,k:int=1,Verbose:bool=False):
     """
@@ -127,7 +63,7 @@ def phi(n:int,m:int=1,k:int=1,Verbose:bool=False):
 
     if m != 1:
 
-        d=ut.euclid(n,m)
+        d = ut.euclid(n,m)
         if Verbose:
             print(f"gcd({n},{m}) = {d}")
             print(f"phi({n})*phi({m})*({d}/phi({d}))")
@@ -136,7 +72,7 @@ def phi(n:int,m:int=1,k:int=1,Verbose:bool=False):
     elif k != 1:
         # phi(n^k) = n ^(k-1) * phi(n)
 
-        mult=ut.square_and_multiply(n,k-1)
+        mult = ut.square_and_multiply(n,k-1)
         
         if Verbose:
             print(f"phi(n^k) = n ^(k-1) * phi(n) = {mult} * phi({n})")
@@ -228,7 +164,7 @@ def multiplicativeOrder(n:int,p:int,Verbose=False):
     k = 1
     
     if Verbose:
-            print(f"m = {n} , iterations: {k}")
+            print(f"m = {n**0} , iterations: {k}")
 
     for e in range(1,p):
         m=ut.square_and_multiply(n,e,p)
@@ -267,7 +203,7 @@ def firstPrimitiveRoot(n:int,Verbose=False):
     if n > 3 and  ut.millerRabin(n):
 
         if Verbose: print(f"Let's find all prime factors of {totient}:")
-        s = findPrimefactors(totient)
+        s = ut.findPrimefactors(totient)
 
         if Verbose:
             print("\n-----------------------------")
@@ -340,41 +276,67 @@ def findOtherGenerators(gen:int,mod:int,Verbose=False):
 def isGenerator(e:int,n:int,printOther=False,Verbose=False):
     """
     Tell if an element e is generator of Zn.
+    By definition, g is a generator of Zn* if and only if that cycling does not occur before these n−1 iterations.
     """
 
-    elements = [1]
-    for i in range(1,n):
-        t = ut.square_and_multiply(e,i,n)
-        elements.append(t)
-        if Verbose:
-            print(f"{e}^{i} = {t} mod {n}")
-        if t == 1 and len(elements) != n :
-            return False
+    if not ut.millerRabin(n):
+        elements = [1]
+        for i in range(1,n):
+            t = ut.square_and_multiply(e,i,n)
+            elements.append(t)
+            if Verbose:
+                print(f"{e}^{i} = {t} mod {n}")
 
-    
-    if printOther:
-        if Verbose:
-            print(f"There are {phi(phi(n))} generators in Z{n}.")
-            print(f"{e} is the a generator of Z{n} with elements: {elements}\n")
-
-        others = findOtherGenerators(e,n,Verbose)
-
-        return True,others
-    else:
-        if Verbose:
-            print(f"There are {phi(phi(n))} generators in Z{n}.")
-            print(f"{e} is the a generator of Z{n} with elements: {elements}\n")
-        return True 
+            #if cycling occurs
+            if t == 1:
+                return False
 
         
-def quadraticsResidues(n:int):
+        if printOther:
+            if Verbose:
+                print(f"There are {phi(phi(n))} generators in Z{n}.")
+                print(f"{e} is the a generator of Z{n} with elements: {elements}\n")
+
+            others = findOtherGenerators(e,n,Verbose)
+
+            return others
+        
+        if Verbose:
+            print(f"There are {phi(phi(n))} generators in Z{n}.")
+            print(f"{e} is the a generator of Z{n} with elements: {elements}\n")
+
+        return True
+    
+    elif e%n != 0:
+        # We can test if some g not divisible by p is a generator of Zp*
+        # by checking if g^k mod p != 1
+        # with k = (p-1)/q for q each of prime factors of p-1
+
+        L = ut.findPrimefactors(n-1)
+        for k in L:
+            t = ut.square_and_multiply(e,k,n)
+            if Verbose:
+                print(f"{e}^{k} = {t} mod {n}")
+            if t == 1:
+                return False
+        
+        return True
+
+
+
+        
+def quadraticsResidues(n:int,sortedList=True):
     """
     For a given n a list of the quadratic residues modulo n may be obtained by simply squaring the numbers 0, 1, ..., n − 1.
     Because a2 ≡ (n − a)2 (mod n), the list of squares modulo n is symmetrical around n/2, and the list only needs to go that high. 
     
     N.B: 0 and 1 are always quadratics residues by definition.
     """
-    return sorted(set([ut.square_and_multiply(e,2,n) for e in range(n)]))
+
+    if sortedList:
+        return sorted(set([ut.square_and_multiply(e,2,n) for e in range(n)]))
+    else:
+        return [ut.square_and_multiply(e,2,n) for e in range(n)]
 
 def legendreSymbol(a:int,p:int,quadraticList=None):
     """

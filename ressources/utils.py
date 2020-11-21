@@ -5,10 +5,12 @@ import random
 import numpy as np
 
 
+
 def swapPos(list, pos1, pos2): 
     """Swap two elements in list."""
     list[pos1], list[pos2] = list[pos2], list[pos1] 
     return list
+
 
 def euclid(a:int,b:int,Verbose=False):  
     
@@ -94,6 +96,7 @@ def square_and_multiply(x, k, p=None):
             r %= p
     return r
 
+
 def millerRabin(p, s=40):
     """Determines whether a given number is likely to be prime."""
     if p == 2: # 2 is the only prime that is even
@@ -135,6 +138,46 @@ def millerRabin(p, s=40):
     return True
 
 
+def findPrimefactors(n:int,exponent = False) : 
+    """
+    Decomposes an integer n into prime factors and store in a set.
+
+    A prime number can only be divided by 1 or itself, so it cannot be factored any further!
+    Every other whole number can be broken down into prime number factors. 
+    It is like the Prime Numbers are the basic building blocks of all numbers.
+
+    Set exponent to True if you want to print p^e. 
+    """
+    from math import sqrt
+
+    s = []
+    # Print the number of 2s that divide n  
+
+    while (n % 2 == 0) : 
+        s.append(2)  
+        n = n // 2
+  
+    # n must be odd at this po. So we can   
+    # skip one element (Note i = i +2)  
+    for i in range(3, int(sqrt(n)), 2): 
+          
+        # While i divides n, print i and divide n  
+        while (n % i == 0) : 
+            s.append(i)  
+            n = n // i  
+          
+    # This condition is to handle the case  
+    # when n is a prime number greater than 2  
+    if (n > 2) : 
+        s.append(n)
+
+    uniqSorted = sorted(list(set(s)))
+
+    if exponent:
+        # using set to get unique list
+        return dict(zip(uniqSorted,[s.count(e) for e in uniqSorted]))
+    else:
+        return uniqSorted
 #########################################
 ############# - CRT - ###################
 #########################################
@@ -147,6 +190,8 @@ def ChineseRemainder(integers:list,modulis:list,Verbose=False):
     [n1,..,nk] - modulis
     return result of Chinese Remainder.
     """
+
+    from ressources.multGroup import inv
     
     product=1
     
@@ -230,3 +275,105 @@ def mapperCRT(elt,p:int,q:int,action:bool=True,Verbose:bool=False):
     else:
         x = ChineseRemainder(elt,[p,q],Verbose)
         return x
+
+#########################################
+############# - DLOG- ###################
+#########################################
+
+def bsgs(g:int,res:int,modulo:int):
+    """
+    Baby-Step Giant-Step solution for discrete algorithm problem.
+
+    res = g^x mod modulo => log_g(res) = x mod modulo
+
+    Use hash table for fast searching of huge values.
+    """
+
+    assert millerRabin(modulo)
+
+    # https://en.wikipedia.org/wiki/Baby-step_giant-step
+
+    from ressources.multGroup import inv
+
+    m = int(sqrt(modulo) + 1);  
+  
+    hashTable = {square_and_multiply(g, j, modulo): j for j in range(m)} # Baby-Step
+    
+    gm = square_and_multiply(g,m,modulo)
+    invGm = inv(gm,modulo)
+
+    #Initialization
+    y = res
+
+    # Search for an equivalence in the table - Giant-Step
+    for i in range(m):  
+
+        if y in hashTable:
+            return i * m + hashTable[y]
+
+        y = (y * invGm) % modulo
+      
+    return -1;
+
+
+def pohlig_hellman(g,h,n):
+    """
+    Based on https://en.wikipedia.org/wiki/Pohlig%E2%80%93Hellman_algorithm
+    """
+
+    def group_of_prime_power_order(g,h,n=tuple):
+        # n = (p,e) prime factor exponent times he appears
+        p,e = n
+        n = square_and_multiply(p,e)
+
+        x = 0
+        # By Lagrange's theorem, this element has order p.
+        y = square_and_multiply(g,square_and_multiply(p,e-1,n),n)
+
+        for k in range(e):
+            hk = square_and_multiply(square_and_multiply(g,-x,n)*h,square_and_multiply(p,e-1-k,n),n)
+            dk = bsgs(y,hk,n)
+            x += dk * square_and_multiply(p,k,n)
+
+        return x
+
+    pFactors = findPrimefactors(n,True)
+    integers, modulis = [],[]
+
+    for p,e in pFactors.items():
+        ni = square_and_multiply(p,e)
+        gi = square_and_multiply(g,(n//ni),n)
+        hi = square_and_multiply(h,(n//ni),n)
+
+        xi = group_of_prime_power_order(gi,hi,(p,e))
+
+        integers.append(xi)
+        modulis.append(ni)
+
+
+    return ChineseRemainder(integers,modulis)
+
+
+# Function to calculate k for given a, b, m  
+def discreteLog(g:int, h:int, p:int,method:int=1):
+    """
+    Given a cyclic group of order 'p' a generator 'g' and a group element r, 
+    the problem is to find an integer 'k' such that g^k = r (mod p) by using
+    baby-step,giant-step algorithm or Pohlig-Hellman algorithm.
+
+    method:
+        0 - baby-step giant-step
+        1 - pohlig-hellman (default)
+    """
+
+    if method == 0:
+        return bsgs(g,h,p)
+    elif method == 1:
+        return pohlig_hellman(g,h,p)
+    else:
+        return -1
+    
+    
+    
+
+
