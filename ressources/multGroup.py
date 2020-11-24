@@ -203,7 +203,7 @@ def firstPrimitiveRoot(n:int,totient=None,Verbose=False):
     if n > 3 and  ut.millerRabin(n):
 
         if Verbose: print(f"Let's find all prime factors of {totient}:")
-        s = ut.findPrimefactors(totient)
+        s = ut.findPrimeFactors(totient)
 
         if Verbose:
             print("\n-----------------------------")
@@ -336,7 +336,7 @@ def isGenerator(e:int,n:int,printOther=False,Verbose=False):
         # by checking if g^k mod p != 1
         # with k = (p-1)/q for q each of prime factors of p-1
 
-        L = ut.findPrimefactors(n-1)
+        L = ut.findPrimeFactors(n-1)
         for k in L:
             t = ut.square_and_multiply(e,k,n)
             if Verbose:

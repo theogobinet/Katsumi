@@ -138,7 +138,7 @@ def millerRabin(p, s=40):
     return True
 
 
-def findPrimefactors(n:int,exponent = False) : 
+def findPrimeFactors(n:int,exponent = False) : 
     """
     Decomposes an integer n into prime factors and store in a set.
 
@@ -337,7 +337,7 @@ def pohlig_hellman(g,h,n):
 
         return x
 
-    pFactors = findPrimefactors(n,True)
+    pFactors = findPrimeFactors(n,True)
     integers, modulis = [],[]
 
     for p,e in pFactors.items():
