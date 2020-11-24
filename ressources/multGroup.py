@@ -185,14 +185,18 @@ def congruenceClasses(e:int):
     """
     elements = []
     for i in range(e):
-        if ut.coprime(i,e):
+        if ut.coprime(i,e) and i not in elements:
             elements.append(i)
 
     return elements
 
 
 def firstPrimitiveRoot(n:int,totient=None,Verbose=False):
-    """ Find primitive root modulo n. """
+    """ 
+    Find primitive root modulo n.
+    
+    https://en.wikipedia.org/wiki/Fermat%27s_little_theorem
+    """
 
     if totient == None:
         totient=phi(n,1,1,Verbose)
@@ -238,9 +242,9 @@ def firstPrimitiveRoot(n:int,totient=None,Verbose=False):
 
     else:
         if Verbose:
-            print(f"According to Euler's theorem, a is a primitive root mod {n} if and only if the order of a is ϕ(n) = {totient}.")
+            print(f"According to Euler's theorem, a is a primitive root mod {n} if and only if the multiplicative order of a is ϕ(n) = {totient}.")
 
-        for e in range(1,n-1):
+        for e in range(1,n):
             o = multiplicativeOrder(e,n,Verbose)
 
             if Verbose:
@@ -293,27 +297,30 @@ def findOtherGenerators(gen:int,mod:int,Verbose=False):
         print(f"Therefore the generators of Z{mod} are {gen}^k for k coprime with {totient}.")
         print(f"Or you can say: {gen}^k (with k elements from congruences classes of {totient}) are generators of Z{mod}.")
 
-    return [ut.square_and_multiply(gen,e,mod) for e in congruenceClasses(totient)]
+    return list(set([ut.square_and_multiply(gen,e,mod) for e in congruenceClasses(totient)]))
 
 
 
 def isGenerator(e:int,n:int,printOther=False,Verbose=False):
     """
     Tell if an element e is generator of Zn.
+    A unit g ∈ Zn* is called a generator or primitive root of Zn* if for every a ∈ Zn* we have g^k = a for some integer k. 
+    In other words, if we start with g, and keep multiplying by g eventually we see every element.
     By definition, g is a generator of Zn* if and only if that cycling does not occur before these n−1 iterations.
     """
 
     if not ut.millerRabin(n):
-        elements = [1]
+        elements = []
         for i in range(1,n):
             t = ut.square_and_multiply(e,i,n)
-            elements.append(t)
             if Verbose:
                 print(f"{e}^{i} = {t} mod {n}")
 
             #if cycling occurs
-            if t == 1:
+            if t == 1 and t in elements:
                 return False
+            else:
+                elements.append(t)
 
         
         if printOther:
@@ -321,9 +328,7 @@ def isGenerator(e:int,n:int,printOther=False,Verbose=False):
                 print(f"There are {phi(phi(n))} generators in Z{n}.")
                 print(f"{e} is the a generator of Z{n} with elements: {elements}\n")
 
-            others = findOtherGenerators(e,n,Verbose)
-
-            return others
+            return True, findOtherGenerators(e,n,Verbose)
         
         if Verbose:
             print(f"There are {phi(phi(n))} generators in Z{n}.")
@@ -337,6 +342,11 @@ def isGenerator(e:int,n:int,printOther=False,Verbose=False):
         # with k = (p-1)/q for q each of prime factors of p-1
 
         L = ut.findPrimefactors(n-1)
+
+        if Verbose:
+            print(f"{e} doesn't divide {n}, let's check if {e}^k mod {n} != 1.")
+            print(f"With k = ({n} -1 ) / q for q each of prime factors of {n}-1 ( = {L}).")
+
         for k in L:
             t = ut.square_and_multiply(e,k,n)
             if Verbose:
@@ -344,6 +354,13 @@ def isGenerator(e:int,n:int,printOther=False,Verbose=False):
             if t == 1:
                 return False
         
+        if printOther:
+            if Verbose:
+                print(f"There are {phi(phi(n))} generators in Z{n}.")
+
+            return True, findOtherGenerators(e,n,Verbose)
+
+
         return True
 
 
