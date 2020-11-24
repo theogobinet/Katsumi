@@ -191,10 +191,11 @@ def congruenceClasses(e:int):
     return elements
 
 
-def firstPrimitiveRoot(n:int,Verbose=False):
+def firstPrimitiveRoot(n:int,totient=None,Verbose=False):
     """ Find primitive root modulo n. """
 
-    totient=phi(n,1,1,Verbose)
+    if totient == None:
+        totient=phi(n,1,1,Verbose)
 
     if Verbose:
         print(f"phi({n}) = {totient} ")
@@ -229,6 +230,8 @@ def firstPrimitiveRoot(n:int,Verbose=False):
                     break
 
             if not flag :
+                if Verbose:
+                    print(f"Generator is: {e}")
                 return e
         # If no primitive root found  
         return -1
@@ -244,6 +247,8 @@ def firstPrimitiveRoot(n:int,Verbose=False):
                 print(f"multiplicative order({e},{n}) = {o} \n")
 
             if o == totient:
+                if Verbose:
+                    print(f"Generator is: {e}")
                 return e
             
         # If no primitive root found 
@@ -255,18 +260,20 @@ def reducedResidueSystem(n:int,g:int=None,Verbose=False):
     """
     Return all elements of Zn* with generator g.
     """
-
+    totient = phi(n,Verbose)
     if g == None:
         if Verbose:
-            print("No generator given in input. Compute oneres")
-        g = firstPrimitiveRoot(n)
+            print("No generator given in input. Computing one now ..")
+        g = firstPrimitiveRoot(n,totient,Verbose)
+        if g == -1:
+            return -1
     
     res = []
     # 1 , g , g^2 , ... , g ^ phi(n)-1
-    for elt in range(phi(n)):
+    for elt in range(totient):
         res.append(ut.square_and_multiply(g,elt,n))
 
-    return sorted(res)
+    return sorted(set(res))
 
 def findOtherGenerators(gen:int,mod:int,Verbose=False):
     """
@@ -275,6 +282,9 @@ def findOtherGenerators(gen:int,mod:int,Verbose=False):
 
     Therefore a^k mod n is another generator of the group if and only if k is coprime to n.
     """
+
+    if gen == -1:
+        return -1
 
     totient = phi(mod)
 

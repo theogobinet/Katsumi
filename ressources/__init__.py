@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 # __init__.py
 
-from .bytesManager import *
-from .interactions import *
-from .utils import *
-from .prng import *
-from .multGroup import *
+from . import bytesManager as bm
+from . import interactions as it
+from . import utils as ut
+from . import prng as prng
+from . import multGroup as multGroup
