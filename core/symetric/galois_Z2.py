@@ -126,7 +126,7 @@ def gen_GL_2(poly,degree):
     if utils.millerRabin(pn1):
         q=[pn1]
     else:
-        q=utils.primeFactors(pn1)[0]
+        q=utils.findPrimeFactors(pn1)
 
     config.ELEMENTS=[i for i in range(2**degree)]
     genList=config.ELEMENTS

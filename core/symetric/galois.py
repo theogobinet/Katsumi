@@ -110,7 +110,7 @@ def gen_GL(poly,degree,p=2,Zn=2):
     if utils.millerRabin(pn1):
         q=[pn1]
     else:
-        q=utils.primeFactors(pn1)[0]
+        q=utils.findPrimeFactors(pn1)
 
     genList=[]
     goodGen=None
