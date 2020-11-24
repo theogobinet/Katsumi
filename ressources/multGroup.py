@@ -194,7 +194,7 @@ def congruenceClasses(e:int):
 def firstPrimitiveRoot(n:int,totient=None,Verbose=False):
     """ 
     Find primitive root modulo n.
-    
+
     https://en.wikipedia.org/wiki/Fermat%27s_little_theorem
     """
 
@@ -207,7 +207,7 @@ def firstPrimitiveRoot(n:int,totient=None,Verbose=False):
     if n > 3 and  ut.millerRabin(n):
 
         if Verbose: print(f"Let's find all prime factors of {totient}:")
-        s = ut.findPrimefactors(totient)
+        s = ut.findPrimeFactors(totient)
 
         if Verbose:
             print("\n-----------------------------")
