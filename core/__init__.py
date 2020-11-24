@@ -4,3 +4,4 @@
 
 from .symetric import *
 from .asymetric import *
+from .hashbased import *

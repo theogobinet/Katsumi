@@ -142,7 +142,6 @@ def encrypt(M:bytes,pKey):
     if bm.bytes_to_int(M) <= p-1:
         # That's a short message
         m=bm.bytes_to_int(M)
-        print(m)
         return process(m)
 
     else:
@@ -192,7 +191,7 @@ def decrypt(ciphertext,sK,asTxt=False):
 #############################################################
 
 
-def delog(publicKey,encrypted=None,asTxt=False):
+def delog(publicKey,encrypted=None,asTxt=False,method=1):
     """
     Retrieve private key with publicKey.
     And if you get the encrypted message, thus you can decrypt them.
@@ -208,7 +207,7 @@ def delog(publicKey,encrypted=None,asTxt=False):
         # PublicKey format : (p,q,gen,h)
         p,q,g,h = publicKey
 
-        x = discreteLog(g,h,p)
+        x = discreteLog(g,h,p,method)
 
         # Same format as private key
         return (p,q,g,x)

@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 import ressources.utils as ut
-from ressources.utils import millerRabin
 
 
 def inv(a:int,m:int,Verbose=False):
@@ -252,7 +251,22 @@ def firstPrimitiveRoot(n:int,Verbose=False):
             print(f"Since there is no number whose order is {totient}, there are no pritive roots modulo {n}.")
         return -1
 
+def reducedResidueSystem(n:int,g:int=None,Verbose=False):
+    """
+    Return all elements of Zn* with generator g.
+    """
 
+    if g == None:
+        if Verbose:
+            print("No generator given in input. Compute oneres")
+        g = firstPrimitiveRoot(n)
+    
+    res = []
+    # 1 , g , g^2 , ... , g ^ phi(n)-1
+    for elt in range(phi(n)):
+        res.append(ut.square_and_multiply(g,elt,n))
+
+    return sorted(res)
 
 def findOtherGenerators(gen:int,mod:int,Verbose=False):
     """
