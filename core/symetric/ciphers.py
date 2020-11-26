@@ -213,7 +213,7 @@ def PCBC(arr,encrypt=True):
     
     return res
 
-def CTR(arr, encrypt=True):
+def CTR(arr, encrypt=True, iniIV=[]):
 
     '''
     Counter Mode is xoring the message with a encrypted counter (IV + incr(0))
@@ -222,10 +222,12 @@ def CTR(arr, encrypt=True):
     encrypt: true to encrypt
     '''
 
-    if encrypt:
+    if encrypt and not iniIV:
         iv=IV(arr)
-    else:
+    elif not encrypt:
         iv=IV_action(arr)
+    else:
+        iv = iniIV
 
     res = []
 
