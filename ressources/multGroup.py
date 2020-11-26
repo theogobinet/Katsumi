@@ -153,29 +153,65 @@ def phi(n:int,m:int=1,k:int=1,Verbose:bool=False):
         
             return int(result)
 
-def multiplicativeOrder(n:int,p:int,Verbose=False):
+
+def multiplicativeOrder(n:int,p:int,iterativeWay=False,Verbose=False):
     """
     The minimum period of the sequence of powers of a is called the order of a.
     So a is a primitive root mod n if and only if the order of a is ϕ(n). 
     Order of n in p is the smallest number M or n^M = 1 mod p
+
+    Set iterative way to true if you want to use iterations.
     """
     
-    k = 1
-    
-    if Verbose:
-            print(f"m = {n**0} , iterations: {k}")
+    if not iterativeWay:
+        print(f"By the Chinese Remainder Theorem, it's enough to calculate the multiplicative order for each prime exponent p^k of {p},")
+        print(f"and combine the results with the least common multiple operation.")
 
-    for e in range(1,p):
-        m=ut.square_and_multiply(n,e,p)
+        from functools import reduce
+
+        def multOrder1(a:int,t:tuple):
+
+            p,e = t
+            m = ut.square_and_multiply(p,e)
+            totient = phi(p,1,e) # phi(p^e)
+            qs = [1]
+
+            for elt,exp in ut.findPrimeFactors(totient,True).items():
+                qs = [ q * elt**j for j in range(1+exp) for q in qs]
+
+            qs.sort()
+
+            for q in qs:
+
+                if ut.square_and_multiply(a,q,m) == 1:
+                    break
+                else:
+                    continue
+                
+            return q
+
+        mofs = (multOrder1(n,(elt,exp)) for elt,exp in ut.findPrimeFactors(p,True).items())
+
+        # used to apply a particular function passed in its argument to all of the list elements mentioned in the sequence passed along.
+        return reduce(ut.lcm,mofs,1)
+
+    else:
+        k = 1
         
-        if m == 1:
-            break
-        else:
-            k+=1
-            if Verbose:
-                print(f"m = {n}^{e} mod {p} = {m} , iterations: {k}")
+        if Verbose:
+                print(f"m = {n**0} , iterations: {k}")
 
-    return k
+        for e in range(1,p):
+            m=ut.square_and_multiply(n,e,p)
+            
+            if m == 1:
+                break
+            else:
+                k+=1
+                if Verbose:
+                    print(f"m = {n}^{e} mod {p} = {m} , iterations: {k}")
+
+        return k
 
 
 def congruenceClasses(e:int):
@@ -260,6 +296,25 @@ def firstPrimitiveRoot(n:int,totient=None,Verbose=False):
             print(f"Since there is no number whose order is {totient}, there are no pritive roots modulo {n}.")
         return -1
 
+
+def genSubGroup(n:int,m:int):
+    """
+    Generate subgroup of n in Zm* with multiplicative order q.
+    E.g, genSubGroup(5,10) = > [1,5,10] and q = 3.
+    """
+
+    res = []
+
+    for e in range(m):
+        t = ut.square_and_multiply(n,e,m)
+        if t not in res:
+            res.append(t)
+        else:
+            continue
+
+    return sorted(res)
+
+
 def reducedResidueSystem(n:int,g:int=None,Verbose=False):
     """
     Return all elements of Zn* with generator g.
@@ -290,10 +345,10 @@ def findOtherGenerators(gen:int,mod:int,Verbose=False):
     if gen == -1:
         return -1
 
-    totient = phi(mod)
+    totient = phi(mod,1,1,Verbose)
 
     if Verbose:
-        print(f"Based on the fact that {gen} is a generator of Z{mod}, the generators are {gen}^k with gcd(phi({mod}),k) = 1. ")
+        print(f"\nBased on the fact that {gen} is a generator of Z{mod}, the generators are {gen}^k with gcd(phi({mod}),k) = 1. ")
         print(f"Therefore the generators of Z{mod} are {gen}^k for k coprime with {totient}.")
         print(f"Or you can say: {gen}^k (with k elements from congruences classes of {totient}) are generators of Z{mod}.")
 
@@ -301,67 +356,100 @@ def findOtherGenerators(gen:int,mod:int,Verbose=False):
 
 
 
-def isGenerator(e:int,n:int,printOther=False,Verbose=False):
+def isGenerator(e:int,n:int,lagrangeWay=True,printOther=False,Verbose=False):
     """
     Tell if an element e is generator of Zn.
     A unit g ∈ Zn* is called a generator or primitive root of Zn* if for every a ∈ Zn* we have g^k = a for some integer k. 
     In other words, if we start with g, and keep multiplying by g eventually we see every element.
     By definition, g is a generator of Zn* if and only if that cycling does not occur before these n−1 iterations.
+
+    lagrangeway is by default set to true.
+    Base on the fact than as a consequence of Lagrange's theorem, ordn(e) always divides φ(n).
+    If ordn(e) is actually equal to φ(n), and therefore as large as possible, then e is called a primitive root modulo n.
     """
 
-    if not ut.millerRabin(n):
-        elements = []
-        for i in range(1,n):
-            t = ut.square_and_multiply(e,i,n)
-            if Verbose:
-                print(f"{e}^{i} = {t} mod {n}")
+    if lagrangeWay:
 
-            #if cycling occurs
-            if t == 1 and t in elements:
-                return False
-            else:
-                elements.append(t)
+        totient = phi(n,1,1,Verbose)
+        order = multiplicativeOrder(e,n,False,Verbose)
 
-        
-        if printOther:
+        if Verbose:
+            print(f"If phi({n}) is equal to mutliplicative order of {e} modulo {n} then it's a generator of {n}.")
+            print(f"phi(n) = {totient} and order(e,n) = {order}.")
+
+        if totient == order :
+
+            if printOther:
+
+                if Verbose:
+                    print(f"There are {phi(phi(n))} generators in Z{n}.")
+                    print(f"{e} is the a generator of Z{n}.\n")
+
+                return True, findOtherGenerators(e,n,Verbose)
+
+            return True
+        else:
+            return False
+
+    else:
+        if not ut.millerRabin(n):
+            # Slowest way, keeped to verify results 
+            elements = []
+            for i in range(1,n):
+                t = ut.square_and_multiply(e,i,n)
+
+                if t in elements:
+                    continue
+                else:
+                    if Verbose:
+                        print(f"{e}^{i} = {t} mod {n}")
+
+                    #if cycling occurs
+                    if t == 1 and t in elements:
+                        return False
+                    else:
+                        elements.append(t)
+
+            
+            if printOther:
+                if Verbose:
+                    print(f"There are {phi(phi(n))} generators in Z{n}.")
+                    print(f"{e} is the a generator of Z{n} with elements: {elements}\n")
+
+                return True, findOtherGenerators(e,n,Verbose)
+            
             if Verbose:
                 print(f"There are {phi(phi(n))} generators in Z{n}.")
                 print(f"{e} is the a generator of Z{n} with elements: {elements}\n")
 
-            return True, findOtherGenerators(e,n,Verbose)
+            return True
         
-        if Verbose:
-            print(f"There are {phi(phi(n))} generators in Z{n}.")
-            print(f"{e} is the a generator of Z{n} with elements: {elements}\n")
+        elif e%n != 0:
+            # We can test if some g not divisible by p is a generator of Zp*
+            # by checking if g^k mod p != 1
+            # with k = (p-1)/q for q each of prime factors of p-1
 
-        return True
-    
-    elif e%n != 0:
-        # We can test if some g not divisible by p is a generator of Zp*
-        # by checking if g^k mod p != 1
-        # with k = (p-1)/q for q each of prime factors of p-1
+            L = ut.findPrimeFactors(n-1)
 
-        L = ut.findPrimefactors(n-1)
-
-        if Verbose:
-            print(f"{e} doesn't divide {n}, let's check if {e}^k mod {n} != 1.")
-            print(f"With k = ({n} -1 ) / q for q each of prime factors of {n}-1 ( = {L}).")
-
-        for k in L:
-            t = ut.square_and_multiply(e,k,n)
             if Verbose:
-                print(f"{e}^{k} = {t} mod {n}")
-            if t == 1:
-                return False
-        
-        if printOther:
-            if Verbose:
-                print(f"There are {phi(phi(n))} generators in Z{n}.")
+                print(f"{e} doesn't divide {n}, let's check if {e}^k mod {n} != 1.")
+                print(f"With k = ({n} -1 ) / q for q each of prime factors of {n}-1 ( = {L}).")
 
-            return True, findOtherGenerators(e,n,Verbose)
+            for k in L:
+                t = ut.square_and_multiply(e,k,n)
+                if Verbose:
+                    print(f"{e}^{k} = {t} mod {n}")
+                if t == 1:
+                    return False
+            
+            if printOther:
+                if Verbose:
+                    print(f"There are {phi(phi(n))} generators in Z{n}.")
+
+                return True, findOtherGenerators(e,n,Verbose)
 
 
-        return True
+            return True
 
 
 

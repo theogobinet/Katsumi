@@ -30,7 +30,7 @@ def generator(p:int,q:int):
         # Without 0 and 1 to keep only legender symbol = 1 results
         
         e = rd.randrange(2,p)
-        g = ut.square_and_multiply(e,2,p)
+        g = ut.square_and_multiply(e,e,p)
 
 
 
