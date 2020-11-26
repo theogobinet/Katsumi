@@ -9,7 +9,7 @@ def inv(a:int,m:int,Verbose=False):
     if ut.euclid(a,m) != 1 :
         if Verbose:
             print(f"gcd({a},{m}) = {ut.euclid(a,m)} != 1 thus you cannot get an invert of a.")
-        raise ValueError("gcd(a,m) != 1 thus you cannot get an invert of a.")
+        raise ValueError(f"gcd({a},{m}) != 1 thus you cannot get an invert of a.")
         # a modular multiplicative inverse can be found directly
     
     elif a == 0:
@@ -164,8 +164,9 @@ def multiplicativeOrder(n:int,p:int,iterativeWay=False,Verbose=False):
     """
     
     if not iterativeWay:
-        print(f"By the Chinese Remainder Theorem, it's enough to calculate the multiplicative order for each prime exponent p^k of {p},")
-        print(f"and combine the results with the least common multiple operation.")
+        if Verbose:
+            print(f"By the Chinese Remainder Theorem, it's enough to calculate the multiplicative order for each prime exponent p^k of {p},")
+            print(f"and combine the results with the least common multiple operation.")
 
         from functools import reduce
 

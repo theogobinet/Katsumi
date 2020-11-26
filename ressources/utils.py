@@ -334,8 +334,7 @@ def pollard_rho(g, h, n , order = None):
     import ressources.multGroup as multGroup
 
     if order == None:
-        order = multGroup.multiplicativeOrder(g,n,True)
-        print(order)
+        order = multGroup.multiplicativeOrder(g,n)
 
     # from a, b and c, partitioning the field
     def step_xab(x, a, b, g, h, order, n):
@@ -348,7 +347,7 @@ def pollard_rho(g, h, n , order = None):
 
         # S2
         if s == 0:
-            x = square_and_multiply(x, 2, order)
+            x = square_and_multiply(x, 2, n)
             a = 2 * a % order
             b = 2 * b % order
 
@@ -407,7 +406,7 @@ def pohlig_hellman(g,h,n):
 
         for k in range(e):
             hk = square_and_multiply(square_and_multiply(g,-x,n)*h,square_and_multiply(p,e-1-k,n),n)
-            dk = pollard_rho(y,hk,n,p)
+            dk = pollard_rho(y,hk,n)
             x += dk * square_and_multiply(p,k,n)
 
         return x
@@ -438,12 +437,15 @@ def discreteLog(g:int, h:int, p:int,method:int=1):
 
     method:
         0 - baby-step giant-step
-        1 - pohlig-hellman (default)
+        1 - pollard rho's algorithm (default - fastest)
+        2 - pohlig-hellman 
     """
 
     if method == 0:
         return bsgs(g,h,p)
     elif method == 1:
+        return pollard_rho(g,h,p)
+    elif method == 2:
         return pohlig_hellman(g,h,p)
     else:
         return -1
