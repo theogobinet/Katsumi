@@ -30,7 +30,7 @@ def generator(p:int,q:int):
         # Without 0 and 1 to keep only legender symbol = 1 results
         
         e = rd.randrange(2,p)
-        g = ut.square_and_multiply(e,2,p)
+        g = ut.square_and_multiply(e,e,p)
 
 
 
@@ -197,8 +197,6 @@ def delog(publicKey,encrypted=None,asTxt=False,method=1):
     And if you get the encrypted message, thus you can decrypt them.
     """
 
-    from ressources.utils import discreteLog
-
     def dlog_get_x(publicKey):
         """
         Find private key using discrete logarithmic method.
@@ -207,7 +205,7 @@ def delog(publicKey,encrypted=None,asTxt=False,method=1):
         # PublicKey format : (p,q,gen,h)
         p,q,g,h = publicKey
 
-        x = discreteLog(g,h,p,method)
+        x = ut.discreteLog(g,h,p,method)
 
         # Same format as private key
         return (p,q,g,x)

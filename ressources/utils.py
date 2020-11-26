@@ -34,6 +34,9 @@ def euclid(a:int,b:int,Verbose=False):
         
         return euclid(b,r,Verbose)
 
+def lcm(a:int, b:int):
+    """Find the Least Common Multiple of number a and b."""
+    return (a*b) // euclid(a, b)
 
 def euclid_ext(a:int, b:int, Verbose=False):
     
@@ -315,7 +318,78 @@ def bsgs(g:int,res:int,modulo:int):
       
     return -1;
 
+###
+# Pollard Roh
+###
 
+def pollard_rho(g, h, n , order = None):
+    """
+    Pollard's Rho algorithm for discrete logarithm (HAC 3.60).
+    Returns the dlog of h on the basis g and field Zn*
+    """
+    x = {0: 1}
+    a = {0: 0}
+    b = {0: 0}
+
+    import ressources.multGroup as multGroup
+
+    if order == None:
+        order = multGroup.multiplicativeOrder(g,n)
+
+    # from a, b and c, partitioning the field
+    def step_xab(x, a, b, g, h, order, n):
+        s = x % 3
+
+        # S1
+        if s == 1:
+            x = x * h % n
+            b = (b + 1) % order
+
+        # S2
+        if s == 0:
+            x = square_and_multiply(x, 2, n)
+            a = 2 * a % order
+            b = 2 * b % order
+
+        # S3
+        if s == 2:
+            x = x * g % n
+            a = (a + 1) % order
+
+        return x, a, b
+
+    # returns x, a, b for a given i using memoization
+    def get_xab(i):
+
+        if i not in x:
+            _x, _a, _b = get_xab(i - 1)
+
+            x[i], a[i], b[i] = step_xab(_x, _a, _b, g, h, order, n)
+
+        return x[i], a[i], b[i]
+
+    def naturals_from(i):
+        while True:
+            # yield is a keyword that is used like return, except the function will return a generator.
+            # https://www.google.com/search?client=firefox-b-d&q=yield+python
+            yield i
+            i += 1
+
+    for i in naturals_from(1):
+
+        x_i, a_i, b_i = get_xab(i)
+        x_2i, a_2i, b_2i = get_xab(2 * i)
+
+        if x_i == x_2i:
+
+            r = (b_i - b_2i) % order
+
+            if r == 0:  return False
+            else:   return multGroup.inv(r, order) * (a_2i - a_i) % order
+
+###
+# Pohlig_Hellman
+###
 def pohlig_hellman(g,h,n):
     """
     Based on https://en.wikipedia.org/wiki/Pohlig%E2%80%93Hellman_algorithm
@@ -332,7 +406,7 @@ def pohlig_hellman(g,h,n):
 
         for k in range(e):
             hk = square_and_multiply(square_and_multiply(g,-x,n)*h,square_and_multiply(p,e-1-k,n),n)
-            dk = bsgs(y,hk,n)
+            dk = pollard_rho(y,hk,n)
             x += dk * square_and_multiply(p,k,n)
 
         return x
@@ -363,12 +437,15 @@ def discreteLog(g:int, h:int, p:int,method:int=1):
 
     method:
         0 - baby-step giant-step
-        1 - pohlig-hellman (default)
+        1 - pollard rho's algorithm (default - fastest)
+        2 - pohlig-hellman 
     """
 
     if method == 0:
         return bsgs(g,h,p)
     elif method == 1:
+        return pollard_rho(g,h,p)
+    elif method == 2:
         return pohlig_hellman(g,h,p)
     else:
         return -1
