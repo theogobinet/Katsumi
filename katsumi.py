@@ -27,7 +27,8 @@ def work_with_selection(pSelection):
         it.katsuAsymm()
         
     elif pSelection == 3 :
-        print("prout")
+        it.katsuHash()
+
     elif pSelection == 4 :
         print("Test")
     elif pSelection == 5 :
@@ -38,11 +39,9 @@ def work_with_selection(pSelection):
         print("Test")
     elif pSelection == 8 :
         print("Test")
-    elif pSelection == 9 :
-        print("Test")
-    elif pSelection == 10:
+    elif pSelection == 9:
         return it.primeNumbersFountain()
-    elif pSelection == 11 :
+    elif pSelection == 10 :
         it.clear()
         print("\t --- Goodbye M'Lord. --- \n")
         sys.exit
@@ -60,7 +59,7 @@ def work_with_selection(pSelection):
 
 def menu():
     
-    choices=["Symmetric","Asymmetric","Generate a hash / fingerprint.","Check a hash / a fingerprint.","Perform a proof of work.","Check a transaction.","Start / increment Block-chain.","Check Block-chain integrity's","I WANT IT ALL !! I WANT IT NOW !","Prime Numbers Fountain's","Exit"]
+    choices=["Symmetric","Asymmetric","Hash","Perform a proof of work.","Check a transaction.","Start / increment Block-chain.","Check Block-chain integrity's","I WANT IT ALL !! I WANT IT NOW !","Prime Numbers Fountain's","Exit"]
 
 
     print("------------------------------------------------------------------")
