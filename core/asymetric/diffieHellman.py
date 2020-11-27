@@ -56,7 +56,6 @@ def compute(accord:tuple):
 # Only a and b are kept secret
 
 
-
 # - ECDH 
 
 

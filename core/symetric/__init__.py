@@ -2,6 +2,6 @@
 # -*- coding: utf-8 -*-
 # __init__.py
 
-from .ciphers import *
-from .galois_Z2 import *
-from .kasumi import *
+from . import ciphers as ciphers
+from . import galois_Z2 as gz2
+from . import kasumi as kasu 

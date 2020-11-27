@@ -74,7 +74,9 @@ def randomInt(evenOrodd:int=0,n:int=512):
     
     return r
 
-def randomPrime(nBits:int=512,gen=randomInt,condition = lambda p : p == p,k:int=1):
+
+
+def randomPrime(nBits:int=512,gen=randomInt,condition = lambda p : p == p,k:int=1,Verbose=False):
     """
     Generates prime numbers with bitlength nBits.
     Stops after the generation of k prime numbers.
@@ -85,16 +87,31 @@ def randomPrime(nBits:int=512,gen=randomInt,condition = lambda p : p == p,k:int=
     # Generate random odd number of nBits
     assert nBits >= 8 and nBits <= 4096
 
-    maybe=gen(0,nBits)
+    def find(Verbose:bool):
+        maybe=gen(0,nBits)
+
+        if Verbose:
+            print("Finding one who respect given condition(s).")
+
+        while not condition(maybe):
+            maybe=gen(0,nBits)
+
+        if Verbose:
+            print("Found !")
+        return maybe
+    
+    maybe = find(Verbose)
 
     b=k
     primes=[]
 
     while k>0:
-        if millerRabin(maybe) and condition(maybe):
+
+        if millerRabin(maybe):
             primes.append(maybe)
             k-=1
-        maybe=gen(0,nBits)
+
+        maybe = find(Verbose)
 
     if b:
         return primes[0]
@@ -117,6 +134,8 @@ def safePrime(nBits:int=1024,randomFunction=None,easyGenerator=False,Verbose=Fal
     Return (safe_prime,sophieGermain_prime) tuple's
     """
     if easyGenerator:
+        if Verbose:
+            print("Easy generator choosen.")
         p_filter = lambda p : p % 3 == 2 and (p % 12 == 1 or p % 12 == 11)# p = 1 mod 12 make 11 as primitive root
     else:
         p_filter = lambda p : p % 3 == 2
@@ -126,16 +145,33 @@ def safePrime(nBits:int=1024,randomFunction=None,easyGenerator=False,Verbose=Fal
         if randomFunction == None:
             randomFunction = randomInt
 
-        sophieGermain_prime = randomPrime(nBits,randomFunction,p_filter)
+        sophieGermain_prime = randomPrime(nBits,randomFunction,p_filter,1)
         safe_prime = 2 * sophieGermain_prime + 1
-        bits = bytes_needed(safe_prime)*8
+        #bits = bytes_needed(safe_prime)*8
 
         if Verbose:
             print(f"Sophie Germain Prime {sophieGermain_prime} candidate's.")
 
-        if bits >= nBits and millerRabin(safe_prime):
+        #if bits >= nBits and millerRabin(safe_prime):
+        if millerRabin(safe_prime):
             return (safe_prime,sophieGermain_prime)
         else:
             if Verbose:
                 print(f"But 2 * him + 1 doesn't seem to be prime...\n")
             continue
+
+
+
+
+def genSafePrimes(n:int,L:list,nBits:int,randomFunction=None,easyGenerator=False,Verbose=False):
+    """
+    Generate n tuples of distincts safe primes number's and append them into a list L.
+    """
+
+    for _ in range(n):
+        s = safePrime(nBits,randomFunction,easyGenerator,Verbose)
+        if s not in L:
+            L.append(s)
+        else:
+            continue
+

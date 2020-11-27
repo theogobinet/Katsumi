@@ -102,6 +102,7 @@ def square_and_multiply(x, k, p=None):
 
 def millerRabin(p, s=40):
     """Determines whether a given number is likely to be prime."""
+    
     if p == 2: # 2 is the only prime that is even
         return True
     if not (p & 1): # n is a even number and can't be prime

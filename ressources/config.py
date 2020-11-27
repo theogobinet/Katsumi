@@ -2,6 +2,8 @@ import os
 
 THIS_FOLDER = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DIRECTORY_GEN = os.path.join(THIS_FOLDER,"ressources/generated/")
+DIRECTORY_PROCESSING = os.path.join(THIS_FOLDER,"processing/")
+DIRECTORY_FOUNT = os.path.join(DIRECTORY_GEN,"PrimeNumber's_Fount/")
 
 # Keys
 KL1 = []

@@ -61,23 +61,42 @@ def generator(p:int,q:int):
 #############################################
 
 
-def key_gen(n:int=512,easyGenerator:bool=False,randomFunction=None,Verbose=False):
+def key_gen(n:int=512,primeFount=None,easyGenerator:bool=False,randomFunction=None,Verbose=False):
     """
     ElGamal key generation.
 
     n: number of bits for safe prime generation.
+
+    primeFount = prime number's fountain used, put tuple of primes into this variable.
 
     easyGenerator: generate appropriated safe prime number according to quadratic residues properties.
 
     randomFunction: prng choosen for random prime number generation (default = randbits from secrets module).
     """
 
+    import ressources.config as config
+
     if Verbose: print(f"Let's try to generate a safe prime number of {n} bits.")
 
-    s = prng.safePrime(n,randomFunction,easyGenerator,Verbose)
+    if primeFount == None:
 
-    p,q=s[0],s[1] # safe_prime and Sophie Germain prime
+        s = prng.safePrime(n,randomFunction,easyGenerator,Verbose)
+        p,q = s # safe_prime and Sophie Germain prime
     
+    else:
+
+        s = primeFount
+        p,q = s # safe_prime and Sophie Germain prime
+
+        # Control if easy generator is possible 
+        p_filter = lambda p : p % 3 == 2 and (p % 12 == 1 or p % 12 == 11)
+        
+        if p_filter(p):
+            easyGenerator = True
+        else:
+            easyGenerator = False
+
+
     if Verbose:
         print(f"Let's find the generator for p: {p} , safe prime number.")
 
@@ -104,14 +123,14 @@ def key_gen(n:int=512,easyGenerator:bool=False,randomFunction=None,Verbose=False
 
     # The private key consists of the values (G,q,g,x).
     private_key = (p,q,gen,x)
-    it.writeVartoFile(private_key,"private_key")
+    it.writeVartoFile(private_key,"private_key",config.DIRECTORY_PROCESSING)
 
     print(f"\nYour private key has been generated Alice, keep it safe !")
 
 
     # The public key consists of the values (G,q,g,h).
     public_key = (p,q,gen,h)
-    it.writeVartoFile(public_key,"public_key")
+    it.writeVartoFile(public_key,"public_key",config.DIRECTORY_PROCESSING)
 
     print(f"\nThe public key : {public_key} has been generated too and saved.")
 
@@ -142,14 +161,21 @@ def encrypt(M:bytes,pKey):
     if bm.bytes_to_int(M) <= p-1:
         # That's a short message
         m=bm.bytes_to_int(M)
-        return process(m)
+
+        e = process(m)
 
     else:
         # M is a longer message, so it's divided into blocks
         # You need to choose a different y for each block to prevent
         # from Eve's attacks.
 
-        return [process(bm.bytes_to_int(elt)) for elt in bm.splitBytes(M,1)]
+        e = [process(bm.bytes_to_int(elt)) for elt in bm.splitBytes(M,1)]
+
+    import ressources.config as config
+
+    it.writeVartoFile(e,"encrypted",config.DIRECTORY_PROCESSING)
+
+    return e
 
 #############################################
 ########### -   Decryption   - ##############
