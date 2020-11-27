@@ -450,7 +450,7 @@ def elGamalKeysGeneration():
     """
     Dealing with conditions for elGamal key generation.
     """
-    from core.asymetric import elGamal
+    from core.asymmetric import elGamal
 
     question = query_yn("Do you want to choose parameters of ElGamal key generation's ( default = No => fastest way) ?")
 
@@ -525,7 +525,7 @@ def keysVerif():
 
 def dlogAttack():
     
-    from core.asymetric import elGamal
+    from core.asymmetric import elGamal
     clear()
     asciiJongling()
 
@@ -614,7 +614,7 @@ def dlogAttack():
 
 def katsuSymm():
 
-    import core.symetric.ciphers as ciphers
+    import core.symmetric.ciphers as ciphers
     import katsumi
 
     clear()
@@ -724,7 +724,7 @@ def katsuSymm():
 def katsuAsymm():
 
     import katsumi
-    import core.asymetric.elGamal as elG
+    import core.asymmetric.elGamal as elG
 
     clear()
     asciiCat()

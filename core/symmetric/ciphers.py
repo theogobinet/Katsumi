@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import core.symetric.kasumi as kasu
-import core.symetric.galois_Z2 as gz2
+import core.symmetric.kasumi as kasu
+import core.symmetric.galois_Z2 as gz2
 
 import ressources.config as config
 import ressources.bytesManager as bm
 import ressources.interactions as it
-from core.symetric.watch import watch
+from core.symmetric.watch import watch
 
 import time
 import base64

@@ -7,8 +7,8 @@
 ##################
 
 import ressources.bytesManager as bm
-from core.symetric.kasumi import set_key
-from core.symetric.ciphers import CTR
+from core.symmetric.kasumi import set_key
+from core.symmetric.ciphers import CTR
 
 def sponge(N, d):
 

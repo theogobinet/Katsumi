@@ -2,6 +2,6 @@
 # -*- coding: utf-8 -*-
 # __init__.py
 
-from .symetric import *
-from .asymetric import *
+from .symmetric import *
+from .asymmetric import *
 from .hashbased import *
