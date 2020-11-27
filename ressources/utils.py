@@ -12,6 +12,20 @@ def swapPos(list, pos1, pos2):
     return list
 
 
+def randomClosureChoice(bucket:list):
+    """
+    Pick randomly elements from a given list till is empty.
+
+    Be careful to set bucket = GivenList.copy() to not loose original variable !
+    """
+    import secrets
+
+    choice = secrets.choice(bucket)
+    bucket.remove(choice)
+    
+    return choice
+
+
 def euclid(a:int,b:int,Verbose=False):  
     
     """Find the Greatest Common Divisor of number a and b."""
@@ -31,7 +45,7 @@ def euclid(a:int,b:int,Verbose=False):
         if Verbose:
             q=a//b
             print(f"{a} = {b}*{q} + {r}")
-        
+    
         return euclid(b,r,Verbose)
 
 def lcm(a:int, b:int):
@@ -102,7 +116,7 @@ def square_and_multiply(x, k, p=None):
 
 def millerRabin(p, s=40):
     """Determines whether a given number is likely to be prime."""
-    
+
     if p == 2: # 2 is the only prime that is even
         return True
     if not (p & 1): # n is a even number and can't be prime

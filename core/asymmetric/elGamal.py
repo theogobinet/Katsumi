@@ -56,6 +56,23 @@ def generator(p:int,q:int):
         # Found a good candidate
         return g
 
+
+def isEasyGeneratorPossible(s:tuple):
+    """
+    Return True is it's possible to generate easly a generator.
+    """
+    # Control if easy generator is possible 
+    p_filter = lambda p : p % 3 == 2 and (p % 12 == 1 or p % 12 == 11)
+
+    p,_ = s
+    
+    if p_filter(p):
+        easyGenerator = True
+    else:
+        easyGenerator = False
+
+    return easyGenerator
+
 #############################################
 ########### - Key Generation - ##############
 #############################################
@@ -76,9 +93,9 @@ def key_gen(n:int=512,primeFount=None,easyGenerator:bool=False,randomFunction=No
 
     import ressources.config as config
 
-    if Verbose: print(f"Let's try to generate a safe prime number of {n} bits.")
-
     if primeFount == None:
+
+        if Verbose: print(f"Let's try to generate a safe prime number of {n} bits.")
 
         s = prng.safePrime(n,randomFunction,easyGenerator,Verbose)
         p,q = s # safe_prime and Sophie Germain prime
@@ -88,22 +105,14 @@ def key_gen(n:int=512,primeFount=None,easyGenerator:bool=False,randomFunction=No
         s = primeFount
         p,q = s # safe_prime and Sophie Germain prime
 
-        # Control if easy generator is possible 
-        p_filter = lambda p : p % 3 == 2 and (p % 12 == 1 or p % 12 == 11)
-        
-        if p_filter(p):
-            easyGenerator = True
-        else:
-            easyGenerator = False
 
-
-    if Verbose:
-        print(f"Let's find the generator for p: {p} , safe prime number.")
+    if Verbose: print(f"Let's find the generator for p: {p} , safe prime number.")
 
     # Generate an efficient description of a cyclic group G, of order q with generator g.
     if easyGenerator:
         # https://en.wikipedia.org/wiki/Quadratic_residue#Table_of_quadratic_residues
         if Verbose: print(f"Easy generator => gen = 12 (condition in prime generation) or (4,9) (for every prime)")
+
         gen = rd.choice([12,4,9])
 
     else:

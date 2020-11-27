@@ -1,4 +1,10 @@
 import os
+import sys
+
+recursionL = sys.getrecursionlimit()
+sys.setrecursionlimit(recursionL * 2)
+# To avoid maximum recursion depth with huge integer (e.g euclid).
+
 
 THIS_FOLDER = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DIRECTORY_GEN = os.path.join(THIS_FOLDER,"ressources/generated/")

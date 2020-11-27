@@ -263,7 +263,7 @@ def doSomethingElse():
 ##### Prime number's fount gestion ######
 #########################################
 
-def extractSafePrimes(nBits:int=1024,all:bool=True,directory=config.DIRECTORY_FOUNT):
+def extractSafePrimes(nBits:int=1024,allE:bool=True,easyGenerator:bool=False,directory:str=config.DIRECTORY_FOUNT):
     """
     Return list of tuples (Safe_Prime,Sophie_Germain_Prime) for given n bits.
     If list doesn't exist, create one with 1 tuple.
@@ -275,16 +275,42 @@ def extractSafePrimes(nBits:int=1024,all:bool=True,directory=config.DIRECTORY_FO
     name = f"{str(nBits)}_bits"
 
     if not isFileHere(name+".txt",directory):
-        stockSafePrimes(nBits,1)
-        extractSafePrimes(nBits,directory)
+        print("File doesn't exist. Creating it with one element.")
+        stockSafePrimes(nBits,0,Verbose=True)
+        extractSafePrimes(nBits,allE,easyGenerator,directory)
     else:
         v = extractVarFromFile(name,directory)
 
-        if all:
+        if allE:
             return v
         else:
-            import random as rd
-            return rd.choice(v)
+            import ressources.utils as ut
+
+            s = ut.randomClosureChoice(v)
+
+            if easyGenerator:
+                from core.asymmetric.elGamal import isEasyGeneratorPossible
+
+                if not isEasyGeneratorPossible(s):
+                    while len(s) != 0 and not isEasyGeneratorPossible(s):
+                        s = ut.randomClosureChoice(v)
+                        print(s,v)
+                    
+                    if len(s) == 0 and not isEasyGeneratorPossible(s):
+                        # It's the only ramaining element and it's not possible to use easy gen with him.
+                        print("No safe prime available for easy generator creation into current {nBits} bits fountain's.")
+
+                        question = query_yn("Do you want to generate one compatible with this condition (It can be long) ? ")
+
+                        if question:
+                            s = prng.safePrime(nBits,easyGenerator=True,Verbose=True)
+                            updatePrimesFount(s,nBits)
+                        else:
+                            return elGamalKeysGeneration()
+                else:
+                    return s
+            else:
+                return s
 
 def stockSafePrimes(n:int=1024,x:int=15,randomFunction=prng.xorshiftperso,Update=False,Verbose=False):
     """ 
@@ -292,19 +318,27 @@ def stockSafePrimes(n:int=1024,x:int=15,randomFunction=prng.xorshiftperso,Update
     
     Using parallelization for fastest generation.
     """
+
+    assert x >= 0
     # Create an appropriated directory.
     handleDirectory("PrimeNumber's_Fount")
 
     from multiprocessing import Pool, cpu_count, Manager
     import random as rd
 
-    c = cpu_count()
-    pool = Pool(c)
+    if x != 0 : 
+        c = cpu_count()
+        poule = Pool(c)
 
-    if Verbose:
-        clear()
-        print(f"You have {c} Central Processing Units.")
-        print(f"Each cpu will computes {x} tuple(s) of safe primes.")
+        if Verbose:
+            clear()
+            print(f"You have {c} Central Processing Units.")
+            print(f"Each cpu will computes {x} tuple(s) of safe primes.")
+    
+    else:
+        if Verbose:
+            clear()
+            print(f"Generating just one tuple for {n} bits safe prime -> No parallelization needed.")
 
     # Safety check, if already exist, then you just update it !
     if isFileHere(f"{str(n)}_bits.txt",config.DIRECTORY_FOUNT):
@@ -312,21 +346,36 @@ def stockSafePrimes(n:int=1024,x:int=15,randomFunction=prng.xorshiftperso,Update
             print("Data concerning this number of bits already exists. Update in progress.")
         Update = True
     else:
+        if Verbose:
+            print("Data not existing, creating file...")
         Update = False
 
     if Update:
         fount = extractSafePrimes(n)
-        fount = Manager().list(fount) # Can be shared between process
+
+        if x != 0:
+            fount = Manager().list(fount) # Can be shared between process
+        
     else:
-        fount = Manager().list() # Can be shared between process
+        if x != 0:
+            fount = Manager().list() # Can be shared between process
+        else:
+            fount = []
 
     if Verbose:
         print(f"Computing in progress. Please wait ...")
 
     # bool(rd.getrandbits(1)) faster than rd.choice([True,False])
-    data = [(x,fount,n,randomFunction,bool(rd.getrandbits(1))) for _ in range(c)]
 
-    pool.starmap(prng.genSafePrimes,data)
+    if x != 0:
+        data = [(x,fount,n,randomFunction,bool(rd.getrandbits(1))) for _ in range(c)]
+
+        poule.starmap(prng.genSafePrimes,data)
+        poule.close()
+
+    else:
+        prng.genSafePrimes(1,fount,n,randomFunction,bool(rd.getrandbits(1)))
+
 
     if Verbose:
         print(f"Generation completed.")
@@ -341,7 +390,7 @@ def updatePrimesFount(p:tuple,nBits:int):
 
     if not isFileHere(name+".txt",config.DIRECTORY_FOUNT):
 
-        stockSafePrimes(nBits,1)
+        stockSafePrimes(nBits,0)
         updatePrimesFount(p,nBits)
 
     else:
@@ -452,7 +501,10 @@ def elGamalKeysGeneration():
     """
     from core.asymmetric import elGamal
 
-    question = query_yn("Do you want to choose parameters of ElGamal key generation's ( default = No => fastest way) ?")
+    clear()
+    asciiCat()
+
+    question = query_yn("Do you want to use the fastest ElGamal key generation's ( No => Choose parameters) ?")
 
     # Because here default is no so not(yes)
     if not question:
@@ -463,24 +515,42 @@ def elGamalKeysGeneration():
         else:
             n = 2048
 
-        question2 = query_yn("Do you want to use the Prime Number's Fountain to generate the keys (fastest) ?")
+        question2 = query_yn("Do you want to use easy Generator ? (fastest)")
 
         if question2:
-            primes = extractSafePrimes(n,False)
+            easyGenerator = True
+        else:
+            easyGenerator = False
+
+
+        question3 = query_yn("Do you want to use the Prime Number's Fountain to generate the keys (fastest) ?")
+
+        if question3:
+            
+            if question2:
+                primes = extractSafePrimes(n,False,easyGenerator)
+            else:
+                primes = extractSafePrimes(n,False)
+
+        else:
             primes = None
 
-            question3 = query_yn("Do you want to use easy Generator ? (fastest)")
+        clear()
+        asciiCat()
 
-            if question3:
-                easyGenerator = True
-            else:
-                easyGenerator = False
-            
-            return elGamal.key_gen(n,primes,easyGenerator)
+        print("\t.... Key generation in progress ....")
+        
+        return elGamal.key_gen(n,primes,easyGenerator,prng.xorshiftperso,True)
     else:
-        n = 512
+        n = 1024
         primes = extractSafePrimes(n,False)
-        return elGamal.key_gen(n,primes)
+
+        clear()
+        asciiCat()
+
+        print("\t.... Key generation in progress ....")
+
+        return elGamal.key_gen(n,primes,Verbose=True)
     
 
 
@@ -491,7 +561,7 @@ def keysVerif():
     import katsumi
 
     clear()
-    katsumi.asciiCat()
+    asciiCat()
 
     print("\nChecking the presence of keys in the system....")
 
@@ -504,6 +574,9 @@ def keysVerif():
             print("Private key's too.\n")
             
             if not query_yn("Do you want to keep them ?"):
+                rmFile("private_key.txt",config.DIRECTORY_PROCESSING)
+                rmFile("public_key.txt",config.DIRECTORY_PROCESSING)
+                rmFile("encrypted.txt",config.DIRECTORY_PROCESSING)
                 return elGamalKeysGeneration()
             else:
                 return katsumi.menu()
@@ -522,6 +595,10 @@ def keysVerif():
                 print("Gotcha !")
 
                 return keysVerif()
+            else:
+                return katsuAsymm()
+    else:
+        return elGamalKeysGeneration()
 
 def dlogAttack():
     
@@ -630,6 +707,7 @@ def katsuSymm():
 
     def doSomething(i:int):
         """ Handle choices for symmetric things. """
+
         clear()
         asciiCat()
 

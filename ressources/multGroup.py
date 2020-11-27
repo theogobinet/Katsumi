@@ -162,7 +162,7 @@ def multiplicativeOrder(n:int,p:int,iterativeWay=False,Verbose=False):
 
     Set iterative way to true if you want to use iterations.
     """
-    
+
     if not iterativeWay:
         if Verbose:
             print(f"By the Chinese Remainder Theorem, it's enough to calculate the multiplicative order for each prime exponent p^k of {p},")
@@ -171,6 +171,8 @@ def multiplicativeOrder(n:int,p:int,iterativeWay=False,Verbose=False):
         from functools import reduce
 
         def multOrder1(a:int,t:tuple):
+
+            q = None # To avoid problem 'Possibly unbound"
 
             p,e = t
             m = ut.square_and_multiply(p,e)

@@ -75,7 +75,6 @@ def randomInt(evenOrodd:int=0,n:int=512):
     return r
 
 
-
 def randomPrime(nBits:int=512,gen=randomInt,condition = lambda p : p == p,k:int=1,Verbose=False):
     """
     Generates prime numbers with bitlength nBits.
@@ -133,6 +132,9 @@ def safePrime(nBits:int=1024,randomFunction=None,easyGenerator=False,Verbose=Fal
 
     Return (safe_prime,sophieGermain_prime) tuple's
     """
+
+    import  ressources.interactions as it
+
     if easyGenerator:
         if Verbose:
             print("Easy generator choosen.")
@@ -141,24 +143,52 @@ def safePrime(nBits:int=1024,randomFunction=None,easyGenerator=False,Verbose=Fal
         p_filter = lambda p : p % 3 == 2
         
     while 1:
-
+        # For faster searching
+        # Calculate 2q +1 and (q-1)//2
+        # Retun Sophie Germain's prime according to what is prime. 
+         
         if randomFunction == None:
             randomFunction = randomInt
 
-        sophieGermain_prime = randomPrime(nBits,randomFunction,p_filter,1)
-        safe_prime = 2 * sophieGermain_prime + 1
-        #bits = bytes_needed(safe_prime)*8
+        q = randomPrime(nBits,randomFunction,p_filter,1)
+
+        p1 = 2 * q + 1
+        
+        p2 = (q - 1) // 2
+
 
         if Verbose:
-            print(f"Sophie Germain Prime {sophieGermain_prime} candidate's.")
+            it.clear()
+            print(f"Prime {q} candidate's.")
 
-        #if bits >= nBits and millerRabin(safe_prime):
-        if millerRabin(safe_prime):
+        
+        if millerRabin(p1):
+
+            if Verbose:
+                print("q is prime and 2q +1 too.")
+                print(f"Sophie Germain prime's: {q}")
+
+            sophieGermain_prime, safe_prime = q , p1
+
             return (safe_prime,sophieGermain_prime)
+
+        elif millerRabin(p2):
+
+            if Verbose:
+                print("q is prime and (q-1)/2 too.")
+                print(f"Sophie Germain prime's: {p2}")
+            
+            sophieGermain_prime, safe_prime = p2 , q
+
+            return (safe_prime,sophieGermain_prime)
+
         else:
             if Verbose:
-                print(f"But 2 * him + 1 doesn't seem to be prime...\n")
+                print(f"But 2 * him + 1 and (him - 1) / 2 doesn't seem to be primes...\n")
             continue
+
+    
+    
 
 
 
