@@ -782,7 +782,6 @@ def katsuSymm():
 
             clear()
             asciiCat()
-
             return doSomethingElse()
         
         elif i == 3:
