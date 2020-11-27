@@ -10,8 +10,6 @@ import ressources.interactions as it
 from core.symmetric.watch import watch
 
 import time
-import base64
-import binascii
 
 #################################################
 ############ Main Method  #######################
@@ -79,11 +77,7 @@ def run(input=it.findFile(".kat"), inFile=True, encrypt=False, method=3, aad="",
         if encrypt:
             data=bytearray(input.encode())
         else:
-            try:
-                data = base64.b64decode(input)
-
-            except binascii.Error:
-                print('ERROR : Unable to decode the message, the format of the encrypted message does not correspond to the expected one (base64).\n')
+            data = input
 
     # Keys initialisation
     kasu.set_key(key)

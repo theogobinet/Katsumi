@@ -168,7 +168,7 @@ def findFile(ext="",directory="processing/"):
 
 def isFileHere(name:str,directory=config.DIRECTORY_GEN):
     """Return if given name file's is here or is not."""
-    return os.path.exists(directory+name)
+    return os.path.isfile(directory+name)
 
 def handleDirectory(dirName:str,directory=config.DIRECTORY_GEN):
     """ If given directory doesn't exist, then create it. """
@@ -221,14 +221,10 @@ def askForKey():
     key = bytearray()
 
     if answer:
-        while len(key) != 16:
-            try:
-                sKey = input()
-                key = base64.b64decode(sKey)
-                if(len(key) != 16):
-                    print("Invalid key, key must be 16 bytes long!")
-            except (binascii.Error, UnicodeEncodeError):
-                print("Invalid key, key must be encoded in base64!")
+        key = getb64("key", 16)
+
+        if not key:
+            katsuSymm()
 
     else:
         import secrets as sr
@@ -773,7 +769,9 @@ def katsuSymm():
                     # Find the first .kat file in the folder
                     answer = findFile("kat")
             else:
-                answer = readFromUser()
+                answer = getb64()
+                if not answer:
+                    katsuSymm()
 
             print("Decryption started....")
 
@@ -788,6 +786,7 @@ def katsuSymm():
             return doSomethingElse()
         
         elif i == 3:
+            clear()
             katsumi.menu()
         else:
             clear()
@@ -873,6 +872,7 @@ def katsuAsymm():
             dlogAttack()
 
         elif i == 6:
+            clear()
             katsumi.menu()
         else:
             clear()
@@ -882,3 +882,128 @@ def katsuAsymm():
         
     return doSomething(selection)
 
+
+def katsuHash():
+
+    import ressources.bytesManager as bm 
+    import core.hashbased.hashFunctions as hf
+    import base64
+
+    clear()
+    asciiCat()
+
+    choices = ["Generate a hash","Check a hash","Back to menu"]
+
+    for i,elt in enumerate(choices):
+        print(f"({i+1}) - {elt}")
+
+    selection = select()
+
+    if selection == 1:
+
+        size = getSize()
+
+        if query_yn("Do you want to hash a file ?","no"):
+
+            f = getFile()
+            clear()
+            
+            if f:
+               print (f"File hash: {base64.b64encode(hf.sponge(bm.fileToBytes(f), size)).decode()}")
+            
+            else:
+                katsuHash()  
+        else:
+            msg = readFromUser("Enter the text to hash:")
+
+            print (f"File hash: {base64.b64encode(hf.sponge(msg.encode(), size)).decode()}")
+            
+
+    elif selection == 2:
+        
+        def verifyHash(h, msg):
+            h2 = hf.sponge(msg, len(h)*8)
+            
+            if h == h2:
+                print("Hashes are the same !")
+            else:
+                print("Hashes are not the same !")
+
+        h = getb64("hash")
+
+        if  h:
+            if query_yn("Do you want to compare this hash to a file's one ?", "no"):
+                f = getFile()
+                if f:
+                    verifyHash(h, bm.fileToBytes(f))
+                else:
+                    katsuHash()
+            else:
+                verifyHash(h, readFromUser("Enter the text to compare with the hash:").encode()) 
+        else:
+            katsuHash()
+    else:
+        import katsumi
+
+        clear()
+        katsumi.menu()
+
+    doSomethingElse()
+
+##############################
+# LOOP FUNCTION TO GET INPUT #
+##############################
+
+def getFile():
+
+    print("Please enter the filename with its extension (source folder is processing):")
+
+    while True:
+        f = input("> ")
+        if f == "c":
+            return None
+        elif isFileHere(f, config.DIRECTORY_PROCESSING):
+            return config.DIRECTORY_PROCESSING + f
+        else:
+            print(f"Error: file '{f}' not found, enter [c] to go back or enter a valid filename:")
+
+        
+def getSize(default=256):
+    print(f"Please enter the hash size ({default} bits by default):")
+
+    while True:
+        i = input("> ")
+        if i == "c":
+            return None
+        elif i == "":
+            return default
+        else:
+            try:
+                val = int(i)
+                if val % 8 == 0 and val >=32:
+                    return val
+                else:
+                    print(f"Error: {i} is not a valid digest size, leave blank or enter a valid hash size:")
+                
+            except ValueError:
+                print(f"Error: '{i}' is not an integer, leave blank or enter a valid hash size:")
+
+
+def getb64(expected="message", size=-1):
+    import base64
+    import binascii
+
+    print(f"Enter the {expected} in base64:")
+    while True:
+        i = input("> ")
+        if i == "c":
+            return None
+        else:
+            try:
+                data = base64.b64decode(i)
+                if size == -1 or len(data) == size:
+                    return data
+                else:
+                    print(f'Error: {expected} must be {size} bytes long, enter [c] to go back or enter a valid base64')
+            except binascii.Error:
+                print('Error: Unable to decode, the format is not in base64, enter [c] to go back or enter a valid base64')
