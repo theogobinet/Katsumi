@@ -177,10 +177,7 @@ def cipher_choice():
 ###############- File Manager - ################
 ################################################
 
-from .config import THIS_FOLDER
-
-
-def findFile(ext="",directory="processing/"):
+def findFile(ext="",directory=config.DIRECTORY_PROCESSING):
     """
     To find a file given extension and return is name.
     """
@@ -189,11 +186,11 @@ def findFile(ext="",directory="processing/"):
 
     if ext=="":
         # Return the first file in the directory that is not crypted
-        for f in os.listdir(os.path.join(THIS_FOLDER,directory)):
+        for f in os.listdir(directory):
             if not(f.endswith("kat")):
                 name=f
     else:
-        for f in os.listdir(os.path.join(THIS_FOLDER,directory)):
+        for f in os.listdir(directory):
             if f.endswith(ext):
                 name=f
 
@@ -738,7 +735,7 @@ def dHgestion():
     
     clear()
     asciiKeys()
-    
+
     print("Shared key created.")
     print(f"\t > {dH_shared}\n")
 
