@@ -117,7 +117,7 @@ def randomPrime(nBits:int=512,gen=randomInt,condition = lambda p : p == p,k:int=
     else:
         return primes
     
-def safePrime(nBits:int=1024,randomFunction=None,easyGenerator=False):
+def safePrime(nBits:int=1024,randomFunction=xorshiftperso,easyGenerator=False,cpu_percentage:int=100):
     """
     The number 2p + 1 associated with a Sophie Germain prime is called a safe prime.
     In number theory, a prime number p is a Sophie Germain prime if 2p + 1 is also prime
@@ -129,7 +129,7 @@ def safePrime(nBits:int=1024,randomFunction=None,easyGenerator=False):
 
     The primes to be generated need to be 1024 bit to 2048 bit long for good cryptographical uses.
 
-    Multiprocessing safe prime computing.
+    Multiprocessing safe prime computing using cpu_percentage of your cpus.
 
     Return (safe_prime,sophieGermain_prime) tuple's
     """
@@ -137,7 +137,9 @@ def safePrime(nBits:int=1024,randomFunction=None,easyGenerator=False):
     from multiprocessing import Pool, cpu_count, Manager
 
     manager = Manager()
-    c = cpu_count()
+
+    c = int((85/100) * cpu_count())
+
     poule = Pool(c)
 
     flag = manager.Value('i',0) # Can be shared between processes.

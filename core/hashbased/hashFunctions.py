@@ -88,28 +88,28 @@ def md5(block):
             F, g = 0, 0
 
             if i <= 15:
-                F = ((B & C) | ((~ B) & D)) % 2**32
+                F = ((B & C) | ((~ B) & D)) % 1 << 32
                 g = i
             elif i <= 31:
-                F = ((D & B) | ((~ D) & C)) % 2**32
+                F = ((D & B) | ((~ D) & C)) % 1 << 32
                 g = (5*i + 1) % 16
             elif i <= 47:
-                F = (B ^ C ^ D) % 2**32
+                F = (B ^ C ^ D) % 1 << 32
                 g = (3*i + 5) % 16
             elif i <= 63:
-                F = (C ^ (B | (~ D))) % 2**32
+                F = (C ^ (B | (~ D))) % 1 << 32
                 g = (7*i) % 16
 
-            F = (F + A + initmd5.K[i] + bm.bytes_to_int(blocks[g])) % 2**32
+            F = (F + A + initmd5.K[i] + bm.bytes_to_int(blocks[g])) % 1 << 32
             A = D
             D = C
             C = B
-            B = (B + ((F << initmd5.s[i]) | (F >> (32 - initmd5.s[i])))) % 2**32
+            B = (B + ((F << initmd5.s[i]) | (F >> (32 - initmd5.s[i])))) % 1 << 32
         
-        h1 = (A + h1) % 2**32
-        h2 = (B + h2) % 2**32
-        h3 = (C + h3) % 2**32
-        h4 = (D + h4) % 2**32
+        h1 = (A + h1) % 1 << 32
+        h2 = (B + h2) % 1 << 32
+        h3 = (C + h3) % 1 << 32
+        h4 = (D + h4) % 1 << 32
 
     return bm.packSplittedBytes([bm.int_to_bytes(h1), bm.int_to_bytes(h2), bm.int_to_bytes(h3), bm.int_to_bytes(h4)])
 

@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from math import sqrt, floor
+from math import sqrt
 import random
-import numpy as np
 
 def integer_sqrt(x):
     """
@@ -164,8 +163,8 @@ def millerRabin(p, s=40):
         r >>= 1
         u += 1
 
-    # at this stage p-1 = 2**u * r  holds
-    assert p-1 == 2**u * r
+    # at this stage p-1 = 1 << u * r  holds
+    assert p-1 == (1 << u) * r
 
     def witness(a):
         """
@@ -177,7 +176,7 @@ def millerRabin(p, s=40):
             return False
 
         for i in range(u):
-            z = square_and_multiply(a, 2**i * r, p)
+            z = square_and_multiply(a, (1 << i) * r, p)
             if z == p1:
                 return False
         return True

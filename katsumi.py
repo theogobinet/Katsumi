@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from datetime import datetime
-
 from ressources import interactions as it
 from core.symmetric.galois_Z2 import GF2
+import ressources.asciiWarehouse as asc
 
 import sys
 import time
@@ -17,7 +16,7 @@ def work_with_selection(pSelection):
     """Interact with others py functions depending on user choice."""
 
     it.clear()
-    it.asciiCat()
+    asc.asciiCat()
 
     # Selection orientation 
     if pSelection == 1 :
@@ -58,12 +57,12 @@ def work_with_selection(pSelection):
 #################################################
 
 def menu():
-    
+
     choices=["Symmetric","Asymmetric","Hash","Perform a proof of work.","Check a transaction.","Start / increment Block-chain.","Check Block-chain integrity's","I WANT IT ALL !! I WANT IT NOW !","Prime Numbers Fountain's","Exit"]
 
 
     print("------------------------------------------------------------------")
-    it.asciiCat()
+    asc.asciiCat()
     print("- Created by : Gobinet Théo && Martin Azaël ")
     print("- Free to use")
     print("- MIT License\n")

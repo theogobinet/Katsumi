@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from ressources import prng
-
 import os
-from datetime import datetime
 import time
+
+from ressources import prng
+from . import asciiWarehouse as asc 
+from datetime import datetime
+
 import ressources.config as config
 import ressources.bytesManager as bm 
 
@@ -13,69 +15,6 @@ import ressources.bytesManager as bm
 ###############- Console Interactions - ########
 ################################################
 
-def asciiJongling():
-    return print(
-        """
-                        '   '    '     
-                        '   '    '   
-                    o/          '  \o 
-                    /-'            -\ 
-                    /\               /\
-                    
-            Do you feel as though you are juggling 
-                a few to many responsibilities?
-        """
-    )
-
-def asciiDeath():
-    return print('''
-                    %%% %%%%%%%            |#|
-                %%%% %%%%%%%%%%%        |#|####
-            %%%%% %         %%%       |#|=#####
-            %%%%% %   @    @   %%      | | ==####
-            %%%%%% % (_  ()  )  %%     | |    ===##
-            %%  %%% %  \_    | %%      | |       =##
-            %    %%%% %  u^uuu %%     | |         ==#
-                %%%% %%%%%%%%%      | |           V
-            
-            ~ Death is irreversible ~
-    '''
-    )
-
-def asciiKeys():
-    return print(
-        """
-        8 8          ,o.                                        ,o.          8 8
-        d8o8azzzzzzzzd   b        Diffie Hellman Key           d   bzzzzzzzza8o8b
-                    `o'               Exchange                  `o'
-
-            8 8 8 8                     ,ooo.
-            8a8 8a8                    oP   ?b
-            d888a888zzzzzzzzzzzzzzzzzzzz8     8b
-            `""^""'                    ?o___oP'
-            
-            """
-    )
-
-def asciiCat():
-    return print('''                         
-       _                        
-       \`*-.                 _  __     _                       _    
-        )  _`-.             | |/ /    | |                     (_)    
-       .  : `. .            | ' / __ _| |_ ___ _   _ _ __ ___  _     
-       : _   '  \           |  < / _` | __/ __| | | | '_ ` _ \| |    
-       ; *` _.   `*-._      | . \ (_| | |_\__ \ |_| | | | | | | |    
-       `-.-'          `-.   |_|\_\__,_|\__|___/\__,_|_| |_| |_|_|    
-         ;       `       `.     
-         :.       .        \               Remember: 
-         . \  .   :   .-'   .     Encryption provides secrecy,
-         '  `+.;  ;  '      :    not authentication or integrety.
-         :  '  |    ;       ;-. 
-         ; '   : :`-:     _.`* ;
-     .*' /  .*' ; .*`- +'  `*' 
-      `*-*   `*-*  `*-*'           
-                                               
-''')
 
 
 def query_yn(question, default="yes"):
@@ -143,7 +82,7 @@ def select(r=None):
 def cipher_choice():
 
     clear()
-    asciiCat()
+    asc.asciiCat()
 
     print("Choice cypher method : ")
     print(" 1 - ECB \n 2 - CBC \n 3 - PCBC (Recommended) \n 4 - CTR (Stream) \n 5 - CGM (Authentification)")
@@ -168,7 +107,7 @@ def cipher_choice():
             return cipher_choice()
         
     clear()
-    asciiCat()
+    asc.asciiCat()
 
     return pCipher
 
@@ -245,7 +184,7 @@ def askForKey():
     import binascii
 
     clear()
-    asciiCat()
+    asc.asciiCat()
 
     answer=query_yn("You have not yet defined a key, you want to enter one?","no")
 
@@ -403,35 +342,7 @@ def primeNumbersFountain():
     """
 
     clear()
-
-    def asciiArt():
-        return print( """
-                              .      .       .       .
-  .   .       .   1217   .      . .      .         .     337   .    .
-         .       .         .    .   .         .         .            .
-    .   .    .       .         . . .        .  2027   .     .    .
- .     13    .   .       .       . .      .        .  .              .
-      .  .    .  .       .     . .    .       . .      .   .        .
- .   .       .    . .   89 .    . .   .      .     .    109    .     .
-    .            .    .     .   . .  .     .   .               .
-     .               .  .    .  . . .    .  .                 .
-                        . .  .  . . .  . .
-                            . . . . . .
-                              . . . .
-                               I . I
-                 _______________III_______________
-                |    .   Prime   .  Numbers   .   |
-                 \SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS/
-                    \ ======================= /
-                        \SSSSSSSSSSSSSSSSS/
-                     ________\       /________
-                    (=+=+=+=+=+=+=+=+=+=+=+=+=)
-                     ~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    """
-    )
-
-    asciiArt()
+    asc.asciiArt()
 
     print("The Foutain contains:")
     for elt in whatInThere():
@@ -448,7 +359,7 @@ def primeNumbersFountain():
     def doSomething(i:int):
         """ Handle choices for fountain. """
         clear()
-        asciiArt()
+        asc.asciiArt()
         if i == 1:
             print("How many bits wanted for this generation ?")
             wanted = select()
@@ -472,7 +383,7 @@ def primeNumbersFountain():
         
         elif i == 3:
             clear()
-            asciiDeath()
+            asc.asciiDeath()
             print("Enter the number of bits corresponding to the list you would like to be removed.")
             lnumber = select()
             name = f"{str(lnumber)}_bits.txt"
@@ -505,7 +416,7 @@ def elGamalKeysGeneration():
     from core.asymmetric import elGamal
 
     clear()
-    asciiCat()
+    asc.asciiCat()
 
     question = query_yn("Do you want to use the fastest ElGamal key generation's ( No => Choose parameters) ?")
 
@@ -539,7 +450,7 @@ def elGamalKeysGeneration():
             primes = None
 
         clear()
-        asciiCat()
+        asc.asciiCat()
 
         print("\t.... Key generation in progress ....")
         
@@ -549,7 +460,7 @@ def elGamalKeysGeneration():
         primes = extractSafePrimes(n,False)
 
         clear()
-        asciiCat()
+        asc.asciiCat()
 
         print("\t.... Key generation in progress ....")
 
@@ -564,7 +475,7 @@ def keysVerif():
     import katsumi
 
     clear()
-    asciiCat()
+    asc.asciiCat()
 
     print("\nChecking the presence of keys in the system....")
 
@@ -607,7 +518,7 @@ def dlogAttack():
     
     from core.asymmetric import elGamal
     clear()
-    asciiJongling()
+    asc.asciiJongling()
 
     choices = ["Retieve private key with publicKey","Decrypt encrypted message.","Back to menu"]
 
@@ -620,18 +531,18 @@ def dlogAttack():
         """ Handle choices for dlog attack. """
 
         clear()
-        asciiJongling()
+        asc.asciiJongling()
 
         if i == 1:
 
             while not isFileHere("public_key.txt",config.DIRECTORY_PROCESSING):
                 clear()
-                asciiJongling()
+                asc.asciiJongling()
 
                 input("Please put your 'public_key.txt' file into the 'processing' folder.")
             
             clear()
-            asciiJongling()
+            asc.asciiJongling()
             print("Gotcha !\n")
 
             print("Compute dlog attack with pollard's rho algorithm.")
@@ -650,22 +561,22 @@ def dlogAttack():
 
             while not isFileHere("public_key.txt",config.DIRECTORY_PROCESSING):
                 clear()
-                asciiJongling()
+                asc.asciiJongling()
 
                 input("Please put your 'public_key.txt' file into the 'processing' folder.")
             
             clear()
-            asciiJongling()
+            asc.asciiJongling()
             print("Gotcha !\n")
             
             while not isFileHere("encrypted.txt",config.DIRECTORY_PROCESSING):
                 clear()
-                asciiJongling()
+                asc.asciiJongling()
 
                 input("Please put your 'encrypted.txt' file into the 'processing' folder.")
             
             clear()
-            asciiJongling()
+            asc.asciiJongling()
             print("Gotcha !\n")
 
             print("Compute dlog attack with pollard's rho algorithm.")
@@ -698,14 +609,14 @@ def dHgestion():
     import ressources.bytesManager as bm
 
     clear()
-    asciiKeys()
+    asc.asciiKeys()
 
     print("On what size n (bits) did you agree with your penpal?")
 
     size = select()
 
     clear()
-    asciiKeys()
+    asc.asciiKeys()
 
     print(f"Checking existence of fountain of {size} bits...")
 
@@ -723,19 +634,19 @@ def dHgestion():
     secret = select(accord[0])
 
     clear()
-    asciiKeys()
+    asc.asciiKeys()
 
     dH.chooseAndSend(accord,secret)
 
     clear()
-    asciiKeys()
+    asc.asciiKeys()
 
     dH_shared = dH.compute(accord,secret)
 
     writeVartoFile(dH_shared,"dH_sharedKey",config.DIRECTORY_PROCESSING)
     
     clear()
-    asciiKeys()
+    asc.asciiKeys()
 
     print("Shared key created.")
     print(f"\t > {dH_shared}\n")
@@ -757,7 +668,7 @@ def katsuSymm():
     import katsumi
 
     clear()
-    asciiCat()
+    asc.asciiCat()
 
     symmetric_choices=["Encrypt a message.", "Decrypt a message.","Back"]
 
@@ -771,7 +682,7 @@ def katsuSymm():
         """ Handle choices for symmetric things. """
 
         clear()
-        asciiCat()
+        asc.asciiCat()
 
         if i in [1,2]:
 
@@ -792,7 +703,7 @@ def katsuSymm():
                     aad = readFromUser()
                 else: 
                     clear()
-                    asciiCat()
+                    asc.asciiCat()
 
             if query_yn("Do you want to encrypt a file ?"):
                 inFile = getFile()
@@ -812,7 +723,7 @@ def katsuSymm():
             input(f"Encryption finished in {end} seconds !\n")
 
             clear()
-            asciiCat()
+            asc.asciiCat()
 
             return doSomethingElse(katsuSymm)
 
@@ -842,7 +753,7 @@ def katsuSymm():
             input(f"Decryption finished in {end} seconds !\n")
 
             clear()
-            asciiCat()
+            asc.asciiCat()
             return doSomethingElse(katsuSymm)
         
         elif i == 3:
@@ -864,7 +775,7 @@ def katsuAsymm():
     import core.asymmetric.elGamal as elG
 
     clear()
-    asciiCat()
+    asc.asciiCat()
 
     asymmetric_choices= ["Using ElGamal to generate public/private key pairs.","Encrypt a message with ElGamal","Decrypt a message encrypted by ElGamal.","Share private key with Diffie-Hellman.","Discrete Logarithmic attack on ElGamal.","Back"]
 
@@ -877,7 +788,7 @@ def katsuAsymm():
     def doSomething(i:int):
         """ Handle choices for symmetric things. """
         clear()
-        asciiCat()
+        asc.asciiCat()
 
         if i == 1:
             print("You are going to generate public/private key pairs with ElGamal algorithm.")
@@ -901,22 +812,22 @@ def katsuAsymm():
             #####
             while not isFileHere("private_key.txt",config.DIRECTORY_PROCESSING):
                 clear()
-                asciiCat()
+                asc.asciiCat()
 
                 input("Please put your 'private_key.txt' file into the 'processing' folder.")
             
             clear()
-            asciiCat()
+            asc.asciiCat()
             print("Gotcha !\n")
             
             while not isFileHere("encrypted.txt",config.DIRECTORY_PROCESSING):
                 clear()
-                asciiCat()
+                asc.asciiCat()
 
                 input("Please put your 'encrypted.txt' file into the 'processing' folder.")
             
             clear()
-            asciiCat()
+            asc.asciiCat()
             print("Gotcha !\n")
             #####
 
@@ -950,7 +861,7 @@ def katsuHash():
     import base64
 
     clear()
-    asciiCat()
+    asc.asciiCat()
 
     choices = ["Generate a hash","Check a hash","Back to menu"]
 

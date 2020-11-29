@@ -266,7 +266,7 @@ def GCM(arr, encrypt=True, aad=""):
         if(aad != ""):
             aadc = aad.encode()
 
-            if len(aadc) > 2**64:
+            if len(aadc) > 1 << 64:
                 raise Exception("Too much AAD")
 
             A = bm.splitBytes(aadc,8)
@@ -315,7 +315,7 @@ def GCM(arr, encrypt=True, aad=""):
         exTime = time.time()
         
         # treats the rightmost 32bits of its argument as a nonnegative integer with the least significant bit on the right, and increments this value modulo 2^32
-        Y = Y[:4] + ((int.from_bytes(Y[-4:],"big") + 1) % 2**32).to_bytes(4,"big")
+        Y = Y[:4] + ((int.from_bytes(Y[-4:],"big") + 1) % 1 << 32).to_bytes(4,"big")
         E = kasu.kasumi(Y)
 
         C.append(bm.b_op(arr[i], E, "XOR"))

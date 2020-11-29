@@ -252,7 +252,7 @@ def primitiveRoot(n:int,totient=None,Verbose=False):
         q = (n-1)//2
 
         # To deal with safe prime
-        if ut.millerRabin(q,1):
+        if ut.millerRabin(q):
 
             if Verbose:
                 print(f"{n} Safe Prime.")

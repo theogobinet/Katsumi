@@ -122,13 +122,13 @@ def poly_exp_mod_2(P:int,exp:int,mod:int):
 def gen_GL_2(poly,degree):
     """Return generator of Galois Field's GF(p^degree) based on primitive polynomial poly in Zn."""
     # Order of multiplicative subgroup
-    pn1=(2**degree)-1
+    pn1=(1 << degree)-1
     if utils.millerRabin(pn1):
         q=[pn1]
     else:
         q=utils.findPrimeFactors(pn1)
 
-    config.ELEMENTS=[i for i in range(2**degree)]
+    config.ELEMENTS=[i for i in range(1 << degree)]
     genList=config.ELEMENTS
 
     goodGen=None
@@ -169,7 +169,7 @@ def invertGalois2_alpha(A):
     """Inversion method with generator table."""
     A=int.from_bytes(A,"big")
     i=config.ALPHA_ELEMENTS.index(A)
-    expo=2**config.DEGREE - 1 - i
+    expo=1 << config.DEGREE - 1 - i
 
     inv=poly_exp_mod_2(config.GENERATOR,expo,config.IRRED_POLYNOMIAL)
     inv=inv.to_bytes(bm.bytes_needed(inv),"big")
