@@ -915,7 +915,7 @@ def katsuHash():
         else:
             msg = readFromUser("Enter the text to hash:")
 
-            print (f"File hash: {base64.b64encode(hf.sponge(msg.encode(), size)).decode()}")
+            print (f"Text hash: {base64.b64encode(hf.sponge(msg.encode(), size)).decode()}")
             
 
     elif selection == 2:
