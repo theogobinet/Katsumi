@@ -117,8 +117,7 @@ def randomPrime(nBits:int=512,gen=randomInt,condition = lambda p : p == p,k:int=
     else:
         return primes
     
-
-def safePrime(nBits:int=1024,randomFunction=None,easyGenerator=False,Verbose=False):
+def safePrime(nBits:int=1024,randomFunction=None,easyGenerator=False):
     """
     The number 2p + 1 associated with a Sophie Germain prime is called a safe prime.
     In number theory, a prime number p is a Sophie Germain prime if 2p + 1 is also prime
@@ -130,9 +129,31 @@ def safePrime(nBits:int=1024,randomFunction=None,easyGenerator=False,Verbose=Fal
 
     The primes to be generated need to be 1024 bit to 2048 bit long for good cryptographical uses.
 
+    Multiprocessing safe prime computing.
+
     Return (safe_prime,sophieGermain_prime) tuple's
     """
 
+    from multiprocessing import Pool, cpu_count, Manager
+
+    manager = Manager()
+    c = cpu_count()
+    poule = Pool(c)
+
+    flag = manager.Value('i',0) # Can be shared between processes.
+
+    return_list = manager.list([])
+
+    data = [(nBits,randomFunction,easyGenerator,False,flag,return_list) for _ in range(c)]
+
+    poule.starmap(safePrime_worker,data)
+    poule.close()
+
+    return list(return_list)[0]
+
+from multiprocessing import Manager
+
+def safePrime_worker(nBits:int=1024,randomFunction=None,easyGenerator=False,Verbose=False,flag=Manager().Value('i',0),returnL=[]):
     import  ressources.interactions as it
 
     if easyGenerator:
@@ -142,11 +163,12 @@ def safePrime(nBits:int=1024,randomFunction=None,easyGenerator=False,Verbose=Fal
     else:
         p_filter = lambda p : p % 3 == 2
         
-    while 1:
+    
+    while not bool(flag.value):
         # For faster searching
         # Calculate 2q +1 and (q-1)//2
         # Retun Sophie Germain's prime according to what is prime. 
-         
+
         if randomFunction == None:
             randomFunction = randomInt
 
@@ -166,40 +188,44 @@ def safePrime(nBits:int=1024,randomFunction=None,easyGenerator=False,Verbose=Fal
 
             if Verbose:
                 print("q is prime and 2q +1 too.")
-                print(f"Sophie Germain prime's: {q}")
+                print(f"\nSophie Germain prime's: {q}\n")
 
             sophieGermain_prime, safe_prime = q , p1
-
-            return (safe_prime,sophieGermain_prime)
+            
+            # Safe prime found
+            flag.value = 1
+            returnL.append((safe_prime,sophieGermain_prime))
 
         elif millerRabin(p2):
 
             if Verbose:
                 print("q is prime and (q-1)/2 too.")
-                print(f"Sophie Germain prime's: {p2}")
+                print(f"\nSophie Germain prime's: {p2}\n")
             
             sophieGermain_prime, safe_prime = p2 , q
 
-            return (safe_prime,sophieGermain_prime)
+            # Safe prime found
+            flag.value = 1
+            returnL.append((safe_prime,sophieGermain_prime))
 
         else:
             if Verbose:
                 print(f"But 2 * him + 1 and (him - 1) / 2 doesn't seem to be primes...\n")
             continue
 
-    
-    
 
 
 
-
-def genSafePrimes(n:int,L:list,nBits:int,randomFunction=None,easyGenerator=False,Verbose=False):
+def genSafePrimes(n:int,L:list,nBits:int,randomFunction=None):
     """
     Generate n tuples of distincts safe primes number's and append them into a list L.
+    Randomly choosing easy generator or not.
     """
+    import random as rd
 
     for _ in range(n):
-        s = safePrime(nBits,randomFunction,easyGenerator,Verbose)
+        # bool(rd.getrandbits(1)) faster than rd.choice([True,False])
+        s = safePrime(nBits,randomFunction,bool(rd.getrandbits(1)))
         if s not in L:
             L.append(s)
         else:

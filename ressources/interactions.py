@@ -26,6 +26,36 @@ def asciiJongling():
         """
     )
 
+def asciiDeath():
+    return print('''
+                    %%% %%%%%%%            |#|
+                %%%% %%%%%%%%%%%        |#|####
+            %%%%% %         %%%       |#|=#####
+            %%%%% %   @    @   %%      | | ==####
+            %%%%%% % (_  ()  )  %%     | |    ===##
+            %%  %%% %  \_    | %%      | |       =##
+            %    %%%% %  u^uuu %%     | |         ==#
+                %%%% %%%%%%%%%      | |           V
+            
+            ~ Death is irreversible ~
+    '''
+    )
+
+def asciiKeys():
+    return print(
+        """
+        8 8          ,o.                                        ,o.          8 8
+        d8o8azzzzzzzzd   b        Diffie Hellman Key           d   bzzzzzzzza8o8b
+                    `o'               Exchange                  `o'
+
+            8 8 8 8                     ,ooo.
+            8a8 8a8                    oP   ?b
+            d888a888zzzzzzzzzzzzzzzzzzzz8     8b
+            `""^""'                    ?o___oP'
+            
+            """
+    )
+
 def asciiCat():
     return print('''                         
        _                        
@@ -96,12 +126,15 @@ def readFromUser(msg="Enter the message there:"):
     return phrase
 
 
-def select():
+def select(r=None):
     while True :
         try:
-            selection=int(input("\n - Please enter your choice: "))
+            selection=int(input("\n - Your choice: "))
+            if r != None:
+                if selection >= r:
+                    raise ValueError
         except ValueError:
-            print("Hmm.. Nope. Repeat please !")
+            print("Hmm.. Seems to be incorrect value. Repeat please ! ")
             continue
         else:
             return selection
@@ -144,10 +177,7 @@ def cipher_choice():
 ###############- File Manager - ################
 ################################################
 
-from .config import THIS_FOLDER
-
-
-def findFile(ext="",directory="processing/"):
+def findFile(ext="",directory=config.DIRECTORY_PROCESSING):
     """
     To find a file given extension and return is name.
     """
@@ -156,11 +186,11 @@ def findFile(ext="",directory="processing/"):
 
     if ext=="":
         # Return the first file in the directory that is not crypted
-        for f in os.listdir(os.path.join(THIS_FOLDER,directory)):
+        for f in os.listdir(directory):
             if not(f.endswith("kat")):
                 name=f
     else:
-        for f in os.listdir(os.path.join(THIS_FOLDER,directory)):
+        for f in os.listdir(directory):
             if f.endswith(ext):
                 name=f
 
@@ -239,18 +269,22 @@ def askForKey():
     return key
 
 
-def doSomethingElse():
+
+def doSomethingElse(m=None):
     """
     Ask user if he want to do something and if yes, get back to main menu.
     """
     answer = query_yn("Do you want to do something else ?")
     import katsumi
 
+    if m == None:
+        m = katsumi.menu
+
     print()
 
     if answer:
             clear()
-            return katsumi.menu()
+            return m()
     else:
         clear()
         return katsumi.work_with_selection(11)
@@ -299,7 +333,7 @@ def extractSafePrimes(nBits:int=1024,allE:bool=True,easyGenerator:bool=False,dir
                         question = query_yn("Do you want to generate one compatible with this condition (It can be long) ? ")
 
                         if question:
-                            s = prng.safePrime(nBits,easyGenerator=True,Verbose=True)
+                            s = prng.safePrime(nBits,easyGenerator=True)
                             updatePrimesFount(s,nBits)
                         else:
                             return elGamalKeysGeneration()
@@ -308,73 +342,34 @@ def extractSafePrimes(nBits:int=1024,allE:bool=True,easyGenerator:bool=False,dir
             else:
                 return s
 
-def stockSafePrimes(n:int=1024,x:int=15,randomFunction=prng.xorshiftperso,Update=False,Verbose=False):
+def stockSafePrimes(n:int=1024,x:int=15,randomFunction=prng.xorshiftperso):
     """ 
-    Stock (x * numbers of cpu) tuples of distincts (Safe prime, Sophie Germain prime) into a fount of given n bits length.
-    
-    Using parallelization for fastest generation.
+    Stock x tuples of distincts (Safe prime, Sophie Germain prime) into a fount of given n bits length.
     """
 
-    assert x >= 0
+    assert x > 0
     # Create an appropriated directory.
     handleDirectory("PrimeNumber's_Fount")
-
-    from multiprocessing import Pool, cpu_count, Manager
-    import random as rd
-
-    if x != 0 : 
-        c = cpu_count()
-        poule = Pool(c)
-
-        if Verbose:
-            clear()
-            print(f"You have {c} Central Processing Units.")
-            print(f"Each cpu will computes {x} tuple(s) of safe primes.")
     
-    else:
-        if Verbose:
-            clear()
-            print(f"Generating just one tuple for {n} bits safe prime -> No parallelization needed.")
-
     # Safety check, if already exist, then you just update it !
     if isFileHere(f"{str(n)}_bits.txt",config.DIRECTORY_FOUNT):
-        if Verbose:
-            print("Data concerning this number of bits already exists. Update in progress.")
+        print("\nData concerning this number of bits already exists. Update in progress.")
         Update = True
     else:
-        if Verbose:
-            print("Data not existing, creating file...")
+        print("\nData not existing, creating file...")
         Update = False
 
     if Update:
         fount = extractSafePrimes(n)
-
-        if x != 0:
-            fount = Manager().list(fount) # Can be shared between process
         
     else:
-        if x != 0:
-            fount = Manager().list() # Can be shared between process
-        else:
-            fount = []
+        fount = []
+    
+    print(f"Computing in progress. Please wait ...")
 
-    if Verbose:
-        print(f"Computing in progress. Please wait ...")
+    prng.genSafePrimes(x,fount,n,randomFunction)
 
-    # bool(rd.getrandbits(1)) faster than rd.choice([True,False])
-
-    if x != 0:
-        data = [(x,fount,n,randomFunction,bool(rd.getrandbits(1))) for _ in range(c)]
-
-        poule.starmap(prng.genSafePrimes,data)
-        poule.close()
-
-    else:
-        prng.genSafePrimes(1,fount,n,randomFunction,bool(rd.getrandbits(1)))
-
-
-    if Verbose:
-        print(f"Generation completed.")
+    print(f"Generation completed.\n")
 
     writeVartoFile(fount,f"{str(n)}_bits",config.DIRECTORY_FOUNT)
 
@@ -385,7 +380,7 @@ def updatePrimesFount(p:tuple,nBits:int):
     name = f"{str(nBits)}_bits"
 
     if not isFileHere(name+".txt",config.DIRECTORY_FOUNT):
-
+        print("\nData not existing, creating file...")
         stockSafePrimes(nBits,0)
         updatePrimesFount(p,nBits)
 
@@ -396,9 +391,9 @@ def updatePrimesFount(p:tuple,nBits:int):
         if p not in buffer:
             buffer.append(p)
             writeVartoFile(buffer,name,config.DIRECTORY_FOUNT)
-            print(f"{p} successfully added to prime number's fount.")
+            print(f"{p} successfully added to prime number's fount.\n")
         else:
-            print(f"{p} already into prime number's fount. Not added.")
+            print(f"{p} already into prime number's fount. Not added.\n")
         
 
 def primeNumbersFountain():
@@ -441,7 +436,7 @@ def primeNumbersFountain():
     for elt in whatInThere():
         print(f"\t > {elt}")
     
-    choices = ["Generate and stock safe primes","Update a list","Back to menu"]
+    choices = ["Generate and stock safe primes","Update a list","Delete a list","Back to menu"]
 
     print("\n")
     for i,elt in enumerate(choices):
@@ -457,25 +452,36 @@ def primeNumbersFountain():
             print("How many bits wanted for this generation ?")
             wanted = select()
 
-            print("\nHow many generations per processor?")
-            cpu = select()
+            print("\nHow many generations ?")
+            numbers = select()
 
-            stockSafePrimes(wanted,cpu,Verbose=True)
+            stockSafePrimes(wanted,numbers)
 
-            return doSomethingElse()
+            return doSomethingElse(primeNumbersFountain)
 
         elif i == 2:
             print("Enter number of bits for updating corresponding one's :")
             wanted = select()
 
-            print("\nHow many generations per processor?")
-            cpu = select()
+            print("\nHow many generations ?")
+            numbers = select()
 
-            stockSafePrimes(wanted,cpu,Update=True,Verbose=True)
-            
-            return doSomethingElse()
+            stockSafePrimes(wanted,numbers)
+            return doSomethingElse(primeNumbersFountain)
         
         elif i == 3:
+            clear()
+            asciiDeath()
+            print("Enter the number of bits corresponding to the list you would like to be removed.")
+            lnumber = select()
+            name = f"{str(lnumber)}_bits.txt"
+
+            rmFile(name,config.DIRECTORY_FOUNT)
+            print(f"{name} removed successfully.\n")
+
+            return doSomethingElse(primeNumbersFountain())
+
+        elif i == 4:
             import katsumi
             katsumi.menu()
         else:
@@ -637,7 +643,7 @@ def dlogAttack():
             print(f"Saved private_key : {el} into appropriated file.\n")
 
 
-            return doSomethingElse()
+            return doSomethingElse(dlogAttack)
 
         elif i == 2:
 
@@ -667,7 +673,7 @@ def dlogAttack():
             el = elGamal.delog(extractVarFromFile("public_key",config.DIRECTORY_PROCESSING),extractVarFromFile("encrypted",config.DIRECTORY_PROCESSING),True)
             print(f"Decrypted message is: \n \t -'{el}'\n")
 
-            return doSomethingElse()
+            return doSomethingElse(dlogAttack)
         
         elif i == 3:
             import katsumi
@@ -679,6 +685,65 @@ def dlogAttack():
             return dlogAttack()
         
     return doSomething(selection)
+
+#########################################
+########## Diffie Hellman ###############
+#########################################
+def dHgestion():
+    """
+    Sharing private key with Diffie Hellman.
+    """
+    import core.asymmetric.diffieHellman as dH
+    import ressources.bytesManager as bm
+
+    clear()
+    asciiKeys()
+
+    print("On what size n (bits) did you agree with your penpal?")
+
+    size = select()
+
+    clear()
+    asciiKeys()
+
+    print(f"Checking existence of fountain of {size} bits...")
+
+    if not isFileHere(f"{size}_bits.txt",config.DIRECTORY_FOUNT):
+        print("\n\tFile unavailable !")
+        print("\n\fOne will be created.\n")
+        fountain = False
+    else:
+        print("\n\tFile available !\n")
+        fountain = True
+
+    accord = dH.agreement(size,fountain)
+    print(f"According to the size of the private key, your agreement is: {accord} ")
+    print(f"\nNow, choose a secret value into [0,{accord[0]}]")
+    secret = select(accord[0])
+
+    clear()
+    asciiKeys()
+
+    dH.chooseAndSend(accord,secret)
+
+    clear()
+    asciiKeys()
+
+    dH_shared = dH.compute(accord,secret)
+
+    writeVartoFile(dH_shared,"dH_sharedKey",config.DIRECTORY_PROCESSING)
+    
+    clear()
+    asciiKeys()
+
+    print("Shared key created.")
+    print(f"\t > {dH_shared}\n")
+
+    return doSomethingElse(katsuAsymm)
+
+
+
+
 
 
 #########################################
@@ -752,7 +817,7 @@ def katsuSymm():
             clear()
             asciiCat()
 
-            return doSomethingElse()
+            return doSomethingElse(katsuSymm)
 
         elif i == 2:
         
@@ -782,7 +847,7 @@ def katsuSymm():
 
             clear()
             asciiCat()
-            return doSomethingElse()
+            return doSomethingElse(katsuSymm)
         
         elif i == 3:
             clear()
@@ -832,7 +897,7 @@ def katsuAsymm():
 
                 print(f"Saved encrypted message: {e} into appropriated file.\n")
 
-                return doSomethingElse()
+                return doSomethingElse(katsuAsymm)
         elif i == 3:
 
             print("Let's check if everything is there.")
@@ -865,8 +930,9 @@ def katsuAsymm():
 
             print(f"Decrypted message is: \n \t -'{d}'\n")
 
-            return doSomethingElse()
-
+            return doSomethingElse(katsuAsymm)
+        elif i == 4:
+            dHgestion()
         elif i == 5:
             dlogAttack()
 
@@ -947,7 +1013,7 @@ def katsuHash():
         clear()
         katsumi.menu()
 
-    doSomethingElse()
+    return doSomethingElse(katsuHash)
 
 ##############################
 # LOOP FUNCTION TO GET INPUT #

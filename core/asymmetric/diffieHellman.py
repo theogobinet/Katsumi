@@ -4,7 +4,6 @@
 import ressources.multGroup as multGroup
 import ressources.utils as ut
 import ressources.interactions as it
-import random as rd
 
 import ressources.prng as prng
 
@@ -15,25 +14,34 @@ import ressources.prng as prng
 ##### - Normal DH
 
 # 1)
-def agreement(n:int=256,easyGenerator=False):
+def agreement(n:int=2048,fountain=True):
     """
     Alice and Bob publicly agree to use a modulus p and a primitive root g modulo p.
     """
-    p = prng.safePrime(n,easyGenerator)
-    return (p,multGroup.firstPrimitiveRoot(p))
+
+    if fountain:
+        p,_ = it.extractSafePrimes(n,False)
+    else:
+        it.stockSafePrimes(n,1)
+        return agreement(n,True)
+
+    return (p,multGroup.primitiveRoot(p))
 
 # 2) and 3)
-def chooseAndSend(accord:tuple,n:int=256):
+def chooseAndSend(accord:tuple,secret=None,n:int=2048):
     """
     Choose a secret integer randomly and send a ciphered result to someone.
 
     n number of bits choosen for generating the integer randomly.
     """
     
-    p,g = accord[0],accord[1]
+    p,g = accord
 
-    i = prng.randInt(2,n)
-    print(f"This is your secret integer, keep it safe: {i}")
+    if secret == None:
+        i = prng.randInt(2,n)
+        print(f"This is your secret integer, keep it safe: {i}")
+    else:
+        i = secret
 
     toSend = ut.square_and_multiply(g,i,p)
 
@@ -44,10 +52,14 @@ def chooseAndSend(accord:tuple,n:int=256):
     return toSend
 
 # 4) and 5)
-def compute(accord:tuple):
+def compute(accord:tuple,secret_int=None):
 
-    secret_int = it.readFromUser("Please enter your secret integer : ")
-    sended = it.readFromUser("Enter here what the other part has sent to you : ")
+    if secret_int == None:
+        print("Please enter your secret integer : ")
+        secret_int = it.select(accord[0])
+    
+    print("Enter here what your penpal has sent to you : ")
+    sended = it.select(accord[0])
 
     shared_secret = ut.square_and_multiply(sended,secret_int,accord[0])
 

@@ -58,7 +58,7 @@ def phi(n:int,m:int=1,k:int=1,Verbose:bool=False):
     if Verbose:
         print(f"\n----------- phi(n={n},m={m},k={k})--------------")
     ## Special cases ##
-    twoN = int(n/2)
+    twoN = n//2
 
     if m != 1:
 
@@ -98,7 +98,7 @@ def phi(n:int,m:int=1,k:int=1,Verbose:bool=False):
             r=totients[n]
 
             if Verbose:
-                print(f"Common totient phi({n}) = {r}")
+                print(f"\nCommon totient phi({n}) = {r}")
 
             return r
 
@@ -107,14 +107,14 @@ def phi(n:int,m:int=1,k:int=1,Verbose:bool=False):
             # p^(k-1) * phi(p) = p^(k-1) * (p-1)
 
             if Verbose:
-                print(f"{n} is a prime number so phi(p) = (p-1)")
+                print(f"\n{n} is a prime number so phi(p) = (p-1)")
 
             return (n-1)
 
         # If even:
         elif not twoN & 1 :
             if Verbose:
-                print(f"phi({n}) = phi(2*{twoN}) = 2 * phi({twoN}).")
+                print(f"\nphi({n}) = phi(2*{twoN}) = 2 * phi({twoN}).")
             return 2*phi(twoN,m,k,Verbose)
 
     ## Special cases ##
@@ -122,7 +122,7 @@ def phi(n:int,m:int=1,k:int=1,Verbose:bool=False):
         else:
 
             if Verbose:
-                print(f"Let's calculate phi({n}) with prime factors way.")
+                print(f"\nLet's calculate phi({n}) with prime factors way.")
 
             result = n   # Initialize result as n 
             
@@ -165,7 +165,7 @@ def multiplicativeOrder(n:int,p:int,iterativeWay=False,Verbose=False):
 
     if not iterativeWay:
         if Verbose:
-            print(f"By the Chinese Remainder Theorem, it's enough to calculate the multiplicative order for each prime exponent p^k of {p},")
+            print(f"\nBy the Chinese Remainder Theorem, it's enough to calculate the multiplicative order for each prime exponent p^k of {p},")
             print(f"and combine the results with the least common multiple operation.")
 
         from functools import reduce
@@ -176,11 +176,11 @@ def multiplicativeOrder(n:int,p:int,iterativeWay=False,Verbose=False):
 
             p,e = t
             m = ut.square_and_multiply(p,e)
-            totient = phi(p,1,e) # phi(p^e)
+            totient = phi(p,1,e,Verbose=Verbose) # phi(p^e)
             qs = [1]
 
             for elt,exp in ut.findPrimeFactors(totient,True).items():
-                qs = [ q * elt**j for j in range(1+exp) for q in qs]
+                qs = [ q * (elt**j) for j in range(1+exp) for q in qs]
 
             qs.sort()
 
@@ -193,7 +193,11 @@ def multiplicativeOrder(n:int,p:int,iterativeWay=False,Verbose=False):
                 
             return q
 
-        mofs = (multOrder1(n,(elt,exp)) for elt,exp in ut.findPrimeFactors(p,True).items())
+        pf = ut.findPrimeFactors(p,True)
+        if Verbose:
+                print(f"\nPrime factors of {p} has been generated : {pf}.")
+
+        mofs = (multOrder1(n,(elt,exp)) for elt,exp in pf.items())
 
         # used to apply a particular function passed in its argument to all of the list elements mentioned in the sequence passed along.
         return reduce(ut.lcm,mofs,1)
@@ -230,7 +234,7 @@ def congruenceClasses(e:int):
     return elements
 
 
-def firstPrimitiveRoot(n:int,totient=None,Verbose=False):
+def primitiveRoot(n:int,totient=None,Verbose=False):
     """ 
     Find primitive root modulo n.
 
@@ -245,40 +249,63 @@ def firstPrimitiveRoot(n:int,totient=None,Verbose=False):
 
     if n > 3 and  ut.millerRabin(n):
 
-        if Verbose: print(f"Let's find all prime factors of {totient}:")
-        s = ut.findPrimeFactors(totient)
+        q = (n-1)//2
 
-        if Verbose:
-            print("\n-----------------------------")
-            print(f"{n} is prime and prime factors of totient are: {s} ")
-            print(f"Computing all g^(phi({n})/p_i) mod {n} with p_i prime factors.")
-            print(f"If all the calculated values are different from 1, then g is a primitive root.")
-            print("-----------------------------")
+        # To deal with safe prime
+        if ut.millerRabin(q,1):
 
+            if Verbose:
+                print(f"{n} Safe Prime.")
+                print("Choose random number between g [2,p-1]")
+            
+            import random as rd
+            
+            g = rd.randrange(2,n)
 
-        for e in range(2,totient+1):
+            if Verbose:
+                print("To verify if g is a generator, you have to verify than g^2 and g^q are differents from 1.")
 
-            # Iterate through all prime factors of phi.  
-            # and check if we found a power with value 1
-            flag = False
-
-            for it in s:
-                t = ut.square_and_multiply(e,totient // it,n)
-
+            while 1 in [ut.square_and_multiply(g,2,n),ut.square_and_multiply(g,q,n)]:
+                g = rd.randrange(2,n)
+            else:
                 if Verbose:
-                    print(f" {e}^(phi({n})/{it}) mod {n} = {t} ")
+                    print(f"{g} is a generator of Z{n}*.")
+                return g
 
-                if t == 1:
-                    flag = True
-                    break
+        else:
+            if Verbose: print(f"Let's find all prime factors of {totient}:")
+            s = ut.findPrimeFactors(totient)
 
-            if not flag :
-                if Verbose:
-                    print(f"Generator is: {e}")
-                return e
-        # If no primitive root found  
-        return -1
+            if Verbose:
+                print("\n-----------------------------")
+                print(f"{n} is prime and prime factors of totient are: {s} ")
+                print(f"Computing all g^(phi({n})/p_i) mod {n} with p_i prime factors.")
+                print(f"If all the calculated values are different from 1, then g is a primitive root.")
+                print("-----------------------------")
 
+
+            for e in range(2,totient+1):
+
+                # Iterate through all prime factors of phi.  
+                # and check if we found a power with value 1
+                flag = False
+
+                for it in s:
+                    t = ut.square_and_multiply(e,totient // it,n)
+
+                    if Verbose:
+                        print(f" {e}^(phi({n})/{it}) mod {n} = {t} ")
+
+                    if t == 1:
+                        flag = True
+                        break
+
+                if not flag :
+                    if Verbose:
+                        print(f"Generator is: {e}")
+                    return e
+            # If no primitive root found  
+            return -1
     else:
         if Verbose:
             print(f"According to Euler's theorem, a is a primitive root mod {n} if and only if the multiplicative order of a is ϕ(n) = {totient}.")
@@ -326,7 +353,7 @@ def reducedResidueSystem(n:int,g:int=None,Verbose=False):
     if g == None:
         if Verbose:
             print("No generator given in input. Computing one now ..")
-        g = firstPrimitiveRoot(n,totient,Verbose)
+        g = primitiveRoot(n,totient,Verbose)
         if g == -1:
             return -1
     

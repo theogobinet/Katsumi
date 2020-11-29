@@ -59,14 +59,14 @@ def bits_compactor(bits:list):
 file_name=""
 without_ext=""
 
-def fileToBytes(file,message=True):
+def fileToBytes(file,message=True,directory=config.DIRECTORY_PROCESSING):
     """
     Read a file and convert to bytearray.
     True if it's a .txt file with a message.
     """
 
     global file_name, without_ext
-    file_name=os.path.join(config.THIS_FOLDER, file)
+    file_name=os.path.join(directory, file)
     without_ext=os.path.splitext(file)[0]
 
     print(f"Opening the {file} file.")

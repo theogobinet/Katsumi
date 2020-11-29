@@ -4,6 +4,37 @@ from math import sqrt, floor
 import random
 import numpy as np
 
+def integer_sqrt(x):
+    """
+    Return the integer part of the square root of x, even for very
+    large integer values.
+
+    Python 'math' module does strange things with large integers...
+
+    Got from https://stackoverflow.com/questions/47854635/square-root-of-a-number-greater-than-102000-in-python-3 .
+    """
+
+    assert x > 0
+
+    _1_40 = 1 << 40  # 2**40
+
+    if x < _1_40:
+        return int(sqrt(x))  # use math's sqrt() for small parameters
+    
+    n = int(x)
+
+    if n <= 1:
+        return n  # handle sqrt(0)==0, sqrt(1)==1
+
+    # Make a high initial estimate of the result (a little lower is slower!!!)
+    r = 1 << ((n.bit_length() + 1) >> 1)
+
+    while True:
+
+        newr = (r + n // r) >> 1  # next estimate by Newton-Raphson
+        if newr >= r:
+            return r
+        r = newr
 
 
 def swapPos(list, pos1, pos2): 
@@ -115,7 +146,10 @@ def square_and_multiply(x, k, p=None):
 
 
 def millerRabin(p, s=40):
-    """Determines whether a given number is likely to be prime."""
+    """
+    Probalistic compositeness test.
+    Determines whether a given number is likely to be prime (not composite).
+    """
 
     if p == 2: # 2 is the only prime that is even
         return True
@@ -166,8 +200,6 @@ def findPrimeFactors(n:int,exponent = False) :
 
     Set exponent to True if you want to print p^e. 
     """
-    from math import sqrt
-
     s = []
     # Print the number of 2s that divide n  
 
@@ -175,12 +207,14 @@ def findPrimeFactors(n:int,exponent = False) :
         s.append(2)  
         n = n // 2
   
-    # n must be odd at this po. So we can   
+    nroot = integer_sqrt(n)
+
+    # n must be odd at this point. So we can   
     # skip one element (Note i = i +2)  
-    for i in range(3, int(sqrt(n)), 2): 
+    for i in range(3, nroot , 2): 
           
         # While i divides n, print i and divide n  
-        while (n % i == 0) : 
+        while (n % i == 0) :
             s.append(i)  
             n = n // i  
           
@@ -313,7 +347,7 @@ def bsgs(g:int,res:int,modulo:int):
 
     from ressources.multGroup import inv
 
-    m = int(sqrt(modulo) + 1);  
+    m = integer_sqrt(modulo) + 1;  
   
     hashTable = {square_and_multiply(g, j, modulo): j for j in range(m)} # Baby-Step
     
