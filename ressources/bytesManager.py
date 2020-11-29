@@ -64,6 +64,7 @@ def fileToBytes(file,message=True,directory=config.DIRECTORY_PROCESSING):
     Read a file and convert to bytearray.
     True if it's a .txt file with a message.
     """
+    import time
 
     global file_name, without_ext
     file_name=os.path.join(directory, file)
@@ -71,8 +72,10 @@ def fileToBytes(file,message=True,directory=config.DIRECTORY_PROCESSING):
 
     print(f"Opening the {file} file.")
 
+    readTime = time.time()
     with open(file_name,'rb') as f:
         data=bytearray(f.read())
+    config.WATCH_READ_TIME = time.time() - readTime
 
     if not message: # If it's a file
         if len(data) < 1024: # At least some kilo_octets
@@ -84,7 +87,7 @@ def fileToBytes(file,message=True,directory=config.DIRECTORY_PROCESSING):
 
 ###################### - File Manager
 
-def codeOut(thing,coded=True,inFile=True,directory="processing/"):
+def codeOut(thing,coded=True,inFile=""):
     '''
     Choose what to do with the text (ciphered or not) and deal with it.
 
@@ -105,10 +108,10 @@ def codeOut(thing,coded=True,inFile=True,directory="processing/"):
 
         if coded:
             #Let's write byte per byte into a .kat file
-            katFile=open(file_name+".kat","wb")
+            katFile=open(inFile+".kat","wb")
             katFile.write(bytes(packed))
         else:
-            katFile=open(os.path.join(config.THIS_FOLDER,directory+"decrypted-"+without_ext),"wb")
+            katFile=open(os.path.join(os.path.dirname(inFile), f'dec_{os.path.basename(inFile)}'),"wb")
             katFile.write(bytes(packed))
         
         katFile.close()
@@ -173,7 +176,7 @@ def b_op(b1,b2,ope="XOR"):
     else:
         return None 
 
-    return int_to_bytes(by)
+    return int.to_bytes(by, m,"big")
 
 def splitBytes(data,n=8):
     """Split BytesArray into chunks of n (=8 by default) bytes."""

@@ -47,37 +47,23 @@ def cipher(arr, method=3, encrypt=True, aad=""):
 
 ###### Running method to run everything:
 
-def run(input=it.findFile(".kat"), inFile=True, encrypt=False, method=3, aad="", key=config.KEY):
+def run(data, inFile="", encrypt=False, method=3, aad="", key=config.KEY):
 
     """
     Run encryption of decryption.
     
-    input: file name with extension
-    inFile: True to write an output file
+    data: file name with extension
     encrypt: False to decrypte
     method: Block cyphering method
     """
+
     from threading import Thread
-    
-    data=bytearray()
 
-    if inFile:
-        readTime = time.time()
-
-        data=bm.fileToBytes(input)
-
-        if len(data) > 100000:
-            thread = Thread(target = watch)
-            thread.daemon = True
-            config.WATCH_EXEC_STATUS = True
-            thread.start()
-
-        config.WATCH_READ_TIME = time.time() - readTime
-    else:
-        if encrypt:
-            data=bytearray(input.encode())
-        else:
-            data = input
+    if len(data) > 100000:
+        thread = Thread(target = watch)
+        thread.daemon = True
+        config.WATCH_EXEC_STATUS = True
+        thread.start()
 
     # Keys initialisation
     kasu.set_key(key)
@@ -207,12 +193,16 @@ def PCBC(arr,encrypt=True):
     
     return res
 
+############################
+###### Counter Mode ########
+############################
+
 def CTR(arr, encrypt=True, iniIV=[]):
 
     '''
     Counter Mode is xoring the message with a encrypted counter (IV + incr(0))
 
-    arr: data to encrypt/decrypt
+    arr: array of bytearray of 8 bytes of data to encrypt/decrypt
     encrypt: true to encrypt
     '''
 
@@ -246,6 +236,10 @@ def CTR(arr, encrypt=True, iniIV=[]):
     
     return res
 
+###################################
+###### Galois Counter Mode ########
+###################################
+
 # https://blkcipher.pl/assets/pdfs/gcm-spec.pdf
 
 def GCM(arr, encrypt=True, aad=""):
@@ -253,7 +247,7 @@ def GCM(arr, encrypt=True, aad=""):
     '''
     GCM is CTR mode with authentification of additional data (AAD) authenticated with multiplication in a Galois Field
 
-    data: bytearray of data to encrypt/decrypt
+    arr: array of bytearray of 8 bytes of data to encrypt/decrypt
     encrypt: boolean, true to encypt
     aad: string of additional authenticated data
     '''
@@ -299,9 +293,8 @@ def GCM(arr, encrypt=True, aad=""):
         n = len(C)
         m = len(A)
 
-        if i == 0:
-            return b'\x00'
-        elif i <= m:
+        if i <= m:
+            # A1 = A[1-1]
             return gz2.poly_mult_mod_2(bti(bm.b_op(X, A[i - 1], "XOR")), H, p)
         elif i <= m + n:
             return gz2.poly_mult_mod_2(bti(bm.b_op(X, C[i - m - 1], "XOR")), H, p)
@@ -310,18 +303,19 @@ def GCM(arr, encrypt=True, aad=""):
 
     H = bti(kasu.kasumi(b'\x00' * 8))
 
-    #Y = GHASH64(H ,b'', iv)
     Y = GHASH64(H, b'', [iv], b'\x00', 1).to_bytes(8,"big")
     E0 = kasu.kasumi(Y)
 
     n = len(arr)
     m = len(A)
 
+    # equivalent of CTR mode
     for i in range(n):
         config.WATCH_PERCENTAGE = (((n*2 + m + 1) - ((n*2 + m + 1) - i)) / (n*2 + m + 1)) * 100
         exTime = time.time()
         
-        Y = Y[:4] + ((int.from_bytes(Y[-4:],"big") + 1) % 2^16).to_bytes(4,"big")
+        # treats the rightmost 32bits of its argument as a nonnegative integer with the least significant bit on the right, and increments this value modulo 2^32
+        Y = Y[:4] + ((int.from_bytes(Y[-4:],"big") + 1) % 2**32).to_bytes(4,"big")
         E = kasu.kasumi(Y)
 
         C.append(bm.b_op(arr[i], E, "XOR"))
@@ -336,6 +330,7 @@ def GCM(arr, encrypt=True, aad=""):
     if not encrypt:
         C = arr
 
+    # first init of X = GHASH64(i=0) = b'\x00'
     X = b'\x00'
 
     for i in range(n + m + 1):
@@ -351,7 +346,7 @@ def GCM(arr, encrypt=True, aad=""):
 
     if not encrypt:
         if icv != icvc:
-            print("WARNING: INTEGRITY CHECK CONTROL INCORRECT, AAD HAVE BEEN MODIFIED !!")
+            print("\nWARNING: INTEGRITY CHECK CONTROL INCORRECT, AAD HAVE BEEN MODIFIED !!")
 
     if encrypt:
         IV_action(res,icvc,"store")

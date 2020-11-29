@@ -7,6 +7,7 @@ import os
 from datetime import datetime
 import time
 import ressources.config as config
+import ressources.bytesManager as bm 
 
 ################################################
 ###############- Console Interactions - ########
@@ -306,7 +307,7 @@ def extractSafePrimes(nBits:int=1024,allE:bool=True,easyGenerator:bool=False,dir
 
     if not isFileHere(name+".txt",directory):
         print("File doesn't exist. Creating it with one element.")
-        stockSafePrimes(nBits,0,Verbose=True)
+        stockSafePrimes(nBits,0)
         extractSafePrimes(nBits,allE,easyGenerator,directory)
     else:
         v = extractVarFromFile(name,directory)
@@ -783,34 +784,30 @@ def katsuSymm():
             # Encryption
             cipher = cipher_choice()
             
-            aad=""
+            aad = ""
+            inFile = ""
 
             if cipher == 5:
-                answer=query_yn("GCM allows to store authentified additional data (not encrypted), do you want to store some AAD ?")
-                if answer:
+                if query_yn("GCM allows to store authentified additional data (not encrypted), do you want to store some AAD ?"):
                     aad = readFromUser()
                 else: 
                     clear()
                     asciiCat()
 
-            fchoice = query_yn("Do you want to encrypt a file ?")
-            answer = ""
-
-            if fchoice:
-                print("Please enter the filename (with extension) to encrypt.")
-                
-                answer=input("E.g: pic.jpg (leave blank by default): ")
-                
-                if answer=="":
-                    answer=findFile()
+            if query_yn("Do you want to encrypt a file ?"):
+                inFile = getFile()
+                if inFile:
+                    data = bm.fileToBytes(inFile)
+                else:
+                    katsuSymm()
             else:
-                answer=readFromUser()
+                data = readFromUser().encode()
 
 
             print("Encryption started....")
 
             begin_time = datetime.now()
-            print(ciphers.run(answer, fchoice, True, cipher, aad, key))
+            print(ciphers.run(data, inFile, True, cipher, aad, key))
             end=datetime.now() - begin_time
             input(f"Encryption finished in {end} seconds !\n")
 
@@ -823,25 +820,24 @@ def katsuSymm():
         
             # Decryption    
             cipher = cipher_choice()
-            fchoice = query_yn("Do you want to decrypt a file ?")  
-            answer = ""
+            inFile = False
 
-            if fchoice:
-                print("Please enter the filename (without .kat ext) to decrypt.")
-                answer=input("E.g: encrypted-pic.jpg (leave blank by default) : ")
-                
-                if answer == "":
-                    # Find the first .kat file in the folder
-                    answer = findFile("kat")
-            else:
-                answer = getb64()
-                if not answer:
+            if query_yn("Do you want to decrypt a file ?"):
+                inFile = getFile()
+                if inFile:
+                    data = bm.fileToBytes(inFile)
+                else:
                     katsuSymm()
+            else:
+                data = getb64()
+                if not data:
+                    katsuSymm()
+
 
             print("Decryption started....")
 
             begin_time = datetime.now()
-            print(ciphers.run(answer, fchoice, False, cipher, "", key))
+            print(ciphers.run(data, inFile, False, cipher, "", key))
             end = datetime.now() - begin_time
             input(f"Decryption finished in {end} seconds !\n")
 
@@ -950,7 +946,6 @@ def katsuAsymm():
 
 def katsuHash():
 
-    import ressources.bytesManager as bm 
     import core.hashbased.hashFunctions as hf
     import base64
 

@@ -49,7 +49,6 @@ def kasumi (arr, encrypt=True):
     if(len(arr) > 8):
         return "Error: Kasumi takes 64 bits as 8 bytes array in input"
     else:
-
         config.WATCH_KASUMI_NUMBER += 1
         exTime = time.time()
 
@@ -85,14 +84,11 @@ def kasumi (arr, encrypt=True):
 def FL(pKL, arr):
    
     if(len(arr) != 4):
-        print("Error: FL takes 32 bits as 4 bytes array in input")
-        return None
+        raise ValueError("FL takes 32 bits as 4 bytes array in input")
     else:
         arr = bm.splitBytes(arr,2)
         l = arr[0]
         r = arr[1]
-
-
 
         rp = bm.b_op(bm.circularRotation(bm.b_op(l,pKL[0],"AND"), 0, 1), r, "XOR")
         lp = bm.b_op(bm.circularRotation(bm.b_op(rp,pKL[1],"OR"), 0, 1), l, "XOR")
@@ -110,8 +106,7 @@ def FL(pKL, arr):
 def FO(pKO, pKI, arr):
 
     if(len(arr) != 4):
-        print("Error: FO takes 32 bits as 4 bytes array in input")
-        return None
+        raise ValueError("FO takes 32 bits as 4 bytes array in input")
     else:
         arr = bm.splitBytes(arr,2)
         l = arr[0]
@@ -120,7 +115,7 @@ def FO(pKO, pKI, arr):
         for i in range (0,3):
             l = r
             r = bm.b_op(r, FI(bm.b_op(l, pKO[i], "XOR"), pKI[i]),"XOR")
-        
+
         return l + r
 
 

@@ -151,10 +151,13 @@ def safePrime(nBits:int=1024,randomFunction=None,easyGenerator=False):
 
     return list(return_list)[0]
 
-from multiprocessing import Manager
 
-def safePrime_worker(nBits:int=1024,randomFunction=None,easyGenerator=False,Verbose=False,flag=Manager().Value('i',0),returnL=[]):
+def safePrime_worker(nBits:int=1024,randomFunction=None,easyGenerator=False,Verbose=False,flag=None,returnL=[]):
     import  ressources.interactions as it
+    from multiprocessing import Manager 
+
+    if not flag:
+        flag=Manager().Value('i',0)
 
     if easyGenerator:
         if Verbose:

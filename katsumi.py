@@ -3,8 +3,8 @@
 
 from datetime import datetime
 
-from ressources import *
-from core import *
+from ressources import interactions as it
+from core.symmetric.galois_Z2 import GF2
 
 import sys
 import time
@@ -80,7 +80,7 @@ def main():
     it.clear()
 
     #Galois field's initialization
-    gz2.GF2(16)
+    GF2(16)
 
     return menu()
 
