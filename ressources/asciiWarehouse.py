@@ -87,7 +87,7 @@ def asciiCat():
          . \  .   :   .-'   .     Encryption provides secrecy,
          '  `+.;  ;  '      :    not authentication or integrety.
          :  '  |    ;       ;-. 
-         ; '   : :`-:     _.`* ;
+         ; '   : :`-:     _.`* ;  Gobinet Théo && Martin Azaël
      .*' /  .*' ; .*`- +'  `*' 
       `*-*   `*-*  `*-*'           
                                                

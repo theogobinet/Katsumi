@@ -454,7 +454,7 @@ def elGamalKeysGeneration():
 
         print("\t.... Key generation in progress ....")
         
-        return elGamal.key_gen(n,primes,easyGenerator,prng.xorshiftperso,True)
+        elGamal.key_gen(n,primes,easyGenerator,prng.xorshiftperso,True)
     else:
         n = 1024
         primes = extractSafePrimes(n,False)
@@ -464,7 +464,7 @@ def elGamalKeysGeneration():
 
         print("\t.... Key generation in progress ....")
 
-        return elGamal.key_gen(n,primes,Verbose=True)
+        elGamal.key_gen(n,primes,Verbose=True)
     
 
 
@@ -491,9 +491,9 @@ def keysVerif():
                 rmFile("private_key.txt",config.DIRECTORY_PROCESSING)
                 rmFile("public_key.txt",config.DIRECTORY_PROCESSING)
                 rmFile("encrypted.txt",config.DIRECTORY_PROCESSING)
-                return elGamalKeysGeneration()
+                elGamalKeysGeneration()
             else:
-                return katsumi.menu()
+                katsumi.menu()
 
         else:
             print("Private key's missing.")
@@ -508,11 +508,11 @@ def keysVerif():
                 clear()
                 print("Gotcha !")
 
-                return keysVerif()
+                keysVerif()
             else:
-                return katsuAsymm()
+                katsuAsymm()
     else:
-        return elGamalKeysGeneration()
+        elGamalKeysGeneration()
 
 def dlogAttack():
     
@@ -555,7 +555,7 @@ def dlogAttack():
             print(f"Saved private_key : {el} into appropriated file.\n")
 
 
-            return doSomethingElse(dlogAttack)
+            doSomethingElse(dlogAttack)
 
         elif i == 2:
 
@@ -585,7 +585,7 @@ def dlogAttack():
             el = elGamal.delog(extractVarFromFile("public_key",config.DIRECTORY_PROCESSING),extractVarFromFile("encrypted",config.DIRECTORY_PROCESSING),True)
             print(f"Decrypted message is: \n \t -'{el}'\n")
 
-            return doSomethingElse(dlogAttack)
+            doSomethingElse(dlogAttack)
         
         elif i == 3:
             import katsumi
@@ -594,9 +594,9 @@ def dlogAttack():
             clear()
             print("\n That's not available in the given menu lad !")
             time.sleep(1)
-            return dlogAttack()
+            dlogAttack()
         
-    return doSomething(selection)
+    doSomething(selection)
 
 #########################################
 ########## Diffie Hellman ###############
@@ -651,7 +651,7 @@ def dHgestion():
     print("Shared key created.")
     print(f"\t > {dH_shared}\n")
 
-    return doSomethingElse(katsuAsymm)
+    doSomethingElse(katsuAsymm)
 
 
 
@@ -725,7 +725,7 @@ def katsuSymm():
             clear()
             asc.asciiCat()
 
-            return doSomethingElse(katsuSymm)
+            doSomethingElse(katsuSymm)
 
         elif i == 2:
         
@@ -754,7 +754,7 @@ def katsuSymm():
 
             clear()
             asc.asciiCat()
-            return doSomethingElse(katsuSymm)
+            doSomethingElse(katsuSymm)
         
         elif i == 3:
             clear()
@@ -763,9 +763,9 @@ def katsuSymm():
             clear()
             print("\n That's not available in the given menu lad !")
             time.sleep(1)
-            return katsuSymm()
+            katsuSymm()
         
-    return doSomething(selection)
+    doSomething(selection)
 
 
 
@@ -804,7 +804,7 @@ def katsuAsymm():
 
                 print(f"Saved encrypted message: {e} into appropriated file.\n")
 
-                return doSomethingElse(katsuAsymm)
+                doSomethingElse(katsuAsymm)
         elif i == 3:
 
             print("Let's check if everything is there.")
@@ -837,7 +837,7 @@ def katsuAsymm():
 
             print(f"Decrypted message is: \n \t -'{d}'\n")
 
-            return doSomethingElse(katsuAsymm)
+            doSomethingElse(katsuAsymm)
         elif i == 4:
             dHgestion()
         elif i == 5:
@@ -850,9 +850,9 @@ def katsuAsymm():
             clear()
             print("\n That's not available in the given menu lad !")
             time.sleep(1)
-            return katsuAsymm()
+            katsuAsymm()
         
-    return doSomething(selection)
+    doSomething(selection)
 
 
 def katsuHash():
@@ -919,7 +919,7 @@ def katsuHash():
         clear()
         katsumi.menu()
 
-    return doSomethingElse(katsuHash)
+    doSomethingElse(katsuHash)
 
 ##############################
 # LOOP FUNCTION TO GET INPUT #
