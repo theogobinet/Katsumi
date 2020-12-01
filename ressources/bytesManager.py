@@ -111,7 +111,7 @@ def codeOut(thing,coded=True,inFile=""):
             katFile=open(inFile+".kat","wb")
             katFile.write(bytes(packed))
         else:
-            katFile=open(os.path.join(os.path.dirname(inFile), f'dec_{os.path.basename(inFile)}'),"wb")
+            katFile=open(os.path.join(os.path.dirname(inFile), f'dec_{os.path.basename(inFile)[:-4]}'),"wb")
             katFile.write(bytes(packed))
         
         katFile.close()
