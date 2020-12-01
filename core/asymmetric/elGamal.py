@@ -78,15 +78,15 @@ def isEasyGeneratorPossible(s:tuple):
 #############################################
 
 
-def key_gen(n:int=512,primeFount=None,easyGenerator:bool=False,randomFunction=None,Verbose=False):
+def key_gen(n:int=2048,primeFount=None,easyGenerator:bool=False,randomFunction=None,Verbose=False):
     """
     ElGamal key generation.
 
-    n: number of bits for safe prime generation.
+    n: number of bits for safe prime generation.\n
 
-    primeFount = prime number's fountain used, put tuple of primes into this variable.
+    primeFount = prime number's fountain used, put tuple of primes into this variable.\n
 
-    easyGenerator: generate appropriated safe prime number according to quadratic residues properties.
+    easyGenerator: generate appropriated safe prime number according to quadratic residues properties.\n
 
     randomFunction: prng choosen for random prime number generation (default = randbits from secrets module).
     """
@@ -101,7 +101,7 @@ def key_gen(n:int=512,primeFount=None,easyGenerator:bool=False,randomFunction=No
         p,q = s # safe_prime and Sophie Germain prime
     
     else:
-
+        primeFount = it.extractSafePrimes(n,False)
         s = primeFount
         p,q = s # safe_prime and Sophie Germain prime
 
@@ -145,7 +145,21 @@ def key_gen(n:int=512,primeFount=None,easyGenerator:bool=False,randomFunction=No
 
     return None
 
-        
+
+def getSize():
+    """
+    Return size of current key based on prime fount's.
+    """
+    from ressources import config as config 
+
+    sizes = [int(elt.split("_")[0]) for elt in it.whatInThere()]
+    
+    pK = it.extractVarFromFile("public_key",config.DIRECTORY_PROCESSING)
+
+    bits = bm.bytes_needed(pK[0])*8
+
+    return ut.closestValue(bits,sizes)
+
 #############################################
 ########### -   Encryption   - ##############
 #############################################

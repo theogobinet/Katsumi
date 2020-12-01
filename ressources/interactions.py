@@ -70,14 +70,77 @@ def select(r=None):
     while True :
         try:
             selection=int(input("\n - Your choice: "))
-            if r != None:
+            if r:
                 if selection >= r:
                     raise ValueError
+            elif not selection:
+                raise ValueError
         except ValueError:
             print("Hmm.. Seems to be incorrect value. Repeat please ! ")
             continue
         else:
             return selection
+
+##############################
+# LOOP FUNCTION TO GET INPUT #
+##############################
+
+def getFile():
+
+    print("Please enter the filename with its extension (source folder is processing):")
+
+    while True:
+        f = input("> ")
+        if f == "c":
+            return None
+        elif isFileHere(f, config.DIRECTORY_PROCESSING):
+            return config.DIRECTORY_PROCESSING + f
+        else:
+            print(f"Error: file '{f}' not found, enter [c] to go back or enter a valid filename:")
+
+        
+def getSize(default=256):
+    print(f"Please enter the hash size ({default} bits by default):")
+
+    while True:
+        i = input("> ")
+        if i == "c":
+            return None
+        elif i == "":
+            return default
+        else:
+            try:
+                val = int(i)
+                if val % 8 == 0 and val >=32:
+                    return val
+                else:
+                    print(f"Error: {i} is not a valid digest size, leave blank or enter a valid hash size:")
+                
+            except ValueError:
+                print(f"Error: '{i}' is not an integer, leave blank or enter a valid hash size:")
+
+
+def getb64(expected="message", size=-1):
+    import base64
+    import binascii
+
+    print(f"Enter the {expected} in base64:")
+    while True:
+        i = input("> ")
+        if i == "c":
+            return None
+        else:
+            try:
+                data = base64.b64decode(i)
+                if size == -1 or len(data) == size:
+                    return data
+                else:
+                    print(f'Error: {expected} must be {size} bytes long, enter [c] to go back or enter a valid base64')
+            except binascii.Error:
+                print('Error: Unable to decode, the format is not in base64, enter [c] to go back or enter a valid base64')
+
+
+
 
 def cipher_choice():
 
@@ -398,7 +461,7 @@ def primeNumbersFountain():
             katsumi.menu()
         else:
             clear()
-            print("\n That's not available in the given menu lad !")
+            print("\n Not available. Getting back...")
             time.sleep(1)
             return primeNumbersFountain()
         
@@ -921,60 +984,3 @@ def katsuHash():
 
     doSomethingElse(katsuHash)
 
-##############################
-# LOOP FUNCTION TO GET INPUT #
-##############################
-
-def getFile():
-
-    print("Please enter the filename with its extension (source folder is processing):")
-
-    while True:
-        f = input("> ")
-        if f == "c":
-            return None
-        elif isFileHere(f, config.DIRECTORY_PROCESSING):
-            return config.DIRECTORY_PROCESSING + f
-        else:
-            print(f"Error: file '{f}' not found, enter [c] to go back or enter a valid filename:")
-
-        
-def getSize(default=256):
-    print(f"Please enter the hash size ({default} bits by default):")
-
-    while True:
-        i = input("> ")
-        if i == "c":
-            return None
-        elif i == "":
-            return default
-        else:
-            try:
-                val = int(i)
-                if val % 8 == 0 and val >=32:
-                    return val
-                else:
-                    print(f"Error: {i} is not a valid digest size, leave blank or enter a valid hash size:")
-                
-            except ValueError:
-                print(f"Error: '{i}' is not an integer, leave blank or enter a valid hash size:")
-
-
-def getb64(expected="message", size=-1):
-    import base64
-    import binascii
-
-    print(f"Enter the {expected} in base64:")
-    while True:
-        i = input("> ")
-        if i == "c":
-            return None
-        else:
-            try:
-                data = base64.b64decode(i)
-                if size == -1 or len(data) == size:
-                    return data
-                else:
-                    print(f'Error: {expected} must be {size} bytes long, enter [c] to go back or enter a valid base64')
-            except binascii.Error:
-                print('Error: Unable to decode, the format is not in base64, enter [c] to go back or enter a valid base64')

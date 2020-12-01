@@ -41,6 +41,13 @@ def swapPos(list, pos1, pos2):
     list[pos1], list[pos2] = list[pos2], list[pos1] 
     return list
 
+def closestValue(givenV:int,aList:list):
+    """
+    Finding the nearest value in a list to a given one.
+    """
+    abs_diff = lambda list_value : abs(list_value - givenV)
+
+    return min(aList, key=abs_diff)
 
 def randomClosureChoice(bucket:list):
     """

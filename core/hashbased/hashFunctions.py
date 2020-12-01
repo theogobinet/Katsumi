@@ -7,10 +7,19 @@
 ##################
 
 import ressources.bytesManager as bm
-from core.symmetric.kasumi import set_key
-from core.symmetric.ciphers import CTR
 
-def sponge(N, d):
+
+def sponge(N:bytearray, d:int):
+    """
+    Sponge construction for hash functions.
+
+    N: Thing to hash \n
+    d: size of hash wanted \n
+
+    return bytearray
+    """
+    from core.symmetric.kasumi import set_key
+    from core.symmetric.ciphers import CTR
 
     # Fixed value of key & IV for CTR used as a pseudorandom permutation function
     set_key(b'\xcd\x8a\xc1\xceV\x01\xc9\xfb\xec\xefj\xa4C\xce\xdcZ')
