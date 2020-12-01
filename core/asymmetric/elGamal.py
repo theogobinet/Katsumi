@@ -93,7 +93,7 @@ def key_gen(n:int=2048,primeFount=None,easyGenerator:bool=False,randomFunction=N
 
     import ressources.config as config
 
-    if primeFount == None:
+    if not primeFount:
 
         if Verbose: print(f"Let's try to generate a safe prime number of {n} bits.")
 
@@ -141,7 +141,7 @@ def key_gen(n:int=2048,primeFount=None,easyGenerator:bool=False,randomFunction=N
     public_key = (p,q,gen,h)
     it.writeVartoFile(public_key,"public_key",config.DIRECTORY_PROCESSING)
 
-    print(f"\nThe public key : {public_key} has been generated too and saved.")
+    print(f"\nThe public key has been generated too and saved.")
 
     return None
 

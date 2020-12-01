@@ -5,7 +5,7 @@ import ressources.multGroup as multGroup
 import ressources.utils as ut
 import ressources.interactions as it
 
-import ressources.prng as prng
+import random as rd
 
 #####################################################################
 # Diffie–Hellman key exchange is a method of securely exchanging cryptographic keys over a public channel 
@@ -37,8 +37,8 @@ def chooseAndSend(accord:tuple,secret=None,n:int=2048):
     
     p,g = accord
 
-    if secret == None:
-        i = prng.randInt(2,n)
+    if not secret:
+        i = rd.randrange(2,n)
         print(f"This is your secret integer, keep it safe: {i}")
     else:
         i = secret
@@ -54,12 +54,10 @@ def chooseAndSend(accord:tuple,secret=None,n:int=2048):
 # 4) and 5)
 def compute(accord:tuple,secret_int=None):
 
-    if secret_int == None:
-        print("Please enter your secret integer : ")
-        secret_int = it.select(accord[0])
+    if not secret_int:
+        secret_int = it.getInt(rd.randrange(2,accord[0]),"your secret integer",False,accord[0])
     
-    print("Enter here what your penpal has sent to you : ")
-    sended = it.select(accord[0])
+    sended = it.getInt(rd.randrange(2,accord[0]),"his secret integer",False,accord[0])
 
     shared_secret = ut.square_and_multiply(sended,secret_int,accord[0])
 

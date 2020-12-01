@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+from math import inf
 import os
 import time
 
@@ -15,6 +16,15 @@ import ressources.bytesManager as bm
 ###############- Console Interactions - ########
 ################################################
 
+
+def enumerateMenu(choices):
+    """
+    Menu enumeration
+    """
+    for i,elt in enumerate(choices):
+        print(f"\t({i+1}) - {elt}")
+
+    print()
 
 
 def query_yn(question, default="yes"):
@@ -65,21 +75,6 @@ def readFromUser(msg="Enter the message there:"):
 
     return phrase
 
-
-def select(r=None):
-    while True :
-        try:
-            selection=int(input("\n - Your choice: "))
-            if r:
-                if selection >= r:
-                    raise ValueError
-            elif not selection:
-                raise ValueError
-        except ValueError:
-            print("Hmm.. Seems to be incorrect value. Repeat please ! ")
-            continue
-        else:
-            return selection
 ##############################
 # LOOP FUNCTION TO GET INPUT #
 ##############################
@@ -98,8 +93,8 @@ def getFile():
             print(f"Error: file '{f}' not found, enter [c] to go back or enter a valid filename:")
 
         
-def getInt(default=256, expected="hash", size=False):
-    print(f"Please enter the {expected} size ({default} bits by default):")
+def getInt(default=256, expected="hash", size=False, limit:int=inf):
+    print(f"Please enter {expected} ({default} by default):")
 
     while True:
         i = input("> ")
@@ -110,13 +105,13 @@ def getInt(default=256, expected="hash", size=False):
         else:
             try:
                 val = int(i)
-                if not size or (val % 8 == 0 and val >=32):
+                if val >= 0 and (not size or (val % 8 == 0 and val >=32)) and val <= limit:
                     return val
                 else:
-                    print(f"Error: {i} is not a valid {expected} size, leave blank or enter a valid {expected} size:")
+                    print(f"Error: {i} is not a valid {expected}, leave blank or enter a valid {expected}:")
                 
             except ValueError:
-                print(f"Error: '{i}' is not an integer, leave blank or enter a valid {expected} size:")
+                print(f"'{i}' is not an integer, leave blank or enter a valid {expected}:")
 
 
 def getb64(expected="message", size=-1):
@@ -148,7 +143,7 @@ def cipher_choice():
     print("Choice cypher method : ")
     print(" 1 - ECB \n 2 - CBC \n 3 - PCBC (Recommended) \n 4 - CTR (Stream) \n 5 - CGM (Authentification)")
 
-    pCipher=select()
+    pCipher=getInt(3,"choices")
 
     # Cipher verification
     if pCipher > 5 :
@@ -240,9 +235,40 @@ def extractVarFromFile(fileName:str,directory=config.DIRECTORY_GEN):
 
     return extracted
 
+def writeKeytoFile(fileName:str,directory=config.DIRECTORY_GEN):
+    """
+    Write key to file
+
+    keyFormat:
+        - 0 for ElGamal
+        - 1 for Diffie Hellman
+
+    """
+
+    return True
+
+
+def extractedKeyFromFile(fileName:str,keyFormat=0,directory=config.DIRECTORY_PROCESSING):
+    """
+    Extract key's from File
+
+    keyFormat:
+        - 0 for ElGamal
+        - 1 for Diffie Hellman
+    """
+
+    b64var = extractVarFromFile(fileName,directory)
+
+    key = None
+
+
+    return key
+
+
+
+
 def askForKey():
     import base64
-    import binascii
 
     clear()
     asc.asciiCat()
@@ -412,10 +438,9 @@ def primeNumbersFountain():
     choices = ["Generate and stock safe primes","Update a list","Delete a list","Back to menu"]
 
     print("\n")
-    for i,elt in enumerate(choices):
-        print(f"({i+1}) - {elt}")
+    enumerateMenu(choices)
 
-    selection = select()
+    selection = getInt(2,"choices")
 
     def doSomething(i:int):
         """ Handle choices for fountain. """
@@ -423,10 +448,10 @@ def primeNumbersFountain():
         asc.asciiArt()
         if i == 1:
             print("How many bits wanted for this generation ?")
-            wanted = select()
+            wanted = getInt(2048,"bits size",True)
 
             print("\nHow many generations ?")
-            numbers = select()
+            numbers = getInt(1,"generations")
 
             stockSafePrimes(wanted,numbers)
 
@@ -434,10 +459,10 @@ def primeNumbersFountain():
 
         elif i == 2:
             print("Enter number of bits for updating corresponding one's :")
-            wanted = select()
+            wanted = getInt(2048,"bits size",True)
 
             print("\nHow many generations ?")
-            numbers = select()
+            numbers = getInt(1,"generations")
 
             stockSafePrimes(wanted,numbers)
             return doSomethingElse(primeNumbersFountain)
@@ -446,7 +471,7 @@ def primeNumbersFountain():
             clear()
             asc.asciiDeath()
             print("Enter the number of bits corresponding to the list you would like to be removed.")
-            lnumber = select()
+            lnumber = getInt(2048,"bits size",True)
             name = f"{str(lnumber)}_bits.txt"
 
             rmFile(name,config.DIRECTORY_FOUNT)
@@ -479,34 +504,18 @@ def elGamalKeysGeneration():
     clear()
     asc.asciiCat()
 
-    question = query_yn("Do you want to use the fastest ElGamal key generation's ( No => Choose parameters) ?")
-
     # Because here default is no so not(yes)
-    if not question:
-        question1 = query_yn("Do you want to choose the length of the key (default = 2048 bits) ?")
+    if not query_yn("Do you want to use the fastest ElGamal key generation's ( No => Choose parameters) ?"):
         
-        if question1:
-            n = select()
+        if query_yn("Do you want to choose the length of the key (default = 2048 bits) ?"):
+            n = getInt(2048,"key size",True)
         else:
             n = 2048
 
-        question2 = query_yn("Do you want to use easy Generator ? (fastest)")
+        eGen = query_yn("Do you want to use easy Generator ? (fastest)")
 
-        if question2:
-            easyGenerator = True
-        else:
-            easyGenerator = False
-
-
-        question3 = query_yn("Do you want to use the Prime Number's Fountain to generate the keys (fastest) ?")
-
-        if question3:
-            
-            if question2:
-                primes = extractSafePrimes(n,False,easyGenerator)
-            else:
-                primes = extractSafePrimes(n,False)
-
+        if query_yn("Do you want to use the Prime Number's Fountain to generate the keys (fastest) ?"):
+            primes = extractSafePrimes(n,False,eGen)
         else:
             primes = None
 
@@ -515,7 +524,7 @@ def elGamalKeysGeneration():
 
         print("\t.... Key generation in progress ....")
         
-        elGamal.key_gen(n,primes,easyGenerator,prng.xorshiftperso,True)
+        elGamal.key_gen(n,primes,eGen,prng.xorshiftperso,True)
     else:
         n = 1024
         primes = extractSafePrimes(n,False)
@@ -583,10 +592,9 @@ def dlogAttack():
 
     choices = ["Retieve private key with publicKey","Decrypt encrypted message.","Back to menu"]
 
-    for i,elt in enumerate(choices):
-        print(f"({i+1}) - {elt}")
+    enumerateMenu(choices)
 
-    selection = select()
+    selection = getInt(1,"choices")
 
     def doSomething(i:int):
         """ Handle choices for dlog attack. """
@@ -614,7 +622,6 @@ def dlogAttack():
             writeVartoFile(el,"private_key",config.DIRECTORY_PROCESSING)
             
             print(f"Saved private_key : {el} into appropriated file.\n")
-
 
             doSomethingElse(dlogAttack)
 
@@ -653,7 +660,7 @@ def dlogAttack():
             katsumi.menu()
         else:
             clear()
-            print("\n That's not available in the given menu lad !")
+            print("\n Not available in the menu. Getting back ... ")
             time.sleep(1)
             dlogAttack()
         
@@ -674,7 +681,7 @@ def dHgestion():
 
     print("On what size n (bits) did you agree with your penpal?")
 
-    size = select()
+    size = getInt(2048,"bits size",True)
 
     clear()
     asc.asciiKeys()
@@ -692,7 +699,9 @@ def dHgestion():
     accord = dH.agreement(size,fountain)
     print(f"According to the size of the private key, your agreement is: {accord} ")
     print(f"\nNow, choose a secret value into [0,{accord[0]}]")
-    secret = select(accord[0])
+
+    import random as rd
+    secret = getInt(rd.randrange(2,accord[0]),"your secret integer",False,accord[0])
 
     clear()
     asc.asciiKeys()
@@ -732,12 +741,10 @@ def katsuSymm():
     asc.asciiCat()
 
     symmetric_choices=["Encrypt a message.", "Decrypt a message.","Back"]
+    
+    enumerateMenu(symmetric_choices)
 
-    print("\n")
-    for i,elt in enumerate(symmetric_choices):
-        print(f"({i+1}) - {elt}")
-
-    selection = select()
+    selection = getInt(1,"choices")
 
     def doSomething(i:int):
         """ Handle choices for symmetric things. """
@@ -822,7 +829,7 @@ def katsuSymm():
             katsumi.menu()
         else:
             clear()
-            print("\n That's not available in the given menu lad !")
+            print("\n Not available in the menu. Getting back ... ")
             time.sleep(1)
             katsuSymm()
         
@@ -840,11 +847,9 @@ def katsuAsymm():
 
     asymmetric_choices= ["Using ElGamal to generate public/private key pairs.","Encrypt a message with ElGamal","Decrypt a message encrypted by ElGamal.","Share private key with Diffie-Hellman.","Discrete Logarithmic attack on ElGamal.","Back"]
 
-    print("\n")
-    for i,elt in enumerate(asymmetric_choices):
-        print(f"({i+1}) - {elt}")
+    enumerateMenu(asymmetric_choices)
 
-    selection = select()
+    selection = getInt(2,"choices")
 
     def doSomething(i:int):
         """ Handle choices for symmetric things. """
@@ -892,7 +897,7 @@ def katsuAsymm():
             print("Gotcha !\n")
             #####
 
-            e = extractVarFromFile("encrypted.txt",config.DIRECTORY_PROCESSING)
+            e = extractVarFromFile("encrypted",config.DIRECTORY_PROCESSING)
 
             d = elG.decrypt(e,extractVarFromFile("private_key",config.DIRECTORY_PROCESSING),asTxt=True)
 
@@ -909,7 +914,7 @@ def katsuAsymm():
             katsumi.menu()
         else:
             clear()
-            print("\n That's not available in the given menu lad !")
+            print("\n Not available in the menu. Getting back ... ")
             time.sleep(1)
             katsuAsymm()
         
@@ -926,10 +931,9 @@ def katsuHash():
 
     choices = ["Generate a hash","Check a hash","Back to menu"]
 
-    for i,elt in enumerate(choices):
-        print(f"({i+1}) - {elt}")
+    enumerateMenu(choices)
 
-    selection = select()
+    selection = getInt(1,"choices")
 
     if selection == 1:
 

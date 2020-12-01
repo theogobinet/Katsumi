@@ -46,7 +46,7 @@ def work_with_selection(pSelection):
         sys.exit
     else:
         it.clear()
-        print("\n That's not available in the given menu lad !")
+        print("\n Not available in the menu. Getting back ... ")
         time.sleep(1)
         return menu()
     
@@ -67,10 +67,10 @@ def menu():
     print("- Free to use")
     print("- MIT License\n")
 
-    for i,elt in enumerate(choices):
-        print(f"\t({i+1}) - {elt}")
+    it.enumerateMenu(choices)
 
-    selection = it.select()
+    print()
+    selection = it.getInt(1,"choices")
 
     return work_with_selection(selection)
 
