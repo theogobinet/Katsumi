@@ -80,7 +80,6 @@ def select(r=None):
             continue
         else:
             return selection
-
 ##############################
 # LOOP FUNCTION TO GET INPUT #
 ##############################
@@ -99,8 +98,8 @@ def getFile():
             print(f"Error: file '{f}' not found, enter [c] to go back or enter a valid filename:")
 
         
-def getSize(default=256):
-    print(f"Please enter the hash size ({default} bits by default):")
+def getInt(default=256, expected="hash", size=False):
+    print(f"Please enter the {expected} size ({default} bits by default):")
 
     while True:
         i = input("> ")
@@ -111,13 +110,13 @@ def getSize(default=256):
         else:
             try:
                 val = int(i)
-                if val % 8 == 0 and val >=32:
+                if not size or (val % 8 == 0 and val >=32):
                     return val
                 else:
-                    print(f"Error: {i} is not a valid digest size, leave blank or enter a valid hash size:")
+                    print(f"Error: {i} is not a valid {expected} size, leave blank or enter a valid {expected} size:")
                 
             except ValueError:
-                print(f"Error: '{i}' is not an integer, leave blank or enter a valid hash size:")
+                print(f"Error: '{i}' is not an integer, leave blank or enter a valid {expected} size:")
 
 
 def getb64(expected="message", size=-1):
@@ -138,7 +137,6 @@ def getb64(expected="message", size=-1):
                     print(f'Error: {expected} must be {size} bytes long, enter [c] to go back or enter a valid base64')
             except binascii.Error:
                 print('Error: Unable to decode, the format is not in base64, enter [c] to go back or enter a valid base64')
-
 
 
 
@@ -935,7 +933,7 @@ def katsuHash():
 
     if selection == 1:
 
-        size = getSize()
+        size = getInt(256, "hash", True)
 
         if query_yn("Do you want to hash a file ?","no"):
 
@@ -983,4 +981,5 @@ def katsuHash():
         katsumi.menu()
 
     doSomethingElse(katsuHash)
+
 
