@@ -659,9 +659,7 @@ def dlogAttack():
             import katsumi
             katsumi.menu()
         else:
-            clear()
-            print("\n Not available in the menu. Getting back ... ")
-            time.sleep(1)
+            
             dlogAttack()
         
     doSomething(selection)
@@ -676,52 +674,82 @@ def dHgestion():
     import core.asymmetric.diffieHellman as dH
     import ressources.bytesManager as bm
 
-    clear()
-    asc.asciiKeys()
-
-    print("On what size n (bits) did you agree with your penpal?")
-
-    size = getInt(2048,"bits size",True)
+    choices = ["Choose agreement","Process with agreement","Back"]
 
     clear()
     asc.asciiKeys()
 
-    print(f"Checking existence of fountain of {size} bits...")
+    enumerateMenu(choices)
 
-    if not isFileHere(f"{size}_bits.txt",config.DIRECTORY_FOUNT):
-        print("\n\tFile unavailable !")
-        print("\n\fOne will be created.\n")
-        fountain = False
-    else:
-        print("\n\tFile available !\n")
-        fountain = True
+    selection = getInt(1,"choices")
 
-    accord = dH.agreement(size,fountain)
-    print(f"According to the size of the private key, your agreement is: {accord} ")
-    print(f"\nNow, choose a secret value into [0,{accord[0]}]")
+    def doSomething(i:int):
+        
+        if i == 1:
+            clear()
+            asc.asciiKeys()
 
-    import random as rd
-    secret = getInt(rd.randrange(2,accord[0]),"your secret integer",False,accord[0])
+            print("On what size n (bits) did you agree with your penpal?")
 
-    clear()
-    asc.asciiKeys()
+            size = getInt(2048,"bits size",True)
 
-    dH.chooseAndSend(accord,secret)
+            clear()
+            asc.asciiKeys()
 
-    clear()
-    asc.asciiKeys()
+            print(f"Checking existence of fountain of {size} bits...")
 
-    dH_shared = dH.compute(accord,secret)
+            if not isFileHere(f"{size}_bits.txt",config.DIRECTORY_FOUNT):
+                print("\n\tFile unavailable !")
+                print("\n\fOne will be created.\n")
+                fountain = False
+            else:
+                print("\n\tFile available !\n")
+                fountain = True
 
-    writeVartoFile(dH_shared,"dH_sharedKey",config.DIRECTORY_PROCESSING)
-    
-    clear()
-    asc.asciiKeys()
+            accord = dH.agreement(size,fountain)
+            print(f"According to the size of the private key, your agreement is: {accord} ")
 
-    print("Shared key created.")
-    print(f"\t > {dH_shared}\n")
+            doSomething()
 
-    doSomethingElse(katsuAsymm)
+        elif i == 2:
+            clear()
+            asc.asciiKeys()
+
+            print("Enter here your common agreement in b64.")
+            accord = getb64("agreement")
+
+            print(f"\nNow, choose a secret value into [0,{accord[0]}]")
+            
+            import random as rd
+            
+            secret = getInt(rd.randrange(2,accord[0]),"your secret integer",False,accord[0])
+
+            dH.chooseAndSend(accord,secret)
+
+            clear()
+            asc.asciiKeys()
+
+            dH_shared = dH.compute(accord,secret)
+
+            writeVartoFile(dH_shared,"dH_sharedKey",config.DIRECTORY_PROCESSING)
+            
+            clear()
+            asc.asciiKeys()
+
+            print("Shared key created.")
+            print(f"\t > {dH_shared}\n")
+
+            doSomethingElse(katsuAsymm)
+
+            
+
+        elif i == 3:
+            import katsumi
+            katsumi.menu()
+        else:
+            dHgestion()
+
+
 
 
 
@@ -828,9 +856,7 @@ def katsuSymm():
             clear()
             katsumi.menu()
         else:
-            clear()
-            print("\n Not available in the menu. Getting back ... ")
-            time.sleep(1)
+            
             katsuSymm()
         
     doSomething(selection)
@@ -913,9 +939,7 @@ def katsuAsymm():
             clear()
             katsumi.menu()
         else:
-            clear()
-            print("\n Not available in the menu. Getting back ... ")
-            time.sleep(1)
+            
             katsuAsymm()
         
     doSomething(selection)
