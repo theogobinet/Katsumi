@@ -235,18 +235,49 @@ def extractVarFromFile(fileName:str,directory=config.DIRECTORY_GEN):
 
     return extracted
 
-def writeKeytoFile(fileName:str,directory=config.DIRECTORY_GEN):
+def writeKeytoFile(key, encrType, fileName:str,directory=config.DIRECTORY_PROCESSING):
     """
     Write key to file
 
     keyFormat:
         - 0 for ElGamal
         - 1 for Diffie Hellman
-
     """
 
-    return True
+    import base64
 
+    def getB64Keys(key):
+
+        sizes = []
+        tw = bytearray()
+
+        for k in key:
+            s = bm.bytes_needed(k)
+            sizes.append(s)
+            tw += s.to_bytes(2,"big")
+
+        for i, k in enumerate(key):
+            tw += k.to_bytes(sizes[i], "big")
+
+        return base64.b64encode(tw).decode()
+
+    f = open(os.path.join(directory, fileName),"w")
+
+    if encrType == 0:
+        if len(key) == 4:
+            f.write("elga-key")
+            f.write(getB64Keys(key))
+        else:
+            raise ValueError("For ElGamal, key must be a tuple of 4 ints")
+
+    if encrType == 1:
+        if len(key) == 2:
+            f.write("dihe-key")
+            f.write(getB64Keys(key))
+        else:
+            raise ValueError("For Diffie Helman, key must be a tuple of 2 ints")
+
+    f.close()
 
 def extractedKeyFromFile(fileName:str,keyFormat=0,directory=config.DIRECTORY_PROCESSING):
     """
@@ -256,15 +287,40 @@ def extractedKeyFromFile(fileName:str,keyFormat=0,directory=config.DIRECTORY_PRO
         - 0 for ElGamal
         - 1 for Diffie Hellman
     """
+    import base64
 
-    b64var = extractVarFromFile(fileName,directory)
+    def getIntKey(b64, keyNumber):
+        data = base64.b64decode(b64)
+        keys = ()
+        kL = []
+        for i in range(keyNumber):
+            kL.append(int.from_bytes(data[i*2:i*2+2],"big"))
+    
+        padding = keyNumber * 2
+        for i, s in enumerate(kL):
+            keys += (int.from_bytes(data[padding: padding + s], "big"),)
+            padding = padding + s
 
-    key = None
+        return keys
 
+    if isFileHere(fileName, directory):
+        f = open(os.path.join(directory, fileName),"r")
+        b64data = f.read()
 
-    return key
+        encrType = b64data[:8]
 
+        if encrType == "elga-key":
+            return getIntKey(b64data[8:], 4)
+        elif encrType == "dihe-key":
+            return getIntKey(b64data[8:], 2)
+        else:
+            raise Exception("Unable to identified the key")
+        
+        f.close()
+    else:
+        raise FileNotFoundError(f"File {fileName} not found")
 
+    return 0
 
 
 def askForKey():
@@ -709,7 +765,7 @@ def dHgestion():
             accord = dH.agreement(size,fountain)
             print(f"According to the size of the private key, your agreement is: {accord} ")
 
-            doSomething()
+            doSomethingElse()
 
         elif i == 2:
             clear()
