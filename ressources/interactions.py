@@ -603,16 +603,16 @@ def elGamalKeysGeneration():
     asc.asciiCat()
 
     # Because here default is no so not(yes)
-    if not query_yn("Do you want to use the fastest ElGamal key generation's ( No => Choose parameters) ?"):
+    if not query_yn("Do you want to use the fastest ElGamal key generation's (default: no) ?","no"):
         
-        if query_yn("Do you want to choose the length of the key (default = 2048 bits) ?"):
+        if query_yn("Do you want to choose the length of the key (default = 2048 bits) ?","no"):
             n = getInt(2048,"key size",True)
         else:
             n = 2048
 
-        eGen = query_yn("Do you want to use easy Generator ? (fastest)")
+        eGen = query_yn("Do you want to use easy Generator (fastest generation) (default: No) ?","no")
 
-        if query_yn("Do you want to use the Prime Number's Fountain to generate the keys (fastest) ?"):
+        if query_yn("Do you want to use the Prime Number's Fountain to generate the keys (fastest) (default: yes) ?"):
             primes = extractSafePrimes(n,False,eGen)
         else:
             primes = None
@@ -642,7 +642,6 @@ def keysVerif():
     """
     Used to verify existence of private or/and public keys of ElGamal.
     """
-    import katsumi
 
     clear()
     asc.asciiCat()
@@ -651,19 +650,39 @@ def keysVerif():
 
     if isFileHere("public_key.kat",config.DIRECTORY_PROCESSING):
 
-        print("\nPublic key's already here.\n")
+        from core.asymmetric import elGamal as elG
+
+        publicS = elG.getSize()
+        print(f"\nPublic key's of {publicS} bits already here.\n")
 
         if isFileHere("private_key.kat",config.DIRECTORY_PROCESSING):
             
-            print("Private key's too.\n")
-            
-            if not query_yn("Do you want to keep them ? (default: No)","no"):
-                rmFile("public_key.kat",config.DIRECTORY_PROCESSING)
-                rmFile("private_key.kat",config.DIRECTORY_PROCESSING)
-                rmFile("encrypted.kat",config.DIRECTORY_PROCESSING)
+            privateS = elG.getSize("private_key")
+            print(f"Private key's of {privateS} bits too.\n")
+
+            if publicS != privateS:
+                clear()
+                asc.asciiDeath()
+                print(f"Key sizes do not match ({privateS} != {publicS}). Suspected corruption.")
+                print("Keys are going to be deleted...")
+                time.sleep(1)
+                
+                for f in ["public_key","private_key","encrypted"]:
+                    rmFile(f+".kat",config.DIRECTORY_PROCESSING)
+
+                clear()
+                asc.asciiDeath()
+                print("Done. Generating other keys now...\n")
+                time.sleep(1)
                 elGamalKeysGeneration()
             else:
-                katsumi.menu()
+                if not query_yn("Do you want to keep them ? (default: No)","no"):
+                    rmFile("public_key.kat",config.DIRECTORY_PROCESSING)
+                    rmFile("private_key.kat",config.DIRECTORY_PROCESSING)
+                    rmFile("encrypted.kat",config.DIRECTORY_PROCESSING)
+                    elGamalKeysGeneration()
+                else:
+                    katsuAsymm()
 
         else:
             print("Private key's missing.\n")
@@ -880,7 +899,7 @@ def dHgestion():
 
 
 #########################################
-########## Other Choices  ###############
+############ Other Menus  ###############
 #########################################
 
 def katsuSymm():
@@ -985,7 +1004,6 @@ def katsuSymm():
     doSomethingSymm(selection)
 
 
-
 def katsuAsymm():
 
     import katsumi
@@ -1017,6 +1035,7 @@ def katsuAsymm():
                 time.sleep(1)
                 doSomethingAssym(1)
             else:
+                keysVerif()
                 answer = readFromUser().encode()
                 e = elG.encrypt(answer,extractKeyFromFile("public_key",config.DIRECTORY_PROCESSING))
 

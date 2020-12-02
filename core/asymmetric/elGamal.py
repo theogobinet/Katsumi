@@ -146,7 +146,7 @@ def key_gen(n:int=2048,primeFount=None,easyGenerator:bool=False,randomFunction=N
     print(f"\nThe public key '{b64pK}' has been generated too and saved.")
 
 
-def getSize():
+def getSize(key:str="public_key"):
     """
     Return size of current key based on prime fount's.
     """
@@ -154,7 +154,7 @@ def getSize():
 
     sizes = [int(elt.split("_")[0]) for elt in it.whatInThere()]
     
-    pK = it.extractKeyFromFile("public_key",config.DIRECTORY_PROCESSING,".kat")
+    pK = it.extractKeyFromFile(key,config.DIRECTORY_PROCESSING,".kat")
 
     bits = bm.bytes_needed(pK[0])*8
 
