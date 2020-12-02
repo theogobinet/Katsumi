@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+from core.asymmetric.diffieHellman import agreement
 from math import inf
 import os
 import time
@@ -59,7 +60,7 @@ def clear():
         os.system("clear")
 
 
-def readFromUser(msg="Enter the message there:"):
+def readFromUser(msg="Enter the message:"):
     from sys import stdin
 
     phrase=""
@@ -69,11 +70,11 @@ def readFromUser(msg="Enter the message there:"):
     for line in stdin:
         if line == '\n': # If empty string is read then stop the loop
             break
-        phrase+=line
+        else:
+            phrase+=line
 
-    clear()
-
-    return phrase
+    # [:-1] to delete the last '\n'
+    return phrase[:-1]
 
 ##############################
 # LOOP FUNCTION TO GET INPUT #
@@ -94,7 +95,7 @@ def getFile():
 
         
 def getInt(default=256, expected="hash", size=False, limit:int=inf):
-    print(f"Please enter {expected} ({default} by default):")
+    print(f"Enter {expected} ({default} by default):")
 
     while True:
         i = input("> ")
@@ -118,7 +119,7 @@ def getb64(expected="message", size=-1):
     import base64
     import binascii
 
-    print(f"Enter the {expected} in base64:")
+    print(f"Enter {expected} in base64:")
     while True:
         i = input("> ")
         if i == "c":
@@ -132,7 +133,6 @@ def getb64(expected="message", size=-1):
                     print(f'Error: {expected} must be {size} bytes long, enter [c] to go back or enter a valid base64')
             except binascii.Error:
                 print('Error: Unable to decode, the format is not in base64, enter [c] to go back or enter a valid base64')
-
 
 
 def cipher_choice():
@@ -203,7 +203,11 @@ def handleDirectory(dirName:str,directory=config.DIRECTORY_GEN):
 
 def rmFile(name:str,directory=config.DIRECTORY_GEN):
     """Remove named file."""
-    return os.remove(directory+name)
+    try:
+        return os.remove(directory+name)
+    except FileNotFoundError:
+        pass
+
 
 def mvFile(name:str,src=config.DIRECTORY_PROCESSING,dst=config.DIRECTORY_GEN):
     """ Move named file """
@@ -216,111 +220,110 @@ def whatInThere(directory=config.DIRECTORY_FOUNT):
     """
     return [os.path.splitext(f)[0] for f in os.listdir(directory)]
 
-def writeVartoFile(var:object,name:str,directory=config.DIRECTORY_GEN):
+def writeVartoFile(var:object,name:str,directory=config.DIRECTORY_GEN,ext:str=".txt"):
     """Write given variable into a file with variable name"""
     # r+ for reading and writing
     name=directory+name
-    with open(name+".txt","w+") as f:
+    with open(name+ext,"w+") as f:
         f.truncate(0)
         f.write(f"{var}")
 
     return True
 
-def extractVarFromFile(fileName:str,directory=config.DIRECTORY_GEN):
+def extractVarFromFile(fileName:str,directory=config.DIRECTORY_GEN,ext:str=".kat"):
     """Extract variable contenant's from txt file."""
     import ast
-    with open(directory+fileName+".txt","r+") as f:
+    with open(directory+fileName+ext,"r+") as f:
         contents=f.read()
         extracted=ast.literal_eval(contents)
 
     return extracted
 
-def writeKeytoFile(key, encrType, fileName:str,directory=config.DIRECTORY_PROCESSING):
+##############################
+######## Key gestion #########
+##############################
+
+def getIntKey(b64, keyNumber):
     """
-    Write key to file
-
-    keyFormat:
-        - 0 for ElGamal
-        - 1 for Diffie Hellman
+    Convert base64 key's into tuples of keyNumber integers.
     """
+    import base64, binascii
 
-    import base64
+    if isinstance(keyNumber,str):
+        keyNumber = int(keyNumber)
 
-    def getB64Keys(key):
-
-        sizes = []
-        tw = bytearray()
-
-        for k in key:
-            s = bm.bytes_needed(k)
-            sizes.append(s)
-            tw += s.to_bytes(2,"big")
-
-        for i, k in enumerate(key):
-            tw += k.to_bytes(sizes[i], "big")
-
-        return base64.b64encode(tw).decode()
-
-    f = open(os.path.join(directory, fileName),"w")
-
-    if encrType == 0:
-        if len(key) == 4:
-            f.write("elga-key")
-            f.write(getB64Keys(key))
-        else:
-            raise ValueError("For ElGamal, key must be a tuple of 4 ints")
-
-    if encrType == 1:
-        if len(key) == 2:
-            f.write("dihe-key")
-            f.write(getB64Keys(key))
-        else:
-            raise ValueError("For Diffie Helman, key must be a tuple of 2 ints")
-
-    f.close()
-
-def extractedKeyFromFile(fileName:str,keyFormat=0,directory=config.DIRECTORY_PROCESSING):
-    """
-    Extract key's from File
-
-    keyFormat:
-        - 0 for ElGamal
-        - 1 for Diffie Hellman
-    """
-    import base64
-
-    def getIntKey(b64, keyNumber):
+    try:
         data = base64.b64decode(b64)
+    except binascii.Error:
+        # then it's already into b64 logically
+        data = b64
+
+    if keyNumber != 1:
         keys = ()
         kL = []
         for i in range(keyNumber):
             kL.append(int.from_bytes(data[i*2:i*2+2],"big"))
-    
+
         padding = keyNumber * 2
         for i, s in enumerate(kL):
             keys += (int.from_bytes(data[padding: padding + s], "big"),)
             padding = padding + s
+    else:
+        keys = bm.bytes_to_int(data)
 
-        return keys
+    return keys
 
-    if isFileHere(fileName, directory):
-        f = open(os.path.join(directory, fileName),"r")
-        b64data = f.read()
+def writeKeytoFile(key,fileName:str,directory=config.DIRECTORY_PROCESSING,ext:str=".kat"):
+    """
+    Write key in b64 format to file with key length's as header.
+    """
 
-        encrType = b64data[:8]
+    def getB64Keys(key):
+        import base64
+        sizes = []
+        tw = bytearray()
 
-        if encrType == "elga-key":
-            return getIntKey(b64data[8:], 4)
-        elif encrType == "dihe-key":
-            return getIntKey(b64data[8:], 2)
+        if isinstance(key,tuple):
+            for k in key:
+                s = bm.bytes_needed(k)
+                sizes.append(s)
+                tw += s.to_bytes(2,"big")
+
+            for i, k in enumerate(key):
+                tw += k.to_bytes(sizes[i], "big")
         else:
-            raise Exception("Unable to identified the key")
-        
+            #uniq key
+            tw = bm.int_to_bytes(key)
+
+        return base64.b64encode(tw).decode()
+
+    b64Key = getB64Keys(key)
+
+    if isinstance(key,tuple):
+        var = f"{len(key)}" + b64Key
+    else:
+        var = "1" + b64Key
+
+    writeVartoFile(var,fileName,directory,ext)
+
+    return b64Key
+
+
+def extractKeyFromFile(fileName:str,directory=config.DIRECTORY_PROCESSING,ext:str=".kat"):
+    """
+    Extract key's from b64 format to tuples from file.
+    """
+
+    fileName += ext
+    if isFileHere(fileName, directory):
+        f = open(os.path.join(directory, fileName),"r+")
+        b64data = f.read()
         f.close()
+
+        return getIntKey(b64data[1:], b64data[0])
+        
     else:
         raise FileNotFoundError(f"File {fileName} not found")
-
-    return 0
 
 
 def askForKey():
@@ -351,13 +354,50 @@ def askForKey():
 
     return key
 
+##############################
+######## Inversion Box #######
+##############################
+
+def handleInvBox():
+
+    if not isFileHere("inversion_Sbox.txt"):
+
+        print("A necessary file for the substitution has been deleted from the system.\n")
+
+        if query_yn("- Do you want to generate the inverse substitution box (No if you want to compute each time needed) ? "):
+   
+            import threading
+            import time
+
+            import core.symmetric.galois_Z2 as gz2
+
+            th=threading.Thread(target = gz2.genInverses2)
+            
+            # This thread dies when main thread (only non-daemon thread) exits.
+            th.daemon = True
+
+            th.start()
+            time.sleep(2)
+
+        else:
+            config.GALOIS_WATCH = True
+    
+    else:
+
+        config.INVERSIONS_BOX=extractVarFromFile("inversion_Sbox",ext=".txt")
+
+        if len(config.INVERSIONS_BOX) != config.NBR_ELEMENTS:
+            rmFile("inversion_Sbox.txt")
+            print("WARNING - Wrong Inversion Substition box ! \n")
+            clear()
+            handleInvBox()
 
 
 def doSomethingElse(m=None):
     """
     Ask user if he want to do something and if yes, get back to main menu.
     """
-    answer = query_yn("Do you want to do something else ?")
+    answer = query_yn("\nDo you want to do something else ?")
     import katsumi
 
     if m == None:
@@ -392,7 +432,7 @@ def extractSafePrimes(nBits:int=1024,allE:bool=True,easyGenerator:bool=False,dir
         stockSafePrimes(nBits,0)
         extractSafePrimes(nBits,allE,easyGenerator,directory)
     else:
-        v = extractVarFromFile(name,directory)
+        v = extractVarFromFile(name,directory,".txt")
 
         if allE:
             return v
@@ -469,7 +509,7 @@ def updatePrimesFount(p:tuple,nBits:int):
 
     else:
 
-        buffer = extractVarFromFile(name,config.DIRECTORY_FOUNT)
+        buffer = extractVarFromFile(name,config.DIRECTORY_FOUNT,".txt")
 
         if p not in buffer:
             buffer.append(p)
@@ -498,7 +538,7 @@ def primeNumbersFountain():
 
     selection = getInt(2,"choices")
 
-    def doSomething(i:int):
+    def doSomethingFount(i:int):
         """ Handle choices for fountain. """
         clear()
         asc.asciiArt()
@@ -530,10 +570,12 @@ def primeNumbersFountain():
             lnumber = getInt(2048,"bits size",True)
             name = f"{str(lnumber)}_bits.txt"
 
-            rmFile(name,config.DIRECTORY_FOUNT)
-            print(f"{name} removed successfully.\n")
-
-            return doSomethingElse(primeNumbersFountain())
+            if query_yn("Are you sure ?"):
+                rmFile(name,config.DIRECTORY_FOUNT)
+                print(f"{name} removed successfully.\n")
+                return doSomethingElse(primeNumbersFountain)
+            else:
+                doSomethingFount()
 
         elif i == 4:
             import katsumi
@@ -544,7 +586,7 @@ def primeNumbersFountain():
             time.sleep(1)
             return primeNumbersFountain()
         
-    return doSomething(selection)
+    return doSomethingFount(selection)
 
 
 #########################################
@@ -591,6 +633,8 @@ def elGamalKeysGeneration():
         print("\t.... Key generation in progress ....")
 
         elGamal.key_gen(n,primes,Verbose=True)
+
+    doSomethingElse(katsuAsymm)
     
 
 
@@ -605,31 +649,30 @@ def keysVerif():
 
     print("\nChecking the presence of keys in the system....")
 
-    if isFileHere("public_key.txt",config.DIRECTORY_PROCESSING):
+    if isFileHere("public_key.kat",config.DIRECTORY_PROCESSING):
 
-        print("Public key already here.\n")
+        print("\nPublic key's already here.\n")
 
-        if isFileHere("private_key.txt",config.DIRECTORY_PROCESSING):
+        if isFileHere("private_key.kat",config.DIRECTORY_PROCESSING):
             
             print("Private key's too.\n")
             
-            if not query_yn("Do you want to keep them ?"):
-                rmFile("private_key.txt",config.DIRECTORY_PROCESSING)
-                rmFile("public_key.txt",config.DIRECTORY_PROCESSING)
-                rmFile("encrypted.txt",config.DIRECTORY_PROCESSING)
+            if not query_yn("Do you want to keep them ? (default: No)","no"):
+                rmFile("public_key.kat",config.DIRECTORY_PROCESSING)
+                rmFile("private_key.kat",config.DIRECTORY_PROCESSING)
+                rmFile("encrypted.kat",config.DIRECTORY_PROCESSING)
                 elGamalKeysGeneration()
             else:
                 katsumi.menu()
 
         else:
-            print("Private key's missing.")
-            answer = query_yn("Do you want to add them now ?")
-            
-            if answer:
+            print("Private key's missing.\n")
+        
+            if query_yn("Do you want to add them now ?\n"):
 
-                while not isFileHere("private_key.txt",config.DIRECTORY_PROCESSING):
+                while not isFileHere("private_key.kat",config.DIRECTORY_PROCESSING):
                     clear()
-                    input("Please put your 'private_key.txt' file into the 'processing' folder.")
+                    input("Please put your 'private_key.kat' file into the 'processing' folder.")
                 
                 clear()
                 print("Gotcha !")
@@ -637,6 +680,23 @@ def keysVerif():
                 keysVerif()
             else:
                 katsuAsymm()
+
+    elif isFileHere("private_key.kat",config.DIRECTORY_PROCESSING):
+        print("\nPrivate key's already here but not public one's.\n")
+
+        if query_yn("Do you want to add them now ? ( default: No)\n","no"):
+
+                while not isFileHere("public_key.kat",config.DIRECTORY_PROCESSING):
+                    clear()
+                    input("Please put your 'public_key.kat' file into the 'processing' folder.")
+                
+                clear()
+                print("Gotcha !")
+
+                keysVerif()
+        else:
+            katsuAsymm()
+
     else:
         elGamalKeysGeneration()
 
@@ -660,11 +720,11 @@ def dlogAttack():
 
         if i == 1:
 
-            while not isFileHere("public_key.txt",config.DIRECTORY_PROCESSING):
+            while not isFileHere("public_key.kat",config.DIRECTORY_PROCESSING):
                 clear()
                 asc.asciiJongling()
 
-                input("Please put your 'public_key.txt' file into the 'processing' folder.")
+                input("Please put your 'public_key.kat' file into the 'processing' folder.")
             
             clear()
             asc.asciiJongling()
@@ -673,7 +733,7 @@ def dlogAttack():
             print("Compute dlog attack with pollard's rho algorithm.")
             print("It can takes times ...\n")
 
-            el = elGamal.delog(extractVarFromFile("public_key",config.DIRECTORY_PROCESSING),None,True)
+            el = elGamal.delog(extractVarFromFile("public_key.kat",config.DIRECTORY_PROCESSING),None,True)
             
             writeVartoFile(el,"private_key",config.DIRECTORY_PROCESSING)
             
@@ -683,21 +743,21 @@ def dlogAttack():
 
         elif i == 2:
 
-            while not isFileHere("public_key.txt",config.DIRECTORY_PROCESSING):
+            while not isFileHere("public_key.kat",config.DIRECTORY_PROCESSING):
                 clear()
                 asc.asciiJongling()
 
-                input("Please put your 'public_key.txt' file into the 'processing' folder.")
+                input("Please put your 'public_key.kat' file into the 'processing' folder.")
             
             clear()
             asc.asciiJongling()
             print("Gotcha !\n")
             
-            while not isFileHere("encrypted.txt",config.DIRECTORY_PROCESSING):
+            while not isFileHere("encrypted.kat",config.DIRECTORY_PROCESSING):
                 clear()
                 asc.asciiJongling()
 
-                input("Please put your 'encrypted.txt' file into the 'processing' folder.")
+                input("Please put your 'encrypted.kat' file into the 'processing' folder.")
             
             clear()
             asc.asciiJongling()
@@ -706,8 +766,15 @@ def dlogAttack():
             print("Compute dlog attack with pollard's rho algorithm.")
             print("It can takes some times...\n")
 
-            el = elGamal.delog(extractVarFromFile("public_key",config.DIRECTORY_PROCESSING),extractVarFromFile("encrypted",config.DIRECTORY_PROCESSING),True)
-            print(f"Decrypted message is: \n \t -'{el}'\n")
+            el = elGamal.delog(extractKeyFromFile("public_key",config.DIRECTORY_PROCESSING),extractKeyFromFile("encrypted",config.DIRECTORY_PROCESSING),True)
+            
+            print(f"Decrypted message is:")
+
+            el = el.split("\n")
+            print(el)
+
+            for phrase in el:
+                print(f"\t -'{phrase}'")
 
             doSomethingElse(dlogAttack)
         
@@ -728,7 +795,6 @@ def dHgestion():
     Sharing private key with Diffie Hellman.
     """
     import core.asymmetric.diffieHellman as dH
-    import ressources.bytesManager as bm
 
     choices = ["Choose agreement","Process with agreement","Back"]
 
@@ -737,9 +803,9 @@ def dHgestion():
 
     enumerateMenu(choices)
 
-    selection = getInt(1,"choices")
+    selection = getInt(2,"choices")
 
-    def doSomething(i:int):
+    def doSomethingDH(i:int):
         
         if i == 1:
             clear()
@@ -763,16 +829,20 @@ def dHgestion():
                 fountain = True
 
             accord = dH.agreement(size,fountain)
+
+            accord = writeKeytoFile(accord,"dH_agreement")
             print(f"According to the size of the private key, your agreement is: {accord} ")
 
-            doSomethingElse()
+            doSomethingElse(dHgestion)
 
         elif i == 2:
             clear()
             asc.asciiKeys()
 
-            print("Enter here your common agreement in b64.")
-            accord = getb64("agreement")
+            if query_yn("Do you want to use the dH_agreement.kat file's ? (default: Yes)"):
+                accord = extractKeyFromFile("dH_agreement")
+            else:
+                accord = getIntKey(getb64("agreement"),2)
 
             print(f"\nNow, choose a secret value into [0,{accord[0]}]")
             
@@ -780,14 +850,15 @@ def dHgestion():
             
             secret = getInt(rd.randrange(2,accord[0]),"your secret integer",False,accord[0])
 
+            clear()
+            asc.asciiKeys()
+
             dH.chooseAndSend(accord,secret)
 
             clear()
             asc.asciiKeys()
 
             dH_shared = dH.compute(accord,secret)
-
-            writeVartoFile(dH_shared,"dH_sharedKey",config.DIRECTORY_PROCESSING)
             
             clear()
             asc.asciiKeys()
@@ -795,7 +866,7 @@ def dHgestion():
             print("Shared key created.")
             print(f"\t > {dH_shared}\n")
 
-            doSomethingElse(katsuAsymm)
+            doSomethingElse(dHgestion)
 
             
 
@@ -805,11 +876,7 @@ def dHgestion():
         else:
             dHgestion()
 
-
-
-
-
-
+    doSomethingDH(selection)
 
 
 #########################################
@@ -830,7 +897,7 @@ def katsuSymm():
 
     selection = getInt(1,"choices")
 
-    def doSomething(i:int):
+    def doSomethingSymm(i:int):
         """ Handle choices for symmetric things. """
 
         clear()
@@ -902,7 +969,7 @@ def katsuSymm():
             begin_time = datetime.now()
             print(ciphers.run(data, inFile, False, cipher, "", key))
             end = datetime.now() - begin_time
-            input(f"Decryption finished in {end} seconds !\n")
+            input(f"Decryption finished in {end} seconds !")
 
             clear()
             asc.asciiCat()
@@ -915,7 +982,7 @@ def katsuSymm():
             
             katsuSymm()
         
-    doSomething(selection)
+    doSomethingSymm(selection)
 
 
 
@@ -927,63 +994,70 @@ def katsuAsymm():
     clear()
     asc.asciiCat()
 
-    asymmetric_choices= ["Using ElGamal to generate public/private key pairs.","Encrypt a message with ElGamal","Decrypt a message encrypted by ElGamal.","Share private key with Diffie-Hellman.","Discrete Logarithmic attack on ElGamal.","Back"]
+    asymmetric_choices= ["Using ElGamal to generate public/private key pairs.","Encrypt a message with ElGamal","Decrypt a message encrypted by ElGamal.","Share private key with Diffie-Hellman.","Discrete Logarithmic attack on ElGamal.","Keys deletion","Back"]
 
     enumerateMenu(asymmetric_choices)
 
     selection = getInt(2,"choices")
 
-    def doSomething(i:int):
+    def doSomethingAssym(i:int):
         """ Handle choices for symmetric things. """
         clear()
         asc.asciiCat()
 
         if i == 1:
             print("You are going to generate public/private key pairs with ElGamal algorithm.")
+            time.sleep(1)
             keysVerif()
 
         elif i == 2:
             
-            if not isFileHere("public_key.txt",config.DIRECTORY_PROCESSING):
-                doSomething(1)
+            if not isFileHere("public_key.kat",config.DIRECTORY_PROCESSING):
+                print("No public key found into the system...")
+                time.sleep(1)
+                doSomethingAssym(1)
             else:
                 answer = readFromUser().encode()
-                e = elG.encrypt(answer,extractVarFromFile("public_key",config.DIRECTORY_PROCESSING))
+                e = elG.encrypt(answer,extractKeyFromFile("public_key",config.DIRECTORY_PROCESSING))
 
-                print(f"Saved encrypted message: {e} into appropriated file.\n")
+                print(f"Saved encrypted message: {e} into appropriated file.")
 
                 doSomethingElse(katsuAsymm)
+
         elif i == 3:
 
             print("Let's check if everything is there.")
 
             #####
-            while not isFileHere("private_key.txt",config.DIRECTORY_PROCESSING):
+            while not isFileHere("public_key.kat",config.DIRECTORY_PROCESSING):
                 clear()
                 asc.asciiCat()
 
-                input("Please put your 'private_key.txt' file into the 'processing' folder.")
+                input("Please put your 'private_key.kat' file into the 'processing' folder.")
             
             clear()
             asc.asciiCat()
             print("Gotcha !\n")
             
-            while not isFileHere("encrypted.txt",config.DIRECTORY_PROCESSING):
+            while not isFileHere("encrypted.kat",config.DIRECTORY_PROCESSING):
                 clear()
                 asc.asciiCat()
 
-                input("Please put your 'encrypted.txt' file into the 'processing' folder.")
+                input("Please put your 'encrypted.kat' file into the 'processing' folder.")
             
             clear()
             asc.asciiCat()
             print("Gotcha !\n")
             #####
 
-            e = extractVarFromFile("encrypted",config.DIRECTORY_PROCESSING)
+            e = extractKeyFromFile("encrypted",config.DIRECTORY_PROCESSING)
 
-            d = elG.decrypt(e,extractVarFromFile("private_key",config.DIRECTORY_PROCESSING),asTxt=True)
+            d = elG.decrypt(e,extractKeyFromFile("private_key",config.DIRECTORY_PROCESSING),asTxt=True)
 
-            print(f"Decrypted message is: \n \t -'{d}'\n")
+            d = d.split("\n")
+
+            for phrase in d:
+                print(f"\t -'{phrase}'")
 
             doSomethingElse(katsuAsymm)
         elif i == 4:
@@ -993,12 +1067,30 @@ def katsuAsymm():
 
         elif i == 6:
             clear()
+            asc.asciiDeath()
+            print("You're going to erase all key's from the system.\n")
+
+            if query_yn("Are you sure ?"):
+
+                for f in ["public_key","private_key","dH_shared_key","dH_agreement","dH_sendable","encrypted"]:
+                    rmFile(f+".kat",config.DIRECTORY_PROCESSING)
+
+                clear()
+                asc.asciiDeath()
+                print("Done.\n")
+                return doSomethingElse(katsuAsymm)
+
+            else:
+                doSomethingAssym()
+
+        elif i == 7:
+            clear()
             katsumi.menu()
         else:
             
             katsuAsymm()
         
-    doSomething(selection)
+    doSomethingAssym(selection)
 
 
 def katsuHash():

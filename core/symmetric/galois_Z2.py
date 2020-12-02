@@ -221,40 +221,6 @@ def genInverses2():
     config.IN_CREATION = False
     print("\n\t || Inverses are generated || \n")
 
-def handleInvBox():
-
-    if not it.isFileHere("inversion_Sbox.txt"):
-
-        print("A necessary file for the substitution has been deleted from the system.\n")
-
-        if it.query_yn("- Do you want to generate the inverse substitution box (No if you want to compute each time needed) ? "):
-   
-            import threading
-            import time
-
-            th=threading.Thread(target=genInverses2)
-            
-            # This thread dies when main thread (only non-daemon thread) exits.
-            th.daemon = True
-
-            th.start()
-            time.sleep(2)
-
-        else:
-            config.GALOIS_WATCH = True
-    
-    else:
-
-        config.INVERSIONS_BOX=it.extractVarFromFile("inversion_Sbox")
-
-        if len(config.INVERSIONS_BOX) != config.NBR_ELEMENTS:
-            it.rmFile("inversion_Sbox.txt")
-            print("WARNING - Wrong Inversion Substition box ! \n")
-            it.clear()
-            handleInvBox()
-
-
-
 
 def GF2(degree):
     """Initialize the Galois Field GF(p^degree) in Zn."""
@@ -263,7 +229,7 @@ def GF2(degree):
     config.IRRED_POLYNOMIAL = int.from_bytes(bm.bits_compactor(config.IRRED_POLYNOMIAL),"big")
     config.GENERATOR = gen_GL_2(config.IRRED_POLYNOMIAL,degree)
 
-    handleInvBox()
+    it.handleInvBox()
 
     if config.IN_CREATION:
         import time

@@ -106,7 +106,7 @@ def key_gen(n:int=2048,primeFount=None,easyGenerator:bool=False,randomFunction=N
         p,q = s # safe_prime and Sophie Germain prime
 
 
-    if Verbose: print(f"Let's find the generator for p: {p} , safe prime number.")
+    if Verbose: print(f"Let's find the generator for p: {p} , safe prime number.\n")
 
     # Generate an efficient description of a cyclic group G, of order q with generator g.
     if easyGenerator:
@@ -117,6 +117,8 @@ def key_gen(n:int=2048,primeFount=None,easyGenerator:bool=False,randomFunction=N
 
     else:
         gen = generator(p,q)
+    
+    if Verbose: print(f"generator found : {gen}\n")
     
 
     # The description of the group is (g,q,p)
@@ -132,18 +134,16 @@ def key_gen(n:int=2048,primeFount=None,easyGenerator:bool=False,randomFunction=N
 
     # The private key consists of the values (G,q,g,x).
     private_key = (p,q,gen,x)
-    it.writeVartoFile(private_key,"private_key",config.DIRECTORY_PROCESSING)
+    it.writeKeytoFile(private_key,"private_key",config.DIRECTORY_PROCESSING,".kat")
 
     print(f"\nYour private key has been generated Alice, keep it safe !")
 
 
     # The public key consists of the values (G,q,g,h).
     public_key = (p,q,gen,h)
-    it.writeVartoFile(public_key,"public_key",config.DIRECTORY_PROCESSING)
+    b64pK = it.writeKeytoFile(public_key,"public_key",config.DIRECTORY_PROCESSING,".kat")
 
-    print(f"\nThe public key has been generated too and saved.")
-
-    return None
+    print(f"\nThe public key '{b64pK}' has been generated too and saved.")
 
 
 def getSize():
@@ -154,7 +154,7 @@ def getSize():
 
     sizes = [int(elt.split("_")[0]) for elt in it.whatInThere()]
     
-    pK = it.extractVarFromFile("public_key",config.DIRECTORY_PROCESSING)
+    pK = it.extractKeyFromFile("public_key",config.DIRECTORY_PROCESSING,".kat")
 
     bits = bm.bytes_needed(pK[0])*8
 
@@ -196,7 +196,7 @@ def encrypt(M:bytes,pKey):
 
     import ressources.config as config
 
-    it.writeVartoFile(e,"encrypted",config.DIRECTORY_PROCESSING)
+    e = it.writeKeytoFile(e,"encrypted",config.DIRECTORY_PROCESSING,".kat")
 
     return e
 

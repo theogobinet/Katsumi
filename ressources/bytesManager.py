@@ -20,16 +20,21 @@ def int_to_bytes(i:int):
     return i.to_bytes(bytes_needed(i),"big")
 
 def mult_to_bytes(obj:object):
-    """Convert given {array of bits, bytes, int} to bytes"""
+    """Convert given {array of bits, bytes, int, b64} to bytes"""
 
     if isinstance(obj,list):
         res=bits_compactor(obj)
     elif isinstance(obj,int):
         res=int_to_bytes(obj)
     elif isinstance(obj,bytes):
-        res=obj
+        try:
+            import base64, binascii
+            res = base64.b64decode(obj)
+        except binascii.Error:
+            res = obj
     else:
-        res=bytes(obj)
+        res = bytes(obj)
+        
 
     return res
 

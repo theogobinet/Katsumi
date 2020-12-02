@@ -19,7 +19,7 @@ def elG_sign(docu,Verbose:bool=False):
     from core.asymmetric import elGamal as elG
     
     # If keys are not generated, then generate one with 2048 bits.
-    if not it.isFileHere("public_key.txt",config.DIRECTORY_PROCESSING) or not it.isFileHere("private_key.txt",config.DIRECTORY_PROCESSING):
+    if not it.isFileHere("public_key",config.DIRECTORY_PROCESSING) or not it.isFileHere("public_key.kat",config.DIRECTORY_PROCESSING):
         elG.key_gen(primeFount=True)
     
     hm = hashF.sponge(docu,elG.getSize())

@@ -45,9 +45,11 @@ def chooseAndSend(accord:tuple,secret=None,n:int=2048):
 
     toSend = ut.square_and_multiply(g,i,p)
 
+    toSend = it.writeKeytoFile(toSend,"dH_sendable")
+
     print(f"Here's what to send to the other one: {toSend}")
 
-    input("Is everything good ? (please tap enter for next)")
+    input("Is everything good ? (Press enter for next)")
 
     return toSend
 
@@ -57,9 +59,11 @@ def compute(accord:tuple,secret_int=None):
     if not secret_int:
         secret_int = it.getInt(rd.randrange(2,accord[0]),"your secret integer",False,accord[0])
     
-    sended = it.getInt(rd.randrange(2,accord[0]),"his secret integer",False,accord[0])
+    sended = it.getIntKey(it.getb64("his secret"),1)
 
     shared_secret = ut.square_and_multiply(sended,secret_int,accord[0])
+
+    shared_secret = it.writeKeytoFile(shared_secret,"dH_shared_key")
 
     return shared_secret
 
