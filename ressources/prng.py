@@ -172,7 +172,7 @@ def safePrime_worker(nBits:int=1024,randomFunction=None,easyGenerator=False,Verb
     while not bool(flag.value):
         # For faster searching
         # Calculate 2q +1 and (q-1)//2
-        # Retun Sophie Germain's prime according to what is prime. 
+        # Return Sophie Germain's prime according to what is prime. 
 
         if randomFunction == None:
             randomFunction = randomInt

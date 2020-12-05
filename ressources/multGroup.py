@@ -306,6 +306,7 @@ def primitiveRoot(n:int,totient=None,Verbose=False):
         return -1
 
 
+
 def genSubGroup(n:int,m:int):
     """
     Generate subgroup of n in Zm* with multiplicative order q.

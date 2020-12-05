@@ -16,14 +16,18 @@ import random as rd
 # Like most public key systems, the ElGamal cryptosystem is usually used as part of a hybrid cryptosystem where
 # the message itself is encrypted using a symmetric cryptosystem and ElGamal is then used to encrypt only the symmetric key.
 ############
-def generator(p:int,q:int):
+
+def generator(p:int,q:int,r:int=2):
     """
     Find a generator g such as g order is q (Sophie Germain prime) with p = 2q + 1.
     That's a generator for Gq. Not Zp* and any other subgroup. Very important point.
 
+    Shnorr group of r.
+    https://en.wikipedia.org/wiki/Schnorr_group
+
     Avoid commons attacks.
     """
-    assert p == 2*q +1
+    assert p == r*q +1
 
     while 1:
 
@@ -31,7 +35,7 @@ def generator(p:int,q:int):
         # Without 0 and 1 to keep only legender symbol = 1 results
         
         e = rd.randrange(2,p)
-        g = ut.square_and_multiply(e,e,p)
+        g = ut.square_and_multiply(e,r,p)
 
 
 
