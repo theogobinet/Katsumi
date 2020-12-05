@@ -28,7 +28,7 @@ def agreement(n:int=2048,fountain=True):
     return (p,multGroup.primitiveRoot(p))
 
 # 2) and 3)
-def chooseAndSend(accord:tuple,secret=None,n:int=2048):
+def chooseAndSend(accord:tuple,secret=None,n:int=2048,saving=False,Verbose=False):
     """
     Choose a secret integer randomly and send a ciphered result to someone.
 
@@ -39,33 +39,45 @@ def chooseAndSend(accord:tuple,secret=None,n:int=2048):
 
     if not secret:
         i = rd.randrange(2,n)
-        print(f"This is your secret integer, keep it safe: {i}")
+        if Verbose:
+            print(f"This is your secret integer, keep it safe: {i}")
     else:
         i = secret
 
     toSend = ut.square_and_multiply(g,i,p)
 
-    toSend = it.writeKeytoFile(toSend,"dH_sendable")
+    if saving:
+        toSend = it.writeKeytoFile(toSend,"dH_sendable")
+    else:
+        toSend = (i,toSend)
 
-    print(f"Here's what to send to the other one: {toSend}")
+    if Verbose:
+        print(f"Here's what to send to the other one: {toSend}")
 
-    input("Is everything good ? (Press enter for next)")
+        input("Is everything good ? (Press enter for next)")
 
     return toSend
 
 # 4) and 5)
-def compute(accord:tuple,secret_int=None):
-
-    if not secret_int:
-        secret_int = it.getInt(rd.randrange(2,accord[0]),"your secret integer",False,accord[0])
+def compute(accord:tuple,L:list,saving=False,Verbose=False):
+    """
+    accord <= common agreement
+    L <= (secret_int,sended)
+    """
     
-    sended = it.getIntKey(it.getb64("his secret"),1)
+    if Verbose:
+        secret_int = it.getInt(rd.randrange(2,accord[0]),"your secret integer",False,accord[0])    
+        sended = it.getIntKey(it.getb64("his secret"),1)
+    
+    else:
+        secret_int,sended = L
 
     shared_secret = ut.square_and_multiply(sended,secret_int,accord[0])
 
-    shared_secret = it.writeKeytoFile(shared_secret,"dH_shared_key")
-
-    return shared_secret
+    if saving:
+        return it.writeKeytoFile(shared_secret,"dH_shared_key")
+    else:
+        return shared_secret
 
 # Only a and b are kept secret
 

@@ -101,10 +101,10 @@ def euclid_ext(a:int, b:int, Verbose=False):
         y0, y1 = y1, (y0 - q * y1)
         x0, x1 = x1, (x0 - q * x1)
         if Verbose and a!=0:
-            print(f"{a}= {a_buffer}×{x1} + {b_buffer}×{y1}")
+            print(f"\n{a} = {a_buffer}×{x1} + {b_buffer}×{y1}")
         n+=1
     
-    s=f"gcd({a_buffer},{b_buffer})= {a_buffer}×{x0} + {b_buffer}×{y0}"
+    s=f"gcd({a_buffer},{b_buffer})= {a_buffer}×{x0} + {b_buffer}×{y0} = {b}"
     
     return b, x0, y0, s, n
 

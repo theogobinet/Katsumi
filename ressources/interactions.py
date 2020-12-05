@@ -273,9 +273,9 @@ def getIntKey(b64, keyNumber):
 
     return keys
 
-def writeKeytoFile(key,fileName:str,directory=config.DIRECTORY_PROCESSING,ext:str=".kat"):
+def writeKeytoFile(key,fileName:str,directory=config.DIRECTORY_PROCESSING,ext:str=".kpk"):
     """
-    Write key in b64 format to file with key length's as header.
+    Write key in b64 format to file .kpk with key length's as header.
     """
 
     def getB64Keys(key):
@@ -287,6 +287,7 @@ def writeKeytoFile(key,fileName:str,directory=config.DIRECTORY_PROCESSING,ext:st
             for k in key:
                 s = bm.bytes_needed(k)
                 sizes.append(s)
+                # Put the size into the coded b64
                 tw += s.to_bytes(2,"big")
 
             for i, k in enumerate(key):
@@ -297,21 +298,25 @@ def writeKeytoFile(key,fileName:str,directory=config.DIRECTORY_PROCESSING,ext:st
 
         return base64.b64encode(tw).decode()
 
+    if isinstance(key,tuple):
+        size = len(key)
+    else:
+        size = 1
+          
+        
+
     b64Key = getB64Keys(key)
 
-    if isinstance(key,tuple):
-        var = f"{len(key)}" + b64Key
-    else:
-        var = "1" + b64Key
+    b64Key = str(size) + b64Key
 
-    writeVartoFile(var,fileName,directory,ext)
+    writeVartoFile(b64Key,fileName,directory,ext)
 
     return b64Key
 
 
-def extractKeyFromFile(fileName:str,directory=config.DIRECTORY_PROCESSING,ext:str=".kat"):
+def extractKeyFromFile(fileName:str,directory=config.DIRECTORY_PROCESSING,ext:str=".kpk"):
     """
-    Extract key's from b64 format to tuples from file.
+    Extract key's from b64 format to tuples from katsumi public/private keys file's.
     """
 
     fileName += ext
@@ -320,7 +325,9 @@ def extractKeyFromFile(fileName:str,directory=config.DIRECTORY_PROCESSING,ext:st
         b64data = f.read()
         f.close()
 
-        return getIntKey(b64data[1:], b64data[0])
+        size = b64data[0]
+
+        return getIntKey(b64data[1:], size)
         
     else:
         raise FileNotFoundError(f"File {fileName} not found")
@@ -622,7 +629,7 @@ def elGamalKeysGeneration():
 
         print("\t.... Key generation in progress ....")
         
-        elGamal.key_gen(n,primes,eGen,prng.xorshiftperso,True)
+        elGamal.key_gen(n,primes,eGen,prng.xorshiftperso,True,True)
     else:
         n = 1024
         primes = extractSafePrimes(n,False)
@@ -632,13 +639,13 @@ def elGamalKeysGeneration():
 
         print("\t.... Key generation in progress ....")
 
-        elGamal.key_gen(n,primes,Verbose=True)
+        elGamal.key_gen(n,primes,saving=True,Verbose=True)
 
     doSomethingElse(katsuAsymm)
     
 
 
-def keysVerif():
+def keysVerif(verif:bool=True):
     """
     Used to verify existence of private or/and public keys of ElGamal.
     """
@@ -648,14 +655,14 @@ def keysVerif():
 
     print("\nChecking the presence of keys in the system....")
 
-    if isFileHere("public_key.kat",config.DIRECTORY_PROCESSING):
+    if isFileHere("public_key.kpk",config.DIRECTORY_PROCESSING):
 
         from core.asymmetric import elGamal as elG
 
         publicS = elG.getSize()
         print(f"\nPublic key's of {publicS} bits already here.\n")
 
-        if isFileHere("private_key.kat",config.DIRECTORY_PROCESSING):
+        if isFileHere("private_key.kpk",config.DIRECTORY_PROCESSING):
             
             privateS = elG.getSize("private_key")
             print(f"Private key's of {privateS} bits too.\n")
@@ -664,34 +671,37 @@ def keysVerif():
                 clear()
                 asc.asciiDeath()
                 print(f"Key sizes do not match ({privateS} != {publicS}). Suspected corruption.")
-                print("Keys are going to be deleted...")
-                time.sleep(1)
                 
-                for f in ["public_key","private_key","encrypted"]:
-                    rmFile(f+".kat",config.DIRECTORY_PROCESSING)
+                if query_yn("Do you want to delete them ?"):
+                    
+                    print("Keys are going to be deleted...")
+                    for f in ["public_key","private_key"]:
+                        rmFile(f+".kpk",config.DIRECTORY_PROCESSING)
 
-                clear()
-                asc.asciiDeath()
-                print("Done. Generating other keys now...\n")
-                time.sleep(1)
-                elGamalKeysGeneration()
+                    clear()
+                    asc.asciiDeath()
+                    print("Done. Generating other keys now...\n")
+                    time.sleep(1)
+                    clear()
+                    asc.asciiCat()
+
             else:
-                if not query_yn("Do you want to keep them ? (default: No)","no"):
-                    rmFile("public_key.kat",config.DIRECTORY_PROCESSING)
-                    rmFile("private_key.kat",config.DIRECTORY_PROCESSING)
+                if verif and not query_yn("Do you want to keep them ? (default: No)","no"):
+                    rmFile("public_key.kpk",config.DIRECTORY_PROCESSING)
+                    rmFile("private_key.kpk",config.DIRECTORY_PROCESSING)
                     rmFile("encrypted.kat",config.DIRECTORY_PROCESSING)
-                    elGamalKeysGeneration()
                 else:
-                    katsuAsymm()
+                    clear()
+                    asc.asciiCat()
 
         else:
             print("Private key's missing.\n")
         
             if query_yn("Do you want to add them now ?\n"):
 
-                while not isFileHere("private_key.kat",config.DIRECTORY_PROCESSING):
+                while not isFileHere("private_key.kpk",config.DIRECTORY_PROCESSING):
                     clear()
-                    input("Please put your 'private_key.kat' file into the 'processing' folder.")
+                    input("Please put your 'private_key.kpk' file into the 'processing' folder.")
                 
                 clear()
                 print("Gotcha !")
@@ -700,14 +710,14 @@ def keysVerif():
             else:
                 katsuAsymm()
 
-    elif isFileHere("private_key.kat",config.DIRECTORY_PROCESSING):
+    elif isFileHere("private_key.kpk",config.DIRECTORY_PROCESSING):
         print("\nPrivate key's already here but not public one's.\n")
 
         if query_yn("Do you want to add them now ? ( default: No)\n","no"):
 
-                while not isFileHere("public_key.kat",config.DIRECTORY_PROCESSING):
+                while not isFileHere("public_key.kpk",config.DIRECTORY_PROCESSING):
                     clear()
-                    input("Please put your 'public_key.kat' file into the 'processing' folder.")
+                    input("Please put your 'public_key.kpk' file into the 'processing' folder.")
                 
                 clear()
                 print("Gotcha !")
@@ -739,11 +749,11 @@ def dlogAttack():
 
         if i == 1:
 
-            while not isFileHere("public_key.kat",config.DIRECTORY_PROCESSING):
+            while not isFileHere("public_key.kpk",config.DIRECTORY_PROCESSING):
                 clear()
                 asc.asciiJongling()
 
-                input("Please put your 'public_key.kat' file into the 'processing' folder.")
+                input("Please put your 'public_key.kpk' file into the 'processing' folder.")
             
             clear()
             asc.asciiJongling()
@@ -752,7 +762,7 @@ def dlogAttack():
             print("Compute dlog attack with pollard's rho algorithm.")
             print("It can takes times ...\n")
 
-            el = elGamal.delog(extractVarFromFile("public_key.kat",config.DIRECTORY_PROCESSING),None,True)
+            el = elGamal.delog(extractVarFromFile("public_key.kpk",config.DIRECTORY_PROCESSING),None,True)
             
             writeVartoFile(el,"private_key",config.DIRECTORY_PROCESSING)
             
@@ -762,11 +772,11 @@ def dlogAttack():
 
         elif i == 2:
 
-            while not isFileHere("public_key.kat",config.DIRECTORY_PROCESSING):
+            while not isFileHere("public_key.kpk",config.DIRECTORY_PROCESSING):
                 clear()
                 asc.asciiJongling()
 
-                input("Please put your 'public_key.kat' file into the 'processing' folder.")
+                input("Please put your 'public_key.kpk' file into the 'processing' folder.")
             
             clear()
             asc.asciiJongling()
@@ -872,12 +882,12 @@ def dHgestion():
             clear()
             asc.asciiKeys()
 
-            dH.chooseAndSend(accord,secret)
+            dH.chooseAndSend(accord,secret,saving=True,Verbose=True)
 
             clear()
             asc.asciiKeys()
 
-            dH_shared = dH.compute(accord,secret)
+            dH_shared = dH.compute(accord,secret,saving=True,Verbose=True)
             
             clear()
             asc.asciiKeys()
@@ -1027,17 +1037,18 @@ def katsuAsymm():
             print("You are going to generate public/private key pairs with ElGamal algorithm.")
             time.sleep(1)
             keysVerif()
+            elGamalKeysGeneration()
 
         elif i == 2:
             
-            if not isFileHere("public_key.kat",config.DIRECTORY_PROCESSING):
+            if not isFileHere("public_key.kpk",config.DIRECTORY_PROCESSING):
                 print("No public key found into the system...")
                 time.sleep(1)
                 doSomethingAssym(1)
             else:
-                keysVerif()
+                keysVerif(verif=False)
                 answer = readFromUser().encode()
-                e = elG.encrypt(answer,extractKeyFromFile("public_key",config.DIRECTORY_PROCESSING))
+                e = elG.encrypt(answer,extractKeyFromFile("public_key",config.DIRECTORY_PROCESSING),saving=True)
 
                 print(f"Saved encrypted message: {e} into appropriated file.")
 
@@ -1048,11 +1059,11 @@ def katsuAsymm():
             print("Let's check if everything is there.")
 
             #####
-            while not isFileHere("public_key.kat",config.DIRECTORY_PROCESSING):
+            while not isFileHere("public_key.kpk",config.DIRECTORY_PROCESSING):
                 clear()
                 asc.asciiCat()
 
-                input("Please put your 'private_key.kat' file into the 'processing' folder.")
+                input("Please put your 'private_key.kpk' file into the 'processing' folder.")
             
             clear()
             asc.asciiCat()
@@ -1069,7 +1080,7 @@ def katsuAsymm():
             print("Gotcha !\n")
             #####
 
-            e = extractKeyFromFile("encrypted",config.DIRECTORY_PROCESSING)
+            e = extractKeyFromFile("encrypted",config.DIRECTORY_PROCESSING,".kat")
 
             d = elG.decrypt(e,extractKeyFromFile("private_key",config.DIRECTORY_PROCESSING),asTxt=True)
 
@@ -1091,8 +1102,8 @@ def katsuAsymm():
 
             if query_yn("Are you sure ?"):
 
-                for f in ["public_key","private_key","dH_shared_key","dH_agreement","dH_sendable","encrypted"]:
-                    rmFile(f+".kat",config.DIRECTORY_PROCESSING)
+                for f in ["public_key","private_key","dH_shared_key","dH_agreement","dH_sendable"]:
+                    rmFile(f+".kpk",config.DIRECTORY_PROCESSING)
 
                 clear()
                 asc.asciiDeath()

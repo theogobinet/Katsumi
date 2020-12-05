@@ -6,6 +6,7 @@ import ressources.utils as ut
 import ressources.bytesManager as bm
 import ressources.interactions as it
 import ressources.multGroup as multGroup
+import ressources.config as config
 
 import random as rd
 
@@ -78,7 +79,7 @@ def isEasyGeneratorPossible(s:tuple):
 #############################################
 
 
-def key_gen(n:int=2048,primeFount=None,easyGenerator:bool=False,randomFunction=None,Verbose=False):
+def key_gen(n:int=2048,primeFount=None,easyGenerator:bool=False,randomFunction=None,saving=False,Verbose=False):
     """
     ElGamal key generation.
 
@@ -91,7 +92,6 @@ def key_gen(n:int=2048,primeFount=None,easyGenerator:bool=False,randomFunction=N
     randomFunction: prng choosen for random prime number generation (default = randbits from secrets module).
     """
 
-    import ressources.config as config
 
     if not primeFount:
 
@@ -132,29 +132,42 @@ def key_gen(n:int=2048,primeFount=None,easyGenerator:bool=False,randomFunction=N
 
     h = ut.square_and_multiply(gen,x,p)
 
-    # The private key consists of the values (G,q,g,x).
-    private_key = (p,q,gen,x)
-    it.writeKeytoFile(private_key,"private_key",config.DIRECTORY_PROCESSING,".kat")
+    # The private key consists of the values (G,x).
+    private_key = (p,x)
+    
+    if saving:
+        it.writeKeytoFile(private_key,"private_key",config.DIRECTORY_PROCESSING,".kpk")
 
-    print(f"\nYour private key has been generated Alice, keep it safe !")
+    if Verbose:
+        print(f"\nYour private key has been generated Alice, keep it safe !")
 
 
     # The public key consists of the values (G,q,g,h).
-    public_key = (p,q,gen,h)
-    b64pK = it.writeKeytoFile(public_key,"public_key",config.DIRECTORY_PROCESSING,".kat")
+    # But we saved only (p,g,h) cause q = (p-1)//2
 
-    print(f"\nThe public key '{b64pK}' has been generated too and saved.")
+    public_key = (p,gen,h)
+    
+    if saving:
+        public_key = it.writeKeytoFile(public_key,"public_key",config.DIRECTORY_PROCESSING,".kpk")
+
+    if Verbose:
+        print(f"\nThe public key '{public_key}' has been generated too.")
+    
+    if not saving:
+        return (public_key,private_key)
 
 
-def getSize(key:str="public_key"):
+def getSize(key:object="public_key"):
     """
     Return size of current key based on prime fount's.
     """
-    from ressources import config as config 
 
     sizes = [int(elt.split("_")[0]) for elt in it.whatInThere()]
     
-    pK = it.extractKeyFromFile(key,config.DIRECTORY_PROCESSING,".kat")
+    if isinstance(key,str):
+        pK = it.extractKeyFromFile(key,config.DIRECTORY_PROCESSING,".kpk")
+    else:
+        pK = key
 
     bits = bm.bytes_needed(pK[0])*8
 
@@ -164,11 +177,11 @@ def getSize(key:str="public_key"):
 ########### -   Encryption   - ##############
 #############################################
 
-def encrypt(M:bytes,pKey):
+def encrypt(M:bytes,pKey,saving:bool=False):
 
     assert isinstance(M,bytes)
 
-    p,g,h = pKey[0],pKey[2],pKey[3]
+    p,g,h = pKey
 
     def process(m):
         y = rd.randrange(1,p-1)
@@ -194,9 +207,9 @@ def encrypt(M:bytes,pKey):
 
         e = [process(bm.bytes_to_int(elt)) for elt in bm.splitBytes(M,1)]
 
-    import ressources.config as config
 
-    e = it.writeKeytoFile(e,"encrypted",config.DIRECTORY_PROCESSING,".kat")
+    if saving:
+        e = it.writeKeytoFile(e,"encrypted",config.DIRECTORY_PROCESSING,".kat")
 
     return e
 
@@ -204,15 +217,13 @@ def encrypt(M:bytes,pKey):
 ########### -   Decryption   - ##############
 #############################################
 
-def decrypt(ciphertext,sK,asTxt=False):
+def decrypt(ciphertext,sK:tuple,asTxt=False):
 
-    x,p = sK[-1],sK[0]
+    p,x = sK
 
     def process(cipherT):
         c1,c2 = cipherT
 
-        s = ut.square_and_multiply(c1,x,p)
-        #s1 = multGroup.inv(s,p)
         s1 = ut.square_and_multiply(c1,p-1-x,p)
 
         # This calculation produces the original message
@@ -233,6 +244,96 @@ def decrypt(ciphertext,sK,asTxt=False):
         return r.decode()
     else:
         return r
+
+#############################################################
+################ - signature scheme - #######################
+#############################################################
+
+def signing(M:bytes,tupleOfKeys:tuple=None,verifying=None,saving:bool=False,Verbose:bool=False):
+    """
+    Signing a message M (bytes)
+    tupleOfKeys <= (public_key,private_key)
+
+    veriying: enter the tuple to verify.
+    The signature is valid if and only if g^(H(m)) = (publicK)^s1 * s1^s2 mod p
+    """
+
+    from ..hashbased import hashFunctions as hashF
+
+    # y choosed randomly between 1 and p-2 with condition than y coprime to p-1
+    if not tupleOfKeys:
+        tupleOfKeys = (it.extractKeyFromFile("public_key"),it.extractKeyFromFile("private_key"))
+        
+    p,g,h = tupleOfKeys[0] #public key
+    p,x = tupleOfKeys[-1] #private key
+    size = getSize(tupleOfKeys[0])
+
+    # M = bm.fileToBytes(M)
+    # M = "Blablabla".encode()
+
+    if Verbose: print("Hashing in progress...")
+
+    hm = 7
+    # hm = hashF.sponge(M,size)
+    # #base64 to int
+    # hm = bm.bytes_to_int(bm.mult_to_bytes(hm))
+
+    if Verbose: print("Hashing done.\n")
+
+    if verifying :
+        
+        if not isinstance(verifying,tuple):
+            b64data = verifying
+            verifying = it.getIntKey(b64data[1:], b64data[0])
+
+        s1,s2 = verifying
+
+        if ((0 < s1 < p) and (0 < s2 < p-1)):
+
+            test1 = ut.square_and_multiply(h,s1,p) * ut.square_and_multiply(s1,s2,p)
+            test2 = ut.square_and_multiply(g,hm,p)
+
+            print(test1,test2)
+
+            if test1 == test2:
+                return True
+            else:
+                return False
+        else:
+            raise ValueError
+
+    else:
+        import random as rd
+
+        p1 = p-1
+
+        # k= rd.randrange(2,p-2)
+
+        # while not ut.coprime(k,p1):
+        #     k = rd.randrange(1,p-2)
+
+        k = 5
+
+        if Verbose: print(f"Your secret integer is: {k}")
+
+        s1 = ut.square_and_multiply(g,k,p)
+
+        from ressources.multGroup import inv
+
+        s2 = (inv(k,p1) * (hm - x*s1)) % p1
+
+        # In the unlikely event that s2 = 0 start again with a different random k.
+
+        if s2 == 0:
+            if Verbose: print(f"Unlikely, s2 is equal to 0. Restart signing...")
+            signing(M,tupleOfKeys,None,saving,Verbose)
+        else:
+            sign = (s1,s2)
+            
+            if saving:
+                sign = it.writeKeytoFile(sign,"elG_signature")
+
+            return sign
 
 
 #############################################################

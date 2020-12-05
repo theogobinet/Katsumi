@@ -24,7 +24,7 @@ def inv(a:int,m:int,Verbose=False):
             print(f"From Fermat's little theorem, because {m} is prime and does not divide {a} so: a^-1 = a^{m}-2 mod {m}")
         u = ut.square_and_multiply(a,m-2,m)
 
-    elif ut.coprime(a,m):
+    elif ut.coprime(a,m) and m < (1 << 20):
         #From Euler's theorem, if a and n are coprime, then a^−1 ≡ a^(φ(n) − 1) (mod n).
         if Verbose:
             print(f"From Euler's theorem, because {a} and {m} are coprime -> a^-1 = a^phi({m})-1 mod {m}")
@@ -39,7 +39,7 @@ def inv(a:int,m:int,Verbose=False):
         # Modular inverse u solves the given equation: a.u+m.v=1 
         # n number of iterations
         _,u,_,_,_=ut.euclid_ext(a,m,Verbose)
-        
+
         if u < 0 : u+=m
     
     if Verbose:
@@ -122,36 +122,15 @@ def phi(n:int,m:int=1,k:int=1,Verbose:bool=False):
         else:
 
             if Verbose:
-                print(f"\nLet's calculate phi({n}) with prime factors way.")
+                print(f"\nLet's calculate phi({n}) with prime factors way.\n")
 
-            result = n   # Initialize result as n 
-            
-            # Consider all prime factors 
-            # of n and for every prime 
-            # factor p, multiply result with (1 - 1 / p)
-
-            p = 2
-
-            while p * p <= n : 
+            tot = n
+            if Verbose: print("Generating primes factors ...\n")
+            for factor in ut.findPrimeFactors(n):
+                if Verbose: print(f"Factor : {factor}")
+                tot -= tot // factor
         
-                # Check if p is a prime factor. 
-                if n % p == 0 : 
-     
-                    # If yes, then update n and result 
-                    while n % p == 0 : 
-                        n = n // p 
-                    result *=  (1 - (1 / p)) 
-                p += 1
-                
-                
-            # If n has a prime factor 
-            # greater than sqrt(n) 
-            # (There can be at-most one 
-            # such prime factor) 
-            if n > 1 : 
-                result *= (1 - (1 / n)) 
-        
-            return int(result)
+            return tot
 
 
 def multiplicativeOrder(n:int,p:int,iterativeWay=False,Verbose=False):
