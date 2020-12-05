@@ -249,13 +249,10 @@ def decrypt(ciphertext,sK:tuple,asTxt=False):
 ################ - signature scheme - #######################
 #############################################################
 
-def signing(M:bytes,tupleOfKeys:tuple=None,verifying=None,saving:bool=False,Verbose:bool=False):
+def signing(M:bytes,tupleOfKeys:tuple=None,saving:bool=False,Verbose:bool=False):
     """
     Signing a message M (bytes)
     tupleOfKeys <= (public_key,private_key)
-
-    veriying: enter the tuple to verify.
-    The signature is valid if and only if g^(H(m)) = (publicK)^s1 * s1^s2 mod p
     """
 
     from ..hashbased import hashFunctions as hashF
@@ -264,8 +261,8 @@ def signing(M:bytes,tupleOfKeys:tuple=None,verifying=None,saving:bool=False,Verb
     if not tupleOfKeys:
         tupleOfKeys = (it.extractKeyFromFile("public_key"),it.extractKeyFromFile("private_key"))
         
-    p,g,h = tupleOfKeys[0] #public key
-    p,x = tupleOfKeys[-1] #private key
+    (p,g,h),(_,x) = tupleOfKeys
+     
     size = getSize(tupleOfKeys[0])
 
     # M = bm.fileToBytes(M)
@@ -273,68 +270,80 @@ def signing(M:bytes,tupleOfKeys:tuple=None,verifying=None,saving:bool=False,Verb
 
     if Verbose: print("Hashing in progress...")
 
-    hm = 7
-    # hm = hashF.sponge(M,size)
+
+    hm = hashF.sponge(M,size)
     # #base64 to int
-    # hm = bm.bytes_to_int(bm.mult_to_bytes(hm))
+    hm = bm.bytes_to_int(bm.mult_to_bytes(hm))
 
     if Verbose: print("Hashing done.\n")
 
-    if verifying :
-        
-        if not isinstance(verifying,tuple):
-            b64data = verifying
-            verifying = it.getIntKey(b64data[1:], b64data[0])
+    import random as rd
 
-        s1,s2 = verifying
+    p1 = p-1
 
-        if ((0 < s1 < p) and (0 < s2 < p-1)):
+    k= rd.randrange(2,p-2)
 
-            test1 = ut.square_and_multiply(h,s1,p) * ut.square_and_multiply(s1,s2,p)
-            test2 = ut.square_and_multiply(g,hm,p)
+    while not ut.coprime(k,p1):
+        k = rd.randrange(1,p-2)
 
-            print(test1,test2)
 
-            if test1 == test2:
-                return True
-            else:
-                return False
-        else:
-            raise ValueError
+    if Verbose: print(f"Your secret integer is: {k}")
 
+    s1 = ut.square_and_multiply(g,k,p)
+
+    from ressources.multGroup import inv
+
+    s2 = (inv(k,p1) * (hm - x*s1)) % p1
+
+    # In the unlikely event that s2 = 0 start again with a different random k.
+
+    if s2 == 0:
+        if Verbose: print(f"Unlikely, s2 is equal to 0. Restart signing...")
+        signing(M,tupleOfKeys,None,saving,Verbose)
     else:
-        import random as rd
+        sign = (s1,s2)
+        
+        if saving:
+            sign = it.writeKeytoFile(sign,"elG_signature")
 
-        p1 = p-1
+        return sign
 
-        # k= rd.randrange(2,p-2)
 
-        # while not ut.coprime(k,p1):
-        #     k = rd.randrange(1,p-2)
+def verifying(M:bytes,pK:tuple=None,sign:tuple=None):
+    """
+    Verifyin given signature of message M with corresponding public key's.
+    """
 
-        k = 5
+    from ..hashbased import hashFunctions as hashF
 
-        if Verbose: print(f"Your secret integer is: {k}")
+    if not pK:
+        pK = it.extractKeyFromFile("public_key")
+        
+    p,g,h = pK
+    size = getSize(pK)
 
-        s1 = ut.square_and_multiply(g,k,p)
+    hm = hashF.sponge(M,size)
+    # #base64 to int
+    hm = bm.bytes_to_int(bm.mult_to_bytes(hm))
 
-        from ressources.multGroup import inv
 
-        s2 = (inv(k,p1) * (hm - x*s1)) % p1
+    if not isinstance(sign,tuple):
+            b64data = sign
+            sign = it.getIntKey(b64data[1:], b64data[0])
 
-        # In the unlikely event that s2 = 0 start again with a different random k.
+    s1,s2 = sign
 
-        if s2 == 0:
-            if Verbose: print(f"Unlikely, s2 is equal to 0. Restart signing...")
-            signing(M,tupleOfKeys,None,saving,Verbose)
+    if ((0 < s1 < p) and (0 < s2 < p-1)):
+
+        test1 = (ut.square_and_multiply(h,s1,p) * ut.square_and_multiply(s1,s2,p)) % p
+        test2 = ut.square_and_multiply(g,hm,p)
+
+        if test1 == test2:
+            return True
         else:
-            sign = (s1,s2)
-            
-            if saving:
-                sign = it.writeKeytoFile(sign,"elG_signature")
-
-            return sign
-
+            return False
+    else:
+        raise ValueError
 
 #############################################################
 ################ - Logarithmic attack - #####################
