@@ -8,8 +8,7 @@
 
 import ressources.bytesManager as bm
 
-
-def sponge(N:bytearray, d:int, useMD5=False):
+def sponge(N:bytearray, d:int):
     """
     Sponge construction for hash functions.
 
@@ -19,69 +18,49 @@ def sponge(N:bytearray, d:int, useMD5=False):
     return bytearray
     """
 
-    if not useMD5:
+    def pad(N, r):
+        iN = bm.bytes_to_int(N)
+        lN = int.bit_length(iN)
 
-        from core.symmetric.kasumi import set_key
-        from core.symmetric.ciphers import CTR
+        # Number of 0 to add
+        b = (r - ((lN + 3) % r)) % r
 
-        # Fixed value of key & IV for CTR used as a pseudorandom permutation function
-        set_key(b'\xcd\x8a\xc1\xceV\x01\xc9\xfb\xec\xefj\xa4C\xce\xdcZ')
-        iv = b'\xf9[\x91\xf0\x1d\xe5OM'
-    else:
-        initmd5()
+        # Padding using the SHA-3 pattern 10*1: a 1 bit, followed by zero or more 0 bits (maximum r − 1) and a final 1 bit.
+        op = ((iN | (1 << b + lN + 1)) << 1) ^ 1
+        
+        return bm.int_to_bytes(op)
 
+    initmd5()
 
-    if useMD5:
-        r = 8
-    else:
-        # Fixed size of 512 bits is used as bitrate
-        r = 64
+    r = 8
     d = int(d/8)
 
     blocks = bm.splitBytes(pad(N, r*8), r)
 
-    # Capacity = 2d as in SHA3 
-    if useMD5:
-        S = bytearray(r + 2*d)
-    else:
-        S = bytearray(128)
+    S = bytearray(128)
 
     # Absorbing
     for block in blocks:
         S[:r] = bm.b_op(S[:r], block)
-        
-        if not useMD5:
-            # Using reversed of S because to decrypt a CTR crypted message, you have to inject it into CTR with the same params, here it's avoided
-            S = bm.packSplittedBytes(CTR(list(reversed(bm.splitBytes(S))), True, iv)[:-1])
-        else:
-            S = md5(S)
+        S = md5(S)
 
     O = bytearray()
     # Squeezing
     while len(O) < d:
         O += S[:r]
-        if not useMD5:
-            S = bm.packSplittedBytes(CTR(list(reversed(bm.splitBytes(S))), True, iv))
-        else:
-            S = md5(S)
+        S = md5(S)
 
     # Truncating with the desired length
     return O[:d]
 
-def pad(N, r):
-
-    iN = bm.bytes_to_int(N)
-    lN = int.bit_length(iN)
-
-    # Number of 0 to add
-    b = (r - ((lN + 3) % r)) % r
-
-    # Padding using the SHA-3 pattern 10*1: a 1 bit, followed by zero or more 0 bits (maximum r − 1) and a final 1 bit.
-    op = ((iN | (1 << b + lN + 1)) << 1) ^ 1
-    
-    return bm.int_to_bytes(op)
-
 def md5(block):
+    '''
+        Return md5 hash
+
+        block: bytearray of data to hash
+    '''
+
+    # Done using the Wikipedia algorithm
 
     def iToB(i):
         return int.to_bytes(i, 4, "little")
@@ -161,3 +140,34 @@ def initmd5():
     initmd5.K = []
     for i in range (64):
         initmd5.K.append((math.floor(2**32 * abs(math.sin(i + 1)))) % (1 << 32))
+
+def PoW(block, zBits=1):
+    '''
+        Find a salt for which the md5 hash ends with zBits null
+
+        block: bytearray of data
+        zBits: number of ending null bits
+
+        return [block|salt]
+    '''
+
+    def nullBits(H, nbZ):
+        H = bm.bytes_to_int(H)
+
+        for i in range (0, nbZ):
+            if ((H >> i) & 1) == 1:
+                return False
+
+        return True
+
+    if(zBits >= 255):
+        raise ValueError('The number of zero bits must be lower than 2^8')
+
+    salt = 1
+    H = sponge(block + bm.int_to_bytes(salt), 256)
+
+    while not nullBits(H, zBits):
+        salt += 1
+        H = sponge(block + bm.int_to_bytes(salt), 256)
+
+    return block + bm.int_to_bytes(salt)
