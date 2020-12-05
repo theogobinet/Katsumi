@@ -156,7 +156,7 @@ def PCBC(arr,encrypt=True):
         iv=IV(arr)
     else:
         iv=IV_action(arr)
-
+        
     res=[]
 
     for i,message in enumerate(arr):
@@ -197,7 +197,7 @@ def PCBC(arr,encrypt=True):
 ###### Counter Mode ########
 ############################
 
-def CTR(arr, encrypt=True, iniIV=[]):
+def CTR(arr, encrypt=True):
 
     '''
     Counter Mode is xoring the message with a encrypted counter (IV + incr(0))
@@ -206,12 +206,10 @@ def CTR(arr, encrypt=True, iniIV=[]):
     encrypt: true to encrypt
     '''
 
-    if encrypt and not iniIV:
+    if encrypt:
         iv=IV(arr)
-    elif not encrypt:
-        iv=IV_action(arr)
     else:
-        iv = iniIV
+        iv=IV_action(arr)
 
     res = []
 
@@ -233,7 +231,7 @@ def CTR(arr, encrypt=True, iniIV=[]):
     if encrypt:
         # Adding the IV to the encrypted data
         IV_action(res,iv,"store")
-    
+
     return res
 
 ###################################
