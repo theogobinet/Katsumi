@@ -273,46 +273,46 @@ def getIntKey(b64, keyNumber):
 
     return keys
 
+
+def getB64Keys(key):
+    import base64
+    
+    if isinstance(key,tuple):
+        
+        tw = bytearray()
+        sizes = []
+        
+        for k in key:
+            s = bm.bytes_needed(k)
+            sizes.append(s)
+            # Put the size into the coded b64
+            tw += s.to_bytes(2,"big")
+
+        for i, k in enumerate(key):
+            tw += k.to_bytes(sizes[i], "big")
+    
+    elif isinstance(key,list):
+        # E.g, ElGamal with M >= p (longer message)
+        
+        e = [getB64Keys(el) for el in key]
+
+        tw = ''
+        for el in e:
+            tw += f"{el}|"
+
+        tw = tw[:-1].encode()
+
+    else:
+        #uniq key
+        tw = bm.int_to_bytes(key)
+
+    return base64.b64encode(tw).decode()
+
+
 def writeKeytoFile(key,fileName:str,directory=config.DIRECTORY_PROCESSING,ext:str=".kpk"):
     """
     Write key in b64 format to file .kpk with key length's as header.
     """
-
-    def getB64Keys(key):
-        import base64
-        
-        
-
-        if isinstance(key,tuple):
-            
-            tw = bytearray()
-            sizes = []
-            
-            for k in key:
-                s = bm.bytes_needed(k)
-                sizes.append(s)
-                # Put the size into the coded b64
-                tw += s.to_bytes(2,"big")
-
-            for i, k in enumerate(key):
-                tw += k.to_bytes(sizes[i], "big")
-        
-        elif isinstance(key,list):
-            # E.g, ElGamal with M >= p (longer message)
-            
-            e = [getB64Keys(el) for el in key]
-
-            tw = ''
-            for el in e:
-                tw += f"{el}|"
-
-            tw = tw[:-1].encode()
-
-        else:
-            #uniq key
-            tw = bm.int_to_bytes(key)
-
-        return base64.b64encode(tw).decode()
 
     if isinstance(key,tuple):
         size = str(len(key))

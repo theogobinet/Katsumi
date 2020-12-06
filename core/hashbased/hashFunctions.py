@@ -141,6 +141,21 @@ def initmd5():
     for i in range (64):
         initmd5.K.append((math.floor(2**32 * abs(math.sin(i + 1)))) % (1 << 32))
 
+def nullBits(H, nbZ):
+    '''
+        Chech if the given hash ends with nBz null bits
+
+        H -> bytearray of the hash
+        nbZ -> number of null bits
+    '''
+    H = bm.bytes_to_int(H)
+
+    for i in range (0, nbZ):
+        if ((H >> i) & 1) == 1:
+            return False
+
+    return True
+
 def PoW(block, zBits=1):
     '''
         Find a salt for which the md5 hash ends with zBits null
@@ -150,15 +165,6 @@ def PoW(block, zBits=1):
 
         return [block|salt]
     '''
-
-    def nullBits(H, nbZ):
-        H = bm.bytes_to_int(H)
-
-        for i in range (0, nbZ):
-            if ((H >> i) & 1) == 1:
-                return False
-
-        return True
 
     if(zBits >= 255):
         raise ValueError('The number of zero bits must be lower than 2^8')
@@ -170,4 +176,4 @@ def PoW(block, zBits=1):
         salt += 1
         H = sponge(block + bm.int_to_bytes(salt), 256)
 
-    return block + bm.int_to_bytes(salt)
+    return bm.int_to_bytes(salt)
