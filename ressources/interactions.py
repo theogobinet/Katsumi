@@ -563,9 +563,11 @@ def primeNumbersFountain():
     clear()
     asc.asciiArt()
 
-    print("The Foutain contains:")
+    print("The Foutain contains:\n")
+
     for elt in whatInThere():
-        print(f"\t > {elt}")
+        numberOfTuples = len(extractSafePrimes(elt.split('_')[0]))
+        print(f"\t > {elt} - {numberOfTuples} tuples")
     
     choices = ["Generate and stock safe primes","Update a list","Delete a list","Back to menu"]
 
