@@ -613,7 +613,7 @@ def primeNumbersFountain():
                 print(f"{name} removed successfully.\n")
                 return doSomethingElse(primeNumbersFountain)
             else:
-                doSomethingFount()
+                primeNumbersFountain()
 
         elif i == 4:
             import katsumi
@@ -622,7 +622,7 @@ def primeNumbersFountain():
             clear()
             print("\n Not available. Getting back...")
             time.sleep(1)
-            return primeNumbersFountain()
+            primeNumbersFountain()
         
     return doSomethingFount(selection)
 

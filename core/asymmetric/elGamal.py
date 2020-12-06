@@ -137,7 +137,7 @@ def key_gen(n:int=2048,primeFount=None,easyGenerator:bool=False,randomFunction=N
     h = ut.square_and_multiply(gen,x,p)
 
     # The private key consists of the values (G,x).
-    private_key = (p,x)
+    private_key = (p,g,x)
     
     if saving:
         it.writeKeytoFile(private_key,"private_key",config.DIRECTORY_PROCESSING,".kpk")
@@ -222,7 +222,7 @@ def encrypt(M:bytes,pKey,saving:bool=False):
 
 def decrypt(ciphertext,sK:tuple,asTxt=False):
 
-    p,x = sK
+    p,_,x = sK
 
     def process(cipherT):
         c1,c2 = cipherT
@@ -255,7 +255,6 @@ def decrypt(ciphertext,sK:tuple,asTxt=False):
 def signing(M:bytes,privateK:tuple=None,saving:bool=False,Verbose:bool=False):
     """
     Signing a message M (bytes)
-    tupleOfKeys <= (public_key,private_key)
     """
 
     from ..hashbased import hashFunctions as hashF
@@ -264,7 +263,7 @@ def signing(M:bytes,privateK:tuple=None,saving:bool=False,Verbose:bool=False):
     if not privateK:
         privateK = it.extractKeyFromFile("private_key")
         
-    p,x = privateK
+    p,g,x = privateK
      
     size = getSize(privateK)
 
@@ -370,7 +369,7 @@ def delog(publicKey,encrypted=None,asTxt=False,method=1):
         x = ut.discreteLog(g,h,p,method)
 
         # Same format as private key
-        return (p,x)
+        return (p,g,x)
 
     private_Key = dlog_get_x(publicKey)
 
