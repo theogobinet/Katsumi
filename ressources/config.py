@@ -54,3 +54,7 @@ INVERSIONS_BOX = []
 
 # Key
 KEY = bytearray()
+
+# Block-Chain variables
+BC_CHAIN = []
+BC_USERS = []
