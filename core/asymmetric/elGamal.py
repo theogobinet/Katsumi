@@ -137,7 +137,7 @@ def key_gen(n:int=2048,primeFount=None,easyGenerator:bool=False,randomFunction=N
     h = ut.square_and_multiply(gen,x,p)
 
     # The private key consists of the values (G,x).
-    private_key = (p,g,x)
+    private_key = (p,gen,x)
     
     if saving:
         it.writeKeytoFile(private_key,"private_key",config.DIRECTORY_PROCESSING,".kpk")
