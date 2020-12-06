@@ -19,20 +19,21 @@ def createTestBC():
     Al = addUser("Alice")
     Bo = addUser("Bob")
 
-    displayBC()
+    transitUTXO(-1, Al, 10)
+    transitUTXO(-1, Al, 20)
+    transitUTXO(-1, Al, 30)
+    transitUTXO(-1, Al, 40)
 
     # add transactions
-    addTransaction(Al, Bo, 50)
-    addTransaction(Al, Bo, 100)
+    addTransaction(Al, Bo, 91)
+    addTransaction(Bo, Al, 30)
 
-    displayBC()
+    print(c.BC_UTXO)
 
     # valid the block
     validBlock(len(c.BC_CHAIN) - 1)
 
     displayBC()
-
-    print(validChain())
 
 ######################
 #       CORE         #
@@ -84,14 +85,22 @@ def validBlock(blockI):
     isValid = True
     containsHash = False
 
+    unvalidTransactions = []
+
     for b in cBlock:
         # if it's a transaction, valid it 
+
         if isinstance(b, list) and isValid:
-            isValid = validTransaction(b)
+            # if the transaction is not valid, it's ingored -> removed of the block for validation
+            if not validTransaction(b):
+                unvalidTransactions.append(b)
 
         # else it's the hash of block n-1 or the salt
         else:
             containsHash = True
+
+    for transaction in unvalidTransactions:
+        cBlock.remove(transaction)
 
     # if the block has been valided, check the hash
     if containsHash and isValid:
@@ -186,10 +195,91 @@ def validTransaction(transaction):
         transaction: array containing transaction information of the format {sender ID -> receiver ID :: amount} -> signed by sender
     '''
 
-    # To define
+    from core.asymmetric.elGamal import verifying
+
+    core = transaction[:-1]
+    signature = transaction[-1]
+
+    sender = core[0]
+
+    isValid = verifying(arrayToBytes(core), getUserKey(sender, 0), signature)
+
+    if isValid:
+        return transitUTXO(sender, core[1], core[2])
+    else:
+        return False
+
+
+def getUserUTXO(user):
+    '''
+        Get a list containing the amount of each UTXO for a given user
+
+        user: user id
+    '''
+
+    amounts = []
+    for i, UTXO in enumerate(c.BC_UTXO):
+        if UTXO[0] == user:
+            amounts.append([i, UTXO[1]])
+
+    return amounts
+
+
+def transitUTXO(sender, receiver, amount):
+    '''
+        Manage the transaction with UTXO
+
+        sender: user id of the sender (-1 if network)
+        receiver: user id of the receiver
+        amount: amount send
+    '''
+
+    # If the sender is the network, add the amount in one UTXO without check
+    if sender == -1:
+        c.BC_UTXO.append([receiver, amount])
+        return True
+
+    senderUTXO = getUserUTXO(sender)
+    senderUTXOam = [x[1] for x in senderUTXO]
+
+    if sum(senderUTXOam) < amount:
+        return False
+
+    senderUTXOam.sort(reverse=True)
+
+    # improved possible -> find the best combinaison of UTXO to reach the amount
+
+
+
+    Ui = []
+    Uo = 0
+
+    if amount in senderUTXOam:
+        Ui.append(amount)
+    else:
+        for Uam in senderUTXOam:
+            if sum(Ui) < amount:
+                if(sum(Ui) + Uam > amount):
+                    Uo = (sum(Ui) + Uam) - amount
+                Ui.append(Uam)
+
+    # Send a full UTXO
+    senderUTXOam = [x[1] for x in senderUTXO]
+    for i, Uam in enumerate(Ui):
+        UTXOindex = senderUTXO[senderUTXOam.index(Uam)][0]
+        
+        if i == len(Ui) - 1:
+            Uam = Uam - Uo
+
+        c.BC_UTXO[UTXOindex] = [receiver, Uam]
+    
+    # Receive the change
+    if Uo:
+        c.BC_UTXO.append([sender, Uo])
+
+    print(c.BC_UTXO)
 
     return True
-
 
 #######################
 #       UTILS        #
