@@ -20,7 +20,7 @@ def agreement(n:int=2048,fountain=True):
     """
 
     if fountain:
-        p,_ = it.extractSafePrimes(n,False)
+        p,_ = it.extractSafePrimes(n,False,Verbose=True)
     else:
         it.stockSafePrimes(n,1)
         return agreement(n,True)

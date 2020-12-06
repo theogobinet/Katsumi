@@ -280,10 +280,14 @@ def writeKeytoFile(key,fileName:str,directory=config.DIRECTORY_PROCESSING,ext:st
 
     def getB64Keys(key):
         import base64
-        sizes = []
-        tw = bytearray()
+        
+        
 
         if isinstance(key,tuple):
+            
+            tw = bytearray()
+            sizes = []
+            
             for k in key:
                 s = bm.bytes_needed(k)
                 sizes.append(s)
@@ -292,6 +296,18 @@ def writeKeytoFile(key,fileName:str,directory=config.DIRECTORY_PROCESSING,ext:st
 
             for i, k in enumerate(key):
                 tw += k.to_bytes(sizes[i], "big")
+        
+        elif isinstance(key,list):
+            # E.g, ElGamal with M >= p (longer message)
+            
+            e = [getB64Keys(el) for el in key]
+
+            tw = ''
+            for el in e:
+                tw += f"{el}|"
+
+            tw = tw[:-1].encode()
+
         else:
             #uniq key
             tw = bm.int_to_bytes(key)
@@ -299,15 +315,19 @@ def writeKeytoFile(key,fileName:str,directory=config.DIRECTORY_PROCESSING,ext:st
         return base64.b64encode(tw).decode()
 
     if isinstance(key,tuple):
-        size = len(key)
-    else:
-        size = 1
-          
-        
+        size = str(len(key))
 
+    elif isinstance(key,list):
+        # size of each element
+        size = len(key[0])
+        size = f"L{size}"
+    
+    else:
+        size = "1"
+          
     b64Key = getB64Keys(key)
 
-    b64Key = str(size) + b64Key
+    b64Key = size + b64Key
 
     writeVartoFile(b64Key,fileName,directory,ext)
 
@@ -325,9 +345,14 @@ def extractKeyFromFile(fileName:str,directory=config.DIRECTORY_PROCESSING,ext:st
         b64data = f.read()
         f.close()
 
-        size = b64data[0]
+        if b64data[0] == "L":
+            #It's a list !
+            from base64 import b64decode
 
-        return getIntKey(b64data[1:], size)
+            return [getIntKey(el,b64data[1]) for el in b64decode(b64data[2:]).decode().split("|") ]
+
+        else:
+            return getIntKey(b64data[1:], b64data[0])
         
     else:
         raise FileNotFoundError(f"File {fileName} not found")
@@ -423,7 +448,7 @@ def doSomethingElse(m=None):
 ##### Prime number's fount gestion ######
 #########################################
 
-def extractSafePrimes(nBits:int=1024,allE:bool=True,easyGenerator:bool=False,directory:str=config.DIRECTORY_FOUNT):
+def extractSafePrimes(nBits:int=1024,allE:bool=True,easyGenerator:bool=False,directory:str=config.DIRECTORY_FOUNT,Verbose=False):
     """
     Return list of tuples (Safe_Prime,Sophie_Germain_Prime) for given n bits.
     If list doesn't exist, create one with 1 tuple.
@@ -436,7 +461,7 @@ def extractSafePrimes(nBits:int=1024,allE:bool=True,easyGenerator:bool=False,dir
 
     if not isFileHere(name+".txt",directory):
         print("File doesn't exist. Creating it with one element.")
-        stockSafePrimes(nBits,0)
+        stockSafePrimes(nBits,1)
         extractSafePrimes(nBits,allE,easyGenerator,directory)
     else:
         v = extractVarFromFile(name,directory,".txt")
@@ -454,19 +479,23 @@ def extractSafePrimes(nBits:int=1024,allE:bool=True,easyGenerator:bool=False,dir
                 if not isEasyGeneratorPossible(s):
                     while len(s) != 0 and not isEasyGeneratorPossible(s):
                         s = ut.randomClosureChoice(v)
-                        print(s,v)
                     
                     if len(s) == 0 and not isEasyGeneratorPossible(s):
                         # It's the only ramaining element and it's not possible to use easy gen with him.
-                        print("No safe prime available for easy generator creation into current {nBits} bits fountain's.")
+                        
+                        if Verbose:
+                            print("No safe prime available for easy generator creation into current {nBits} bits fountain's.")
 
-                        question = query_yn("Do you want to generate one compatible with this condition (It can be long) ? ")
+                            question = query_yn("Do you want to generate one compatible with this condition (It can be long) ? ")
 
-                        if question:
-                            s = prng.safePrime(nBits,easyGenerator=True)
-                            updatePrimesFount(s,nBits)
+                            if question:
+                                s = prng.safePrime(nBits,easyGenerator=True)
+                                updatePrimesFount(s,nBits)
+                            else:
+                                return elGamalKeysGeneration()
                         else:
-                            return elGamalKeysGeneration()
+                            #No choice.
+                            updatePrimesFount(s,nBits)
                 else:
                     return s
             else:
@@ -490,7 +519,7 @@ def stockSafePrimes(n:int=1024,x:int=15,randomFunction=prng.xorshiftperso):
         Update = False
 
     if Update:
-        fount = extractSafePrimes(n)
+        fount = extractSafePrimes(n,Verbose=True)
         
     else:
         fount = []
@@ -620,19 +649,19 @@ def elGamalKeysGeneration():
         eGen = query_yn("Do you want to use easy Generator (fastest generation) (default: No) ?","no")
 
         if query_yn("Do you want to use the Prime Number's Fountain to generate the keys (fastest) (default: yes) ?"):
-            primes = extractSafePrimes(n,False,eGen)
+            primes = extractSafePrimes(n,False,eGen,Verbose=True)
         else:
             primes = None
 
         clear()
         asc.asciiCat()
 
-        print("\t.... Key generation in progress ....")
+        print("\t.... Key generation in progress ....\n")
         
         elGamal.key_gen(n,primes,eGen,prng.xorshiftperso,True,True)
     else:
         n = 1024
-        primes = extractSafePrimes(n,False)
+        primes = extractSafePrimes(n,False,Verbose=True)
 
         clear()
         asc.asciiCat()
@@ -762,9 +791,9 @@ def dlogAttack():
             print("Compute dlog attack with pollard's rho algorithm.")
             print("It can takes times ...\n")
 
-            el = elGamal.delog(extractVarFromFile("public_key.kpk",config.DIRECTORY_PROCESSING),None,True)
+            el = elGamal.delog(extractKeyFromFile("public_key",config.DIRECTORY_PROCESSING,".kpk"),None,True)
             
-            writeVartoFile(el,"private_key",config.DIRECTORY_PROCESSING)
+            el = writeKeytoFile(el,"private_key",config.DIRECTORY_PROCESSING,".kpk")
             
             print(f"Saved private_key : {el} into appropriated file.\n")
 
@@ -795,7 +824,7 @@ def dlogAttack():
             print("Compute dlog attack with pollard's rho algorithm.")
             print("It can takes some times...\n")
 
-            el = elGamal.delog(extractKeyFromFile("public_key",config.DIRECTORY_PROCESSING),extractKeyFromFile("encrypted",config.DIRECTORY_PROCESSING),True)
+            el = elGamal.delog(extractKeyFromFile("public_key",config.DIRECTORY_PROCESSING),extractKeyFromFile("encrypted",config.DIRECTORY_PROCESSING,".kat"),True)
             
             print(f"Decrypted message is:")
 

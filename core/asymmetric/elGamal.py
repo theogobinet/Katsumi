@@ -105,7 +105,7 @@ def key_gen(n:int=2048,primeFount=None,easyGenerator:bool=False,randomFunction=N
         p,q = s # safe_prime and Sophie Germain prime
     
     else:
-        primeFount = it.extractSafePrimes(n,False)
+        primeFount = it.extractSafePrimes(n,False,Verbose=True)
         s = primeFount
         p,q = s # safe_prime and Sophie Germain prime
 
@@ -211,7 +211,6 @@ def encrypt(M:bytes,pKey,saving:bool=False):
 
         e = [process(bm.bytes_to_int(elt)) for elt in bm.splitBytes(M,1)]
 
-
     if saving:
         e = it.writeKeytoFile(e,"encrypted",config.DIRECTORY_PROCESSING,".kat")
 
@@ -253,7 +252,7 @@ def decrypt(ciphertext,sK:tuple,asTxt=False):
 ################ - signature scheme - #######################
 #############################################################
 
-def signing(M:bytes,tupleOfKeys:tuple=None,saving:bool=False,Verbose:bool=False):
+def signing(M:bytes,privateK:tuple=None,saving:bool=False,Verbose:bool=False):
     """
     Signing a message M (bytes)
     tupleOfKeys <= (public_key,private_key)
@@ -262,12 +261,12 @@ def signing(M:bytes,tupleOfKeys:tuple=None,saving:bool=False,Verbose:bool=False)
     from ..hashbased import hashFunctions as hashF
 
     # y choosed randomly between 1 and p-2 with condition than y coprime to p-1
-    if not tupleOfKeys:
-        tupleOfKeys = (it.extractKeyFromFile("public_key"),it.extractKeyFromFile("private_key"))
+    if not privateK:
+        privateK = it.extractKeyFromFile("private_key")
         
-    (p,g,h),(_,x) = tupleOfKeys
+    p,x = privateK
      
-    size = getSize(tupleOfKeys[0])
+    size = getSize(privateK)
 
     # M = bm.fileToBytes(M)
     # M = "Blablabla".encode()
@@ -303,7 +302,7 @@ def signing(M:bytes,tupleOfKeys:tuple=None,saving:bool=False,Verbose:bool=False)
 
     if s2 == 0:
         if Verbose: print(f"Unlikely, s2 is equal to 0. Restart signing...")
-        signing(M,tupleOfKeys,None,saving,Verbose)
+        signing(M,privateK,saving,Verbose)
     else:
         sign = (s1,s2)
         
@@ -366,12 +365,12 @@ def delog(publicKey,encrypted=None,asTxt=False,method=1):
         """
         
         # PublicKey format : (p,q,gen,h)
-        p,q,g,h = publicKey
+        p,g,h = publicKey
 
         x = ut.discreteLog(g,h,p,method)
 
         # Same format as private key
-        return (p,q,g,x)
+        return (p,x)
 
     private_Key = dlog_get_x(publicKey)
 
