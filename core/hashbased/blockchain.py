@@ -16,22 +16,25 @@ def createTestBC():
     initChain()
 
     # create 2 users
-    Al = addUser("Alice")
+    Al = addUser("Alic")
+    Bo = addUser("Bobo")
 
     # valid the block -> reward money to miner (Alice)
     validBlock(len(c.BC_CHAIN) - 1, Al)
     validBlock(len(c.BC_CHAIN) - 1, Al)
 
-    Bo = addUser("Bob")
 
     # with reward, alice have enough to send to Bob
-    addTransaction(Al, Bo, 10)
+    validBlock(len(c.BC_CHAIN) - 1, Bo)
+
+    addTransaction(Al, Bo, 20)
 
     validBlock(len(c.BC_CHAIN) - 1, Al)
 
+    displayLogs()
     displayBC()
 
-    print(validChain())
+    print(validChain(Al))
 
 ######################
 #       CORE         #
@@ -53,23 +56,28 @@ def initChain():
     addUser("Network")
 
 
-def validChain():
+def validChain(user):
     '''
         Check the integrity of the blockchain, return boolean
     '''
 
+    # Reset users UTXO to follow block-chain
+    c.BC_UTXO = []
+
     # Don't check last block as it has not been validated
     for i in range(0, len(c.BC_CHAIN) - 1):
-        if not isValidBlock(i):
+        if not isValidBlock(i, user):
             return False
     
     return True
 
-def isValidBlock(blockI):
+def isValidBlock(blockI, user, lastValidedBlock=False):
     '''
-        Check transactions sinature without performing them, check block integrity (previous hash & salt)
+        Check block integrity: previous hash, salt, transactions signature, transactions funds
 
         blockI: blockI: block id corresponding of its index in the block-chain
+        user: user id of the user who perform the check
+        lastValidedBlock: if the check only concernes the last validated block, transactions are not performed as we suppose the network has done it.
     '''
 
     from core.hashbased import hashFunctions as hf
@@ -79,7 +87,10 @@ def isValidBlock(blockI):
     for b in cBlock:
         # if it's a transaction, valid it 
         if isinstance(b, list):
-            if not validTransaction(b, False):
+            if validTransaction(user, b):
+                if not lastValidedBlock:
+                    transitUTXO(b[0], b[1], b[2])
+            else:
                 return False
 
     prevH = cBlock[-2]
@@ -107,7 +118,9 @@ def validBlock(blockI, user):
     from core.hashbased import hashFunctions as hf
 
     if not user:
-        raise ValueError("Network can't valid block")
+        return False
+
+    addLog(user, 0, [blockI])
 
     cBlock = c.BC_CHAIN[blockI]
 
@@ -118,27 +131,47 @@ def validBlock(blockI, user):
 
         if isinstance(b, list):
             # if the transaction is not valid, it's ingored -> removed of the block for validation
-            if not validTransaction(b):
+            if not validTransaction(user, b):
+                addLog(user, 1, [str(b)])
                 unvalidTransactions.append(b)
 
         else:
-            raise Exception("Block seems to have already been validated or it's corrupted")
+            # Block already validated
+            addLog(user, 8, [blockI])
+            return False
 
     for transaction in unvalidTransactions:
         cBlock.remove(transaction)
 
 
-    # Adding the hash of the previous block
-    cBlock.append(getBlockHash(c.BC_CHAIN[blockI - 1]))
+    # Calculating the hash of the previous block
+    prevH = getBlockHash(c.BC_CHAIN[blockI - 1])
 
-    # Block validation -> calcul of proof of work
-    cBlock.append(hf.PoW(arrayToBytes(cBlock), c.BC_POW_NULL))
+    # Calculating the proof of work -> mining
+    addLog(user, 5, [blockI])
+    proof = hf.PoW(arrayToBytes(cBlock + [prevH]), c.BC_POW_NULL)
+
+    # POW found
+    addLog(user, 6, [blockI, proof])
+
+    # Send the validation to the block-chain
+    cBlock.extend([prevH, proof])
+
+    addLog(user, 7, [blockI])
+
+    # Perform all transactions in 
+    for t in cBlock:
+        if isinstance(t, list):
+            transitUTXO(t[0], t[1], t[2])
+            addLog(user, 4, [str(t)])
 
     # Create a new block in the blockchain
-    c.BC_CHAIN.append([])  
+    c.BC_CHAIN.append([]) 
 
     # Reward the miner   
     addTransaction(0, user, c.BC_MINER_REWARD)
+
+    return True
 
 
 def addUser(username, autoGenerateKeys=True, keys=[]):
@@ -204,10 +237,11 @@ def getUserKey(user, key):
     return c.BC_USERS[user][2 + key]
 
 
-def validTransaction(transaction, perform=True):
+def validTransaction(user, transaction):
     '''
-        Verify the given transaction signature, and perform the UTXO exchange if perform is true
+        Verify the given transaction
 
+        user: user if of the user who perform the check
         transaction: array containing transaction information of the format {sender ID -> receiver ID :: amount} -> signed by sender
     '''
 
@@ -217,19 +251,22 @@ def validTransaction(transaction, perform=True):
     signature = transaction[-1]
 
     sender = core[0]
+        
 
-    isValid = verifying(arrayToBytes(core), getUserKey(sender, 0), signature)
-
-    if isValid and perform:
-        return transitUTXO(sender, core[1], core[2])
-    elif isValid:
-        return True
+    if verifying(arrayToBytes(core), getUserKey(sender, 0), signature):
+        if enoughToTransit(sender, core[2]):
+            return True
+        else:
+            addLog(user, 2, [str(transaction)])
+            return False
     else:
+        addLog(user, 3, [str(transaction)]) 
         return False
 
 
 def getUserBalance(user):
     return sum([x[1] for x in getUserUTXO(user)])
+
 
 def getUserUTXO(user):
     '''
@@ -244,6 +281,24 @@ def getUserUTXO(user):
             amounts.append([i, UTXO[1]])
 
     return amounts
+
+
+def enoughToTransit(sender, amount):
+    '''
+        Returns if the user have enough money to send the given amount
+
+        sender: user id of the sender
+        amount: amount send
+    '''
+
+    # if sender is the network, don't check
+    if not sender:
+        return True
+
+    senderUTXO = getUserUTXO(sender)
+    senderUTXOam = [x[1] for x in senderUTXO]
+
+    return sum(senderUTXOam) >= amount
 
 
 def transitUTXO(sender, receiver, amount):
@@ -273,8 +328,6 @@ def transitUTXO(sender, receiver, amount):
 
     # improved possible -> find the best combinaison of UTXO to reach the amount
 
-
-
     Ui = []
     Uo = 0
 
@@ -303,9 +356,48 @@ def transitUTXO(sender, receiver, amount):
 
     return True
 
+
+def addLog(user, logID, params=[]):
+    c.BC_LOGS.append([user, logID, params])
+
 #######################
 #       UTILS        #
 ######################
+
+def displayLogs():
+    print("--------------- LOGS ---------------")
+    for i, log in enumerate(c.BC_LOGS):
+        user = c.BC_USERS[log[0]]
+        logID = log[1]
+        params = log[2]
+
+        header = f"{i}\t{user[1]} ({user[0]})"
+        core = ""
+
+        if logID == 0:
+            core = f"Start to validate block: {params[0]}"
+        elif logID == 1:
+            core = f"Invalid transaction ignored: {params[0]}"
+        elif logID == 2:
+            core = f"Not enough money for transaction: {params[0]}"
+        elif logID == 3:
+            core = f"Wrong signature for transaction: {params[0]}"
+        elif logID == 4:
+            core = f"Transaction performed: {params[0]}"
+        elif logID == 5:
+            core = f"Calculating POW for block: {params[0]}"
+        elif logID == 6:
+            core = f"Found POW for block {params[0]}: {params[1]}"
+        elif logID == 7:
+            core = f"Block {params[0]} validated"
+        elif logID == 8:
+            core = f"Block {params[0]} has already been validated"
+        else:
+            core = "Log ID unknown"
+
+        print(f'{header}\t{core}')
+
+    print()
 
 def displayBC():
 

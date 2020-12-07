@@ -59,6 +59,7 @@ KEY = bytearray()
 BC_CHAIN = []
 BC_USERS = []
 BC_UTXO = []
+BC_LOGS = []
 BC_POW_NULL = 5
 BC_HASH_SIZE = 256
 BC_KEY_SIZE = 2048
