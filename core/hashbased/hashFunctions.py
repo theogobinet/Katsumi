@@ -30,14 +30,12 @@ def sponge(N:bytearray, d:int):
         
         return bm.int_to_bytes(op)
 
-    initmd5()
-
     r = 8
     d = int(d/8)
 
     blocks = bm.splitBytes(pad(N, r*8), r)
 
-    S = bytearray(128)
+    S = bytearray(16)
 
     # Absorbing
     for block in blocks:
@@ -46,6 +44,7 @@ def sponge(N:bytearray, d:int):
 
     O = bytearray()
     # Squeezing
+
     while len(O) < d:
         O += S[:r]
         S = md5(S)
@@ -60,6 +59,8 @@ def md5(block):
         block: bytearray of data to hash
     '''
 
+    import math
+
     # Done using the Wikipedia algorithm
 
     def iToB(i):
@@ -67,6 +68,17 @@ def md5(block):
     
     def p32(a, b):
         return (a + b) % (1 << 32)
+
+    s = [
+        7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22,
+        5, 9, 14, 20, 5, 9, 14, 20, 5, 9, 14, 20, 5, 9, 14, 20,
+        4, 11, 16, 23, 4, 11, 16, 23, 4, 11, 16, 23, 4, 11, 16, 23,
+        6, 10, 15, 21, 6, 10, 15, 21, 6, 10, 15, 21, 6, 10, 15, 21
+    ]
+
+    K = []
+    for i in range (64):
+        K.append((math.floor(2**32 * abs(math.sin(i + 1)))) % (1 << 32))
 
     iN = bm.bytes_to_int(block)
     lN = len(block)*8
@@ -113,12 +125,17 @@ def md5(block):
                 
 
             # F + A + K[i] + M[g] 
-            F = p32(p32(p32(F, A), initmd5.K[i]), int.from_bytes(blocks[g],"little"))
+            try:
+                F = p32(p32(p32(F, A), K[i]), int.from_bytes(blocks[g],"little"))
+            except IndexError:
+                print(i, K, blocks[g])
+                raise Exception('Error') 
+
             A = D
             D = C
             C = B
             # B + leftrotate(F, s[i])
-            B = p32(B, ((F << initmd5.s[i]) | (F >> (32 - initmd5.s[i]))))
+            B = p32(B, ((F << s[i]) | (F >> (32 - s[i]))))
         
         h1 = p32(A, h1)
         h2 = p32(B, h2)
@@ -127,19 +144,6 @@ def md5(block):
 
     return bm.packSplittedBytes([iToB(h1), iToB(h2), iToB(h3), iToB(h4)])
 
-def initmd5():
-    import math
-
-    initmd5.s = [
-        7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22,
-        5, 9, 14, 20, 5, 9, 14, 20, 5, 9, 14, 20, 5, 9, 14, 20,
-        4, 11, 16, 23, 4, 11, 16, 23, 4, 11, 16, 23, 4, 11, 16, 23,
-        6, 10, 15, 21, 6, 10, 15, 21, 6, 10, 15, 21, 6, 10, 15, 21
-    ]
-
-    initmd5.K = []
-    for i in range (64):
-        initmd5.K.append((math.floor(2**32 * abs(math.sin(i + 1)))) % (1 << 32))
 
 def nullBits(H, nbZ):
     '''
@@ -156,7 +160,8 @@ def nullBits(H, nbZ):
 
     return True
 
-def PoW(block, zBits=1):
+
+def PoW(block, zBits=1, interruptOnChange=('', 0)):
     '''
         Find a salt for which the md5 hash ends with zBits null
 
@@ -166,6 +171,12 @@ def PoW(block, zBits=1):
         return [block|salt]
     '''
 
+    import random
+    from ressources import config as c
+
+    if interruptOnChange[0]:
+        originalData = getattr(locals()['c'], interruptOnChange[0])[interruptOnChange[1]].copy()
+
     if(zBits >= 255):
         raise ValueError('The number of zero bits must be lower than 2^8')
 
@@ -173,7 +184,12 @@ def PoW(block, zBits=1):
     H = sponge(block + bm.int_to_bytes(salt), 256)
 
     while not nullBits(H, zBits):
-        salt += 1
+
+        if interruptOnChange[0]:
+            if originalData != getattr(locals()['c'], interruptOnChange[0])[interruptOnChange[1]]:
+                return False
+
+        salt = random.randint(0, 1 << 32)
         H = sponge(block + bm.int_to_bytes(salt), 256)
 
     return bm.int_to_bytes(salt)
