@@ -43,9 +43,14 @@ Clone the repository then go to the eponymous folder and launch "katsumi.py" wit
 |:-----------------------------------------------------------------:|      
 |                                 **n3rada**                        |
 
+<br />
+
 |  [![Elec](images/Elec.png)](https://github.com/theogobinet)       |
 |:-----------------------------------------------------------------:|
 |                            **Elec**                               |
+
+<br />
+
 ## Licence
 Katsumi is licensed under the terms of the MIT Licence 
 and is available for free.
