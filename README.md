@@ -38,7 +38,7 @@ Clone the repository then go to the eponymous folder and launch "katsumi.py" wit
 ### Performances
 
 ## Authors
-[![N3rada](images/n3rada.png)](https://github.com/n3rada) & [![Elec](images/Elec.png)](https://github.com/theogobinet)
+[![N3rada](images/n3rada.png)](https://github.com/n3rada) [![Elec](images/Elec.png)](https://github.com/theogobinet)
 
 <br />
 
