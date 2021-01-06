@@ -39,9 +39,9 @@ Clone the repository then go to the eponymous folder and launch "katsumi.py" wit
 
 ## Authors
 
-| [![N3rada]](images/n3rada.png) 	|
-|:----------------------------------|
-|           **N3rada**              |
+| [![N3rada]](images/n3rada.png)](images/n3rada.png) 	|
+|:-----------------------------------------------------:|
+|                     **N3rada**                        |
 ## Licence
 Katsumi is licensed under the terms of the MIT Licence 
 and is available for free.
