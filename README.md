@@ -1,5 +1,5 @@
 <a>
-    <img src="images/Katsumi.png" alt="Katsumi logo" title="katsumi" align="center" />
+    <img src="images/Katsumi.png" alt="Katsumi logo" title="katsumi" align="right" />
 </a>
 
 `Katsumi` is an interactive cryptographical tool.
@@ -14,12 +14,12 @@
     - [Structure](#Structure)
     - [Features](#Features)
     - [Performances](#Performances)
+- [Authors](#Authors)
 - [License](#License)
 - [Links](#Links)
 ## About
-It is a school cryptography project carried out at the UTT for the GS15 subject. For more information about this subject, click on the course's decription below to see the given subject:
-
-<a href="/pdfs/Projet.pdf" class="image fit"><img src="images/GS15.png" alt=""></a>
+It is a school cryptography project carried out at the [UTT](https://www.utt.fr/) for the [GS15](images/GS15.png) subject.
+For more information about this subject, click [here](pdfs/Projet.pdf) (it's in French).
 
 ## Installation
 Clone the repository then go to the eponymous folder and launch "katsumi.py" with python 3.
@@ -32,11 +32,16 @@ Clone the repository then go to the eponymous folder and launch "katsumi.py" wit
 
 #### Prime Number's Fountain
 <a>
-    <img src="images/PrimeFount.png" alt="Fount" title="Prime Number's Fountain" align="center" />
+    <img src="images/PrimeFount.png" alt="Fount" title="Prime Number's Fountain" align="right" />
 </a>
 
 ### Performances
 
+## Authors
+
+| [![N3rada]](images/n3rada.png) 	|
+|:----------------------------------|
+|           **N3rada**              |
 ## Licence
 Katsumi is licensed under the terms of the MIT Licence 
 and is available for free.
