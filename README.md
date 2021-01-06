@@ -1,5 +1,5 @@
 <a>
-    <img src="images/Katsumi.png" alt="Katsumi logo" title="katsumi" align="center" height="60" />
+    <img src="images/Katsumi.png" alt="Katsumi logo" title="katsumi" align="center" />
 </a>
 
 `Katsumi` is an interactive cryptographical tool.
@@ -32,7 +32,7 @@ Clone the repository then go to the eponymous folder and launch "katsumi.py" wit
 
 #### Prime Number's Fountain
 <a>
-    <img src="images/PrimeFount.png" alt="Fount" title="Prime Number's Fountain" align="center" height="60" />
+    <img src="images/PrimeFount.png" alt="Fount" title="Prime Number's Fountain" align="center" />
 </a>
 
 ### Performances
