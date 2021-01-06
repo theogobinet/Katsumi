@@ -39,7 +39,7 @@ Clone the repository then go to the eponymous folder and launch "katsumi.py" wit
 
 ## Authors
 
-| [![N3rada](https://github.com/n3rada)](images/n3rada.png)      	|      |  [![Elec](https://github.com/theogobinet)](images/Elec.png)          |
+| [![N3rada](images/n3rada.png)](https://github.com/n3rada)      	|      |  [![Elec](images/Elec.png)](https://github.com/theogobinet)          |
 |:-----------------------------------------------------------------:|      |:--------------------------------------------------------------------:|
 |                                 **n3rada**                        |      |                            **Elec**                                  |
 
