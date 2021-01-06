@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from core._cipher.galois import *
+from core import *
 from ressources import *
 
 import ressources.config as config
 import numpy as np
 import matplotlib.pyplot as plt
-import sys
 import sympy as sym
+from core.symmetric.galois import *
         
 # For good printing of polynomials:
 x = sym.symbols('x')
@@ -153,7 +153,7 @@ def tablesOpe(GF,mod,Zn=2):
         i+=1
         for j,d in enumerate(elts):
             j+=1
-            calc=poly_add_mod(u,d,mod)
+            calc=poly_add_mod(u,d,mod,Zn)
             pCalc=printPoly(calc)
             plus[i][j]=pCalc
 
@@ -165,7 +165,7 @@ def tablesOpe(GF,mod,Zn=2):
         i+=1
         for j,d in enumerate(elts):
             j+=1
-            calc=poly_mult_mod(u,d,mod)
+            calc=poly_mult_mod(u,d,mod,Zn)
             pCalc=printPoly(calc)
             plus[i][j]=pCalc
 

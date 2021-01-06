@@ -1,4 +1,5 @@
-# GS15
-GS15 Project
+## About
+`Katsumi` is an interactive cryptographical tool.
+It is a school cryptography project carried out at the UTT for the GS15 subject. For more information about this subject, here is the pdf provided by our teacher.
 
-https://moodle.utt.fr/pluginfile.php/141985/mod_resource/content/2/Projet_A20_blockChain_AD.pdf
+<a href="/pdfs/projet.pdf" class="image fit"><img src="images/GS15.png" alt=""></a>
