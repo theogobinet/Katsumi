@@ -179,7 +179,8 @@ def initChain():
     from core.hashbased import hashFunctions as hf
 
     firstBlock = [hf.sponge(b"Lorsqu'un canide aboie, ca fait BARK", c.BC_HASH_SIZE)]
-    firstBlock.append(hf.PoW(arrayToBytes(firstBlock), c.BC_POW_NULL))
+    fBTB = arrayToBytes(firstBlock)
+    firstBlock.append(hf.PoW(fBTB, getAdaptativePOWnb(len(fBTB), True)))
 
     c.BC_TIME_START = time.time()
 
@@ -204,7 +205,7 @@ def validChain(user):
             if vB != False:
                 print("Unvalid block: ", i, " - Transaction: ", vB)
             else:
-                print("Unvalid block previous hash: ", i)
+                print("Unvalid block previous hash or salt: ", i)
             return False
     
     return True
@@ -236,9 +237,15 @@ def isValidBlock(blockI, user, lastValidedBlock=False, UTXO=c.BC_UTXO):
     else:
         prevBlockH = prevH
 
+    # Salt is verified
+    bH = getBlockHash(blockI, False)
+    saltValid = hf.nullBits(bH, getAdaptativePOWnb(len(arrayToBytes(cBlock[:-1])), blockI < 2))
+
+    # Previous hash is verified
+    hashValid = prevBlockH == prevH
+
     # if the previous block calculated hash is the same that the one stored and the salt is ok, block is valid
-    bH = getBlockHash(blockI) # No drugs
-    return prevBlockH == prevH and hf.nullBits(getBlockHash(blockI), getAdaptativePOWnb(len(bH)))
+    return saltValid and hashValid
 
 
 def validBlock(blockI, user, validated=(-1, [], [])):
@@ -306,9 +313,10 @@ def validBlock(blockI, user, validated=(-1, [], [])):
         return (i, cBlock, cUTXO)
 
     # Calculating the proof of work -> mining
-    nbNullBits = getAdaptativePOWnb(len(cBlock))
-    addLog(user, 5, [blockI, nbNullBits])
-    proof = hf.PoW(arrayToBytes(cBlock + [prevH]), nbNullBits, ('BC_CHAIN', blockI))
+    bytesBlock = arrayToBytes(cBlock + [prevH])
+    nbNullBits = getAdaptativePOWnb(len(bytesBlock), blockI < 2)
+    addLog(user, 5, [blockI, nbNullBits, len(bytesBlock)])
+    proof = hf.PoW(bytesBlock, nbNullBits, ('BC_CHAIN', blockI))
 
     if not proof:
         addLog(user, 9, [blockI])
@@ -511,7 +519,7 @@ def transitUTXO(sender, receiver, amount, UTXO=c.BC_UTXO):
 
     return True
 
-def getAdaptativePOWnb(blockSize:int):
+def getAdaptativePOWnb(blockSize:int, firstBlock=False):
     '''
         Returns the adaptive number of null bits required for POW validation
 
@@ -520,10 +528,10 @@ def getAdaptativePOWnb(blockSize:int):
 
     import math
 
-    if not blockSize:
-        return 13
+    if firstBlock:
+        return c.BC_POW_FIRST
 
-    return max(round(-1.18 * math.log(max(blockSize,1)) + 10.8), 1)
+    return round(min(max(14131 * math.pow(blockSize, -1.024), 1) * c.BC_POW_RATIO, 100))
 
 
 def addLog(user, logID, params=[]):
@@ -596,7 +604,7 @@ def displayLogs(last=0):
             elif logID == 4:
                 core = f"{bcolors.OKGREEN}Transaction performed: {params[0]}{bcolors.ENDC}"
             elif logID == 5:
-                core = f"Calculating POW({params[1]}) for block: {params[0]}"
+                core = f"Calculating POW({params[1]}-{params[2]}) for block: {params[0]}"
             elif logID == 6:
                 core = f"{bcolors.OKGREEN}Found POW for block {params[0]}: {base64.b64encode(params[1]).decode()}{bcolors.ENDC}"
             elif logID == 7:
@@ -661,6 +669,9 @@ def arrayToBytes(array):
 
         array: data to convert
     '''
+
+    import base64
+
     byts=b''
     for x in array:
         if not isinstance(x, (bytes, bytearray)):
@@ -668,10 +679,10 @@ def arrayToBytes(array):
         else:
             byts += x
 
-    return byts
+    return base64.b64encode(byts)
 
 
-def getBlockHash(block):
+def getBlockHash(block, ignoreSalt=True):
     '''
         Get an hash of the block
 
@@ -682,4 +693,11 @@ def getBlockHash(block):
     if isinstance(block, int):
         block = c.BC_CHAIN[block]
 
-    return sponge(arrayToBytes(block), c.BC_HASH_SIZE)
+    toHash = bytearray()
+
+    if ignoreSalt:
+        toHash = arrayToBytes(block)
+    else:
+        toHash = arrayToBytes(block[:-1]) + block[-1]
+
+    return sponge(toHash, c.BC_HASH_SIZE)
