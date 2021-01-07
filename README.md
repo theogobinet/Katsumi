@@ -31,14 +31,20 @@ For more information about this subject, click [here](pdfs/Projet.pdf) (it's in 
 ### Structure
 The source code is ordered as follows:
 * The "core" folder contains the core of the program. Everything related to symmetric, asymmetric and hash-based encryption methods (i.e. [the BlockChain](core/hashbased/blockchain.py)).
-* The "processing" folder which contains all outputs of the program destined for the user (i.e. public/private keys, digital signatures and encrypted things).
-* The "resources" folder contains all the largest code files. This is where most of the primary functions reside. 
+* The ["processing" folder](processing/) which contains all outputs of the program destined for the user (i.e. public/private keys, digital signatures and encrypted things).
+* The ["resources" folder](ressources/) contains all the largest code files. This is where most of the primary functions reside.
+
+
 
 ### Features
 
 * To make it easier to handle the inverses in the Galois fields, we have [pre-recorded in memory the inverses](ressources/generated/inversion_Sbox.txt) of the Galois field degree 16 (itself written in raw).
 
 * The Inversion_Sbox.txt is checked at each start and if it's corrupted (not here or wrong), the program will generate one before starting.
+
+* Any generator for El-Gamal is designed to resist common attacks and is found via the principle of [Schnorr's group](https://en.wikipedia.org/wiki/Schnorr_group). More information by reading the code about El-Gamal [here](core/asymmetric/elGamal.py).
+
+* The generation of safe prime numbers is done by optimizing the search. We start from p prime number and check if 2p+1 is also prime OR if (p-1)/2 is also prime. [The source code dedicated to this subject](ressources/prng.py) has been commented in order to understand the thinking process.
 
 #### Prime Number's Fountain
 
