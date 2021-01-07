@@ -108,7 +108,7 @@ def euclid_ext(a:int, b:int, Verbose=False):
     
     return b, x0, y0, s, n
 
-def  coprime(a:int,b:int):
+def coprime(a:int,b:int):
     """
     Two values are said to be coprime if they have no common prime factors.
     This is equivalent to their greatest common divisor (gcd) being 1.
@@ -196,7 +196,7 @@ def millerRabin(p, s=40):
     return True
 
 
-def findPrimeFactors(n:int,exponent = False) : 
+def findPrimeFactors(n:int,exponent:bool = False) : 
     """
     Decomposes an integer n into prime factors and store in a set.
 

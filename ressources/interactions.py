@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from core.asymmetric.diffieHellman import agreement
 from math import inf
 import os
 import time
@@ -14,9 +13,46 @@ import ressources.config as config
 import ressources.bytesManager as bm 
 
 ################################################
+###############- Colored Interactions - ########
+################################################
+# colored text and background 
+from colorama import Fore, Style
+
+def prRed(s): print(f"{Fore.RED}{s}{Style.RESET_ALL}") 
+def prGreen(s): print(f"{Fore.GREEN}{s}{Style.RESET_ALL}") 
+def prYellow(s): print(f"{Fore.YELLOW}{s}{Style.RESET_ALL}") 
+def prPurple(s): print(f"{Fore.MAGENTA}{s}{Style.RESET_ALL}") 
+def prCyan(s): print(f"{Fore.CYAN}{s}{Style.RESET_ALL}") 
+
+
+################################################
 ###############- Console Interactions - ########
 ################################################
 
+def correctSizeHook():
+    """
+    Ensures that the terminal window is suitable for the proper operation of the program.
+
+    Return if size was correct
+    """
+
+    c,l=os.get_terminal_size()
+
+    
+    if c<85 or l<45:
+        clear()
+        prRed("The size of the window is too small for the content to be displayed.")
+        print(f"Please extend the windows.")
+
+        while c<85 or l<45:
+            c,l=os.get_terminal_size()
+
+        return False
+
+    else:
+        return True
+    
+        
 
 def enumerateMenu(choices):
     """
@@ -204,7 +240,7 @@ def handleDirectory(dirName:str,directory=config.DIRECTORY_GEN):
 def rmFile(name:str,directory=config.DIRECTORY_GEN):
     """Remove named file."""
     try:
-        return os.remove(directory+name)
+        os.remove(directory+name)
     except FileNotFoundError:
         pass
 
@@ -213,6 +249,36 @@ def mvFile(name:str,src=config.DIRECTORY_PROCESSING,dst=config.DIRECTORY_GEN):
     """ Move named file """
     import shutil
     return shutil.move(src+name,dst)
+
+def findAndReplace(name:str,toFind:str,toReplace:str,src=config.DIRECTORY_GEN,dst=config.DIRECTORY_PROCESSING):
+    #input file
+    fin = open(src+name, "rt")
+    #output file to write the result to
+    fout = open(dst+name, "wt")
+    #for each line in the input file
+    for line in fin:
+        #read replace the string and write to output file
+        fout.write(line.replace(toFind, toReplace))
+    #close input and output files
+    fin.close()
+    fout.close()
+
+def findAndReplaceInPlace(name:str,toFind:str,toReplace:str,src=config.DIRECTORY_PROCESSING):
+    #read input file
+    fin = open(src+name, "rt")
+    #read file contents to string
+    data = fin.read()
+    #replace all occurrences of the required string
+    data = data.replace(toFind, toReplace)
+    #close the input file
+    fin.close()
+    #open the input file in write mode
+    fin = open(src+name, "wt")
+    #overrite the input file with the resulting data
+    fin.write(data)
+    #close the file
+    fin.close()
+
 
 def whatInThere(directory=config.DIRECTORY_FOUNT):
     """
@@ -324,6 +390,7 @@ def writeKeytoFile(key,fileName:str,directory=config.DIRECTORY_PROCESSING,ext:st
     
     else:
         size = "1"
+          
           
     b64Key = getB64Keys(key)
 

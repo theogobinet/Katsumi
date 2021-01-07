@@ -94,6 +94,8 @@ def key_gen(n:int=2048,primeFount=None,easyGenerator:bool=False,randomFunction=N
     easyGenerator: generate appropriated safe prime number according to quadratic residues properties.\n
 
     randomFunction: prng choosen for random prime number generation (default = randbits from secrets module).
+
+    saving: True if you want to save the private key to a file.
     """
 
 
@@ -105,7 +107,7 @@ def key_gen(n:int=2048,primeFount=None,easyGenerator:bool=False,randomFunction=N
         p,q = s # safe_prime and Sophie Germain prime
     
     else:
-        primeFount = it.extractSafePrimes(n,False,Verbose=True)
+        primeFount = it.extractSafePrimes(n,False,Verbose)
         s = primeFount
         p,q = s # safe_prime and Sophie Germain prime
 

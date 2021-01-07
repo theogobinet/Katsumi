@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+from ressources import interactions as it
+
 def asciiArt():
+    it.clear()
     return print( """
                                         .      .       .       .
             .   .       .   1217   .      . .      .         .     337   .    .
@@ -30,6 +33,7 @@ def asciiArt():
 
 
 def asciiJongling():
+    it.clear()
     return print(
         """
                         '   '    '     
@@ -44,6 +48,7 @@ def asciiJongling():
     )
 
 def asciiDeath():
+    it.clear()
     return print('''
                     %%% %%%%%%%            |#|
                 %%%% %%%%%%%%%%%        |#|####
@@ -59,6 +64,7 @@ def asciiDeath():
     )
 
 def asciiKeys():
+    it.clear()
     return print(
         """
         8 8          ,o.                                        ,o.          8 8
@@ -74,6 +80,7 @@ def asciiKeys():
     )
 
 def asciiCat():
+    it.clear()
     return print('''                         
        _                        
        \`*-.                 _  __     _                       _    
