@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from core.asymmetric.diffieHellman import agreement
 from math import inf
 import os
 import time
@@ -241,7 +240,7 @@ def handleDirectory(dirName:str,directory=config.DIRECTORY_GEN):
 def rmFile(name:str,directory=config.DIRECTORY_GEN):
     """Remove named file."""
     try:
-        return os.remove(directory+name)
+        os.remove(directory+name)
     except FileNotFoundError:
         pass
 
@@ -250,6 +249,36 @@ def mvFile(name:str,src=config.DIRECTORY_PROCESSING,dst=config.DIRECTORY_GEN):
     """ Move named file """
     import shutil
     return shutil.move(src+name,dst)
+
+def findAndReplace(name:str,toFind:str,toReplace:str,src=config.DIRECTORY_GEN,dst=config.DIRECTORY_PROCESSING):
+    #input file
+    fin = open(src+name, "rt")
+    #output file to write the result to
+    fout = open(dst+name, "wt")
+    #for each line in the input file
+    for line in fin:
+        #read replace the string and write to output file
+        fout.write(line.replace(toFind, toReplace))
+    #close input and output files
+    fin.close()
+    fout.close()
+
+def findAndReplaceInPlace(name:str,toFind:str,toReplace:str,src=config.DIRECTORY_PROCESSING):
+    #read input file
+    fin = open(src+name, "rt")
+    #read file contents to string
+    data = fin.read()
+    #replace all occurrences of the required string
+    data = data.replace(toFind, toReplace)
+    #close the input file
+    fin.close()
+    #open the input file in write mode
+    fin = open(src+name, "wt")
+    #overrite the input file with the resulting data
+    fin.write(data)
+    #close the file
+    fin.close()
+
 
 def whatInThere(directory=config.DIRECTORY_FOUNT):
     """
@@ -361,6 +390,7 @@ def writeKeytoFile(key,fileName:str,directory=config.DIRECTORY_PROCESSING,ext:st
     
     else:
         size = "1"
+          
           
     b64Key = getB64Keys(key)
 
