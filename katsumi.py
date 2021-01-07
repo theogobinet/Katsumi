@@ -48,7 +48,7 @@ def work_with_selection(pSelection):
         it.clear()
         print("\n Not available in the menu. Getting back ... ")
         time.sleep(1)
-        return menu()
+        menu()
     
     return None
 
@@ -60,19 +60,23 @@ def menu():
 
     choices=["Symmetric","Asymmetric","Hash","Perform a proof of work.","Check a transaction.","Start / increment Block-chain.","Check Block-chain integrity's","I WANT IT ALL !! I WANT IT NOW !","Prime Numbers Fountain's","Exit"]
 
+    if it.correctSizeHook():
 
-    print("------------------------------------------------------------------")
-    asc.asciiCat()
-    print("- Created by : Gobinet Théo && Martin Azaël ")
-    print("- Free to use")
-    print("- MIT License\n")
+        print("------------------------------------------------------------------")
+        asc.asciiCat()
+        print("- Created by : Gobinet Théo && Martin Azaël ")
+        print("- Free to use")
+        print("- MIT License\n")
 
-    it.enumerateMenu(choices)
+        it.enumerateMenu(choices)
 
-    print()
-    selection = it.getInt(1,"choices")
+        selection = it.getInt(1,"choices")
 
-    return work_with_selection(selection)
+
+        return work_with_selection(selection)
+        
+    else:
+        menu()
 
 
 def main():

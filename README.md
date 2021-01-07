@@ -31,19 +31,24 @@ Clone the repository then go to the eponymous folder and launch "katsumi.py" wit
 ### Features
 
 #### Prime Number's Fountain
+
+Generating safe primes can take a lot of computing time. 
+To overcome this problem, we have imagined storing our safe primes in an accessible and editable location.
+We decided to call this thing: ** The Prime Number's Fountain **
+
 <a>
     <img src="images/PrimeFount.png" alt="Fount" title="Prime Number's Fountain" align="right" />
 </a>
 
+With this method, the user can have safe prime numbers loaded in his free time and use them appropriately at the right time.
+
 ### Performances
 
 ## Authors
-[![N3rada](images/n3rada.png)](https://github.com/n3rada) [![Elec](images/Elec.png)](https://github.com/theogobinet)
-
-<br />
-
+* **Azaël MARTIN** - [n3rada](https://github.com/n3rad)
+* **Théo GOBINET** - [Elec](https://github.com/theogobinet)
 ## Licence
 Katsumi is licensed under the terms of the MIT Licence 
-and is available for free.
+and is available for free - see the [LICENSE.md](LICENSE.md) file for details.
 
 ## Links

@@ -14,9 +14,46 @@ import ressources.config as config
 import ressources.bytesManager as bm 
 
 ################################################
+###############- Colored Interactions - ########
+################################################
+# colored text and background 
+from colorama import Fore, Style
+
+def prRed(s): print(f"{Fore.RED}{s}{Style.RESET_ALL}") 
+def prGreen(s): print(f"{Fore.GREEN}{s}{Style.RESET_ALL}") 
+def prYellow(s): print(f"{Fore.YELLOW}{s}{Style.RESET_ALL}") 
+def prPurple(s): print(f"{Fore.MAGENTA}{s}{Style.RESET_ALL}") 
+def prCyan(s): print(f"{Fore.CYAN}{s}{Style.RESET_ALL}") 
+
+
+################################################
 ###############- Console Interactions - ########
 ################################################
 
+def correctSizeHook():
+    """
+    Ensures that the terminal window is suitable for the proper operation of the program.
+
+    Return if size was correct
+    """
+
+    c,l=os.get_terminal_size()
+
+    
+    if c<85 or l<45:
+        clear()
+        prRed("The size of the window is too small for the content to be displayed.")
+        print(f"Please extend the windows.")
+
+        while c<85 or l<45:
+            c,l=os.get_terminal_size()
+
+        return False
+
+    else:
+        return True
+    
+        
 
 def enumerateMenu(choices):
     """
