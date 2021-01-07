@@ -48,7 +48,7 @@ def work_with_selection(pSelection):
 
 def menu():
 
-    choices=["Symmetric","Asymmetric","Hash","Perform a proof of work.","Check a transaction.","Start / increment Block-chain.","Check Block-chain integrity's","I WANT IT ALL !! I WANT IT NOW !","Prime Numbers Fountain's","Exit"]
+    choices=["Symmetric","Asymmetric","Hash","BlockChain","Prime Numbers Fountain's","Exit"]
 
     if it.correctSizeHook():
 
