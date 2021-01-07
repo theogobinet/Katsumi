@@ -19,6 +19,24 @@ def int_to_bytes(i:int):
     """Take an integer as input and return the bytes written version"""
     return i.to_bytes(bytes_needed(i),"big")
 
+def isBase64(sb):
+    """
+    Check if both string and bytes objects are in base64.
+    """
+    import base64
+    try:
+            if isinstance(sb, str):
+                    # If there's any unicode here, an exception will be thrown and the function will return false
+                    sb_bytes = bytes(sb, 'ascii')
+            elif isinstance(sb, bytes):
+                    sb_bytes = sb
+            else:
+                    raise ValueError("Argument must be string or bytes")
+            return base64.b64encode(base64.b64decode(sb_bytes)) == sb_bytes
+    except Exception:
+            return False
+
+
 def mult_to_bytes(obj:object):
     """Convert given {array of bits, bytes, int, b64} to bytes"""
 
@@ -26,12 +44,11 @@ def mult_to_bytes(obj:object):
         res=bits_compactor(obj)
     elif isinstance(obj,int):
         res=int_to_bytes(obj)
+    elif isBase64(obj):
+        import base64
+        res = base64.b64decode(obj)
     elif isinstance(obj,bytes):
-        try:
-            import base64, binascii
-            res = base64.b64decode(obj)
-        except binascii.Error:
-            res = obj
+        res = obj
     else:
         res = bytes(obj)
         

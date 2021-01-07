@@ -29,31 +29,6 @@ def prCyan(s): print(f"{Fore.CYAN}{s}{Style.RESET_ALL}")
 ###############- Console Interactions - ########
 ################################################
 
-def correctSizeHook():
-    """
-    Ensures that the terminal window is suitable for the proper operation of the program.
-
-    Return if size was correct
-    """
-
-    c,l=os.get_terminal_size()
-
-    
-    if c<85 or l<45:
-        clear()
-        prRed("The size of the window is too small for the content to be displayed.")
-        print(f"Please extend the windows.")
-
-        while c<85 or l<45:
-            c,l=os.get_terminal_size()
-
-        return False
-
-    else:
-        return True
-    
-        
-
 def enumerateMenu(choices):
     """
     Menu enumeration
@@ -94,6 +69,35 @@ def clear():
         os.system("cls")
     else:
         os.system("clear")
+
+
+
+def correctSizeHook():
+    """
+    Ensures that the terminal window is suitable for the proper operation of the program.
+
+    Return if size was correct
+    """
+
+    c,_=os.get_terminal_size()
+
+
+    if os.name == 'nt':
+        cE=66
+    else:
+        cE=69
+    
+    if c<cE:
+        clear()
+        prRed(f"Width needs to be at least {cE}!")
+
+        while c<cE:
+            c,_=os.get_terminal_size()
+
+        return False
+
+    else:
+        return True
 
 
 def readFromUser(msg="Enter the message:"):
@@ -250,35 +254,6 @@ def mvFile(name:str,src=config.DIRECTORY_PROCESSING,dst=config.DIRECTORY_GEN):
     import shutil
     return shutil.move(src+name,dst)
 
-def findAndReplace(name:str,toFind:str,toReplace:str,src=config.DIRECTORY_GEN,dst=config.DIRECTORY_PROCESSING):
-    #input file
-    fin = open(src+name, "rt")
-    #output file to write the result to
-    fout = open(dst+name, "wt")
-    #for each line in the input file
-    for line in fin:
-        #read replace the string and write to output file
-        fout.write(line.replace(toFind, toReplace))
-    #close input and output files
-    fin.close()
-    fout.close()
-
-def findAndReplaceInPlace(name:str,toFind:str,toReplace:str,src=config.DIRECTORY_PROCESSING):
-    #read input file
-    fin = open(src+name, "rt")
-    #read file contents to string
-    data = fin.read()
-    #replace all occurrences of the required string
-    data = data.replace(toFind, toReplace)
-    #close the input file
-    fin.close()
-    #open the input file in write mode
-    fin = open(src+name, "wt")
-    #overrite the input file with the resulting data
-    fin.write(data)
-    #close the file
-    fin.close()
-
 
 def whatInThere(directory=config.DIRECTORY_FOUNT):
     """
@@ -309,7 +284,7 @@ def extractVarFromFile(fileName:str,directory=config.DIRECTORY_GEN,ext:str=".kat
 ######## Key gestion #########
 ##############################
 
-def getIntKey(b64, keyNumber):
+def getIntKey(b64, keyNumber:int=1):
     """
     Convert base64 key's into tuples of keyNumber integers.
     """
@@ -367,7 +342,9 @@ def getB64Keys(key):
             tw += f"{el}|"
 
         tw = tw[:-1].encode()
-
+    elif isinstance(key,bytes):
+        #Already into bytes
+        tw = key
     else:
         #uniq key
         tw = bm.int_to_bytes(key)
@@ -1209,7 +1186,7 @@ def katsuAsymm():
                 return doSomethingElse(katsuAsymm)
 
             else:
-                doSomethingAssym()
+                katsuAsymm()
 
         elif i == 7:
             clear()
