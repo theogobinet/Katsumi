@@ -8,30 +8,43 @@ from ressources import config as c
 #       LIVE CHAIN        #
 ###########################
 
-def network(limit, rangeTB=(10,15), rangeBS=(2,3)):
+'''
+    This is a single-threaded simulation, so adding miners will not speed up block validation.
+    On the contrary, as the simulation will have to deal with the different miners at the same time, it will be strongly slowed down.
+    It is therefore recommended to keep the number of miners at a relatively low level.
+    However, if the number of miners is high, the frequency of transactions and the difficulty of the proof of work must be reduced.
+
+    Note that reducing the difficulty of the proof of work will not be sufficient if the transaction frequency is too high.
+    Because all the calculation time will be spent verifying the transactions for each miner rather than calculating the proof of work.
+'''
+
+def network(limit:int, rangeTB:tuple=(10,15), rangeBS:tuple=(2,3)):
     '''
         Infinite loop that creates random users and transactions
 
         limit: stops when the number of block in the block-chain have reach limit
-
         rangeBS: range between each cycles of transactions (e.g. new cycle between every (1,2) seconds)
         rangeTB: range of transactions per cycles (e.g. between (3,5) transactions are generated per cycle)
 
-        ex: each rand(rangeBS), rand(rangeTB) transactions are generated
+        Transaction frequency calculation: avg(rangeTB) / avg(rangeBS) = average number of transactions per second
     '''
 
     import time
     import random
 
+    # List of names
     names = ["Martin", "Bernard", "Dubois", "Thomas", "Robert", "Richard", "Petit", "Durand", "Leroix", "Moreau", "Simon", "Laurent", "Lefebvre", "Michel", "Garcia", "David", "Bertrand", "Roux", "Vincent", "Fournier", "Morel", "Girard", "André", "Lefèvre", "Mercier", "Dupont", "Lambert", "Bonnet", "Francois", "Matinez", "Gobinet", "Mazoin"]
 
+    # While the limit is not reached, we generate random users and random transactions
     while len(c.BC_CHAIN) < limit:
 
+        # random users generation
         if int(time.time() % 2) or len(c.BC_USERS) <= 2:
             addUser(random.choice(names))
 
         nbUsers = len(c.BC_USERS)
 
+        # random transactions generation
         if len(c.BC_USERS) > 2:
 
             for _ in range(random.randint(rangeTB[0], rangeTB[1])):
@@ -46,15 +59,18 @@ def network(limit, rangeTB=(10,15), rangeBS=(2,3)):
         time.sleep(random.randrange(rangeBS[0], rangeBS[1]))
 
 
-def mine(user):
+def mine(user:int):
     '''
-        Miner loop to validate a block until it has been validated by him or someone else
+        Try to validate the last block
+        Restart the validation process when the chain has been changed
+        Loop until the block has been validated by him or someone else
 
         user: user id of the miner
     '''
 
     import time
-    time.sleep(1)
+
+    # Waits a bit before trying to validate the block
 
     cBIndex = len(c.BC_CHAIN) - 1
 
@@ -183,8 +199,12 @@ def validChain(user):
 
     # Don't check last block as it has not been validated
     for i in range(0, len(c.BC_CHAIN) - 1):
-        if not isValidBlock(i, user, False, UTXO):
-            print("Unvalid block: ", i)
+        vB = isValidBlock(i, user, False, UTXO)
+        if vB != True:
+            if vB != False:
+                print("Unvalid block: ", i, " - Transaction: ", vB)
+            else:
+                print("Unvalid block previous hash: ", i)
             return False
     
     return True
@@ -202,11 +222,11 @@ def isValidBlock(blockI, user, lastValidedBlock=False, UTXO=c.BC_UTXO):
 
     cBlock = c.BC_CHAIN[blockI]
 
-    for b in cBlock:
+    for i, b in enumerate(cBlock):
         # if it's a transaction, valid it 
         if isinstance(b, list):
             if not validTransaction(user, b, UTXO):
-                return False
+                return i
 
     prevH = cBlock[-2]
     
@@ -217,7 +237,8 @@ def isValidBlock(blockI, user, lastValidedBlock=False, UTXO=c.BC_UTXO):
         prevBlockH = prevH
 
     # if the previous block calculated hash is the same that the one stored and the salt is ok, block is valid
-    return prevBlockH == prevH and hf.nullBits(getBlockHash(blockI), c.BC_POW_NULL)
+    bH = getBlockHash(blockI) # No drugs
+    return prevBlockH == prevH and hf.nullBits(getBlockHash(blockI), getAdaptativePOWnb(len(bH)))
 
 
 def validBlock(blockI, user, validated=(-1, [], [])):
@@ -285,8 +306,9 @@ def validBlock(blockI, user, validated=(-1, [], [])):
         return (i, cBlock, cUTXO)
 
     # Calculating the proof of work -> mining
-    addLog(user, 5, [blockI])
-    proof = hf.PoW(arrayToBytes(cBlock + [prevH]), c.BC_POW_NULL, ('BC_CHAIN', blockI))
+    nbNullBits = getAdaptativePOWnb(len(cBlock))
+    addLog(user, 5, [blockI, nbNullBits])
+    proof = hf.PoW(arrayToBytes(cBlock + [prevH]), nbNullBits, ('BC_CHAIN', blockI))
 
     if not proof:
         addLog(user, 9, [blockI])
@@ -489,6 +511,20 @@ def transitUTXO(sender, receiver, amount, UTXO=c.BC_UTXO):
 
     return True
 
+def getAdaptativePOWnb(blockSize:int):
+    '''
+        Returns the adaptive number of null bits required for POW validation
+
+        Computed to get a constant POW execution time's depending of the size of a block
+    '''
+
+    import math
+
+    if not blockSize:
+        return 13
+
+    return max(round(-1.18 * math.log(max(blockSize,1)) + 10.8), 1)
+
 
 def addLog(user, logID, params=[]):
     import time
@@ -560,7 +596,7 @@ def displayLogs(last=0):
             elif logID == 4:
                 core = f"{bcolors.OKGREEN}Transaction performed: {params[0]}{bcolors.ENDC}"
             elif logID == 5:
-                core = f"Calculating POW for block: {params[0]}"
+                core = f"Calculating POW({params[1]}) for block: {params[0]}"
             elif logID == 6:
                 core = f"{bcolors.OKGREEN}Found POW for block {params[0]}: {base64.b64encode(params[1]).decode()}{bcolors.ENDC}"
             elif logID == 7:
