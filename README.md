@@ -29,6 +29,10 @@ For more information about this subject, click [here](pdfs/Projet.pdf) (it's in 
 ## Overview
 
 ### Structure
+The source code is ordered as follows:
+* The "core" folder contains the core of the program. Everything related to symmetric, asymmetric and hash-based encryption methods (i.e. [the BlockChain](core/hashbased/blockchain.py)).
+* The "processing" folder which contains all outputs of the program destined for the user (i.e. public/private keys, digital signatures and encrypted things).
+* The "resources" folder contains all the largest code files. This is where most of the primary functions reside. 
 
 ### Features
 
@@ -40,7 +44,7 @@ For more information about this subject, click [here](pdfs/Projet.pdf) (it's in 
 
 Generating safe primes can take a lot of computing time. 
 To overcome this problem, we have imagined storing our safe primes in an accessible and editable location.
-We decided to call this thing: **The Prime Number's Fountain**
+We decided to call this thing: [**The Prime Number's Fountain**](ressources/generated/PrimeNumber's_Fount)
 
 <a>
     <img src="images/PrimeFount.png" alt="Fount" title="Prime Number's Fountain" align="center" />
