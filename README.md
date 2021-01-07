@@ -27,7 +27,7 @@ For more information about this subject, click [here](pdfs/Projet.pdf) (it's in 
 * **No requirements.txt needed** . Everything works without the need for additional libraries. A native installation of python3 is enough ! 
 
 ## Overview
-
+This project was initially devoted to the development of a modified version of [Kasumi's symmetric encryption](https://en.wikipedia.org/wiki/KASUMI) algorithm, then to the generation of a public/private key pair to finally gather all the acquired knowledge and simulate a [blockchain](pdfs/blockChain_article.pdf).
 ### Structure
 The source code is ordered as follows:
 * The "core" folder contains the core of the program. Everything related to symmetric, asymmetric and hash-based encryption methods (i.e. [the BlockChain](core/hashbased/blockchain.py)).
