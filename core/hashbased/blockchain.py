@@ -20,7 +20,7 @@ from ressources import config as c
 
 def network(limit:int, rangeTB:tuple=(10,15), rangeBS:tuple=(2,3)):
     '''
-        Infinite loop that creates random users and transactions
+        Loop that creates random users and transactions, stops when block limit is reached
 
         limit: stops when the number of block in the block-chain have reach limit
         rangeBS: range between each cycles of transactions (e.g. new cycle between every (1,2) seconds)
@@ -32,7 +32,7 @@ def network(limit:int, rangeTB:tuple=(10,15), rangeBS:tuple=(2,3)):
     import time
     import random
 
-    # List of names
+    # List of most used french names
     names = ["Martin", "Bernard", "Dubois", "Thomas", "Robert", "Richard", "Petit", "Durand", "Leroix", "Moreau", "Simon", "Laurent", "Lefebvre", "Michel", "Garcia", "David", "Bertrand", "Roux", "Vincent", "Fournier", "Morel", "Girard", "André", "Lefèvre", "Mercier", "Dupont", "Lambert", "Bonnet", "Francois", "Matinez", "Gobinet", "Mazoin"]
 
     # While the limit is not reached, we generate random users and random transactions
@@ -85,19 +85,19 @@ def mine(user:int):
             index, cBlock, cUTXO = res
 
 
-def startLive(limit, maxMiner):
+def startLive(limit:int, maxMiner:int, rangeTB:tuple=(10,15), rangeBS:tuple=(2,3)):
     '''
         Main function to start the live execution of the block-chain
 
         limit: stops when the number of block in the block-chain have reach limit
         maxMiner: maximal number of simultaneous miner
+        rangeBS: range between each cycles of transactions (e.g. new cycle between every (1,2) seconds)
+        rangeTB: range of transactions per cycles (e.g. between (3,5) transactions are generated per cycle)
     '''
 
     import threading
     import time
     import random
-
-    c.BC_KEY_SIZE = 128
 
     initChain()
 
@@ -139,7 +139,12 @@ def startLive(limit, maxMiner):
 
 def createTestBC():
 
+    '''
+        Quick demonstration of how blockchain works
+    '''
+
     c.BC_KEY_SIZE = 128
+    c.BC_POW_RATIO = 0.1
 
     # create the 1st block
     initChain()
@@ -175,6 +180,7 @@ def initChain():
     '''
         Create the first block of the block-chain
     '''
+
     import time
     from core.hashbased import hashFunctions as hf
 
@@ -190,9 +196,11 @@ def initChain():
     addUser("Network")
 
 
-def validChain(user):
+def validChain(user:int):
     '''
         Check the integrity of the blockchain, return boolean
+
+        user: user id of the user who perform the check, it can be 0 for network
     '''
 
     # Reset users UTXO to follow block-chain
@@ -210,19 +218,21 @@ def validChain(user):
     
     return True
 
-def isValidBlock(blockI, user, lastValidedBlock=False, UTXO=c.BC_UTXO):
+def isValidBlock(blockI:int, user:int, lastValidedBlock:bool=False, UTXO:list=c.BC_UTXO):
     '''
         Check block integrity: previous hash, salt, transactions signature, transactions funds
 
         blockI: blockI: block id corresponding of its index in the block-chain
         user: user id of the user who perform the check
         lastValidedBlock: if the check only concernes the last validated block, transactions are not performed as we suppose the network has done it.
+        UTXO: current state of UTXO
     '''
 
     from core.hashbased import hashFunctions as hf
 
     cBlock = c.BC_CHAIN[blockI]
 
+    # check every transactions
     for i, b in enumerate(cBlock):
         # if it's a transaction, valid it 
         if isinstance(b, list):
@@ -231,7 +241,7 @@ def isValidBlock(blockI, user, lastValidedBlock=False, UTXO=c.BC_UTXO):
 
     prevH = cBlock[-2]
     
-    # do not check previous hash for first block
+    # do not check previous hash for the first block
     if blockI:
         prevBlockH = getBlockHash(blockI-1)
     else:
@@ -248,7 +258,7 @@ def isValidBlock(blockI, user, lastValidedBlock=False, UTXO=c.BC_UTXO):
     return saltValid and hashValid
 
 
-def validBlock(blockI, user, validated=(-1, [], [])):
+def validBlock(blockI:int, user:int, validated:tuple=(-1, [], [])):
 
     '''
         Valid a block referenced by its ID, verify the transactions, calcul the hash & salt
@@ -282,6 +292,7 @@ def validBlock(blockI, user, validated=(-1, [], [])):
 
     unvalidTransactions = []
 
+    # verify every transactions, transactions are performled on the local copy of UTXO
     i = 0
     for i, b in enumerate(cBlock):
         # if it's a transaction, valid it 
@@ -300,14 +311,17 @@ def validBlock(blockI, user, validated=(-1, [], [])):
             addLog(user, 8, [blockI])
             return False
 
+    # remove unvalid transactions from the local copy
     for transaction in unvalidTransactions:
         cBlock.remove(transaction)
 
+    # add already validated transactions to the local copy
     cBlock = validated[1] + cBlock[validated[0] + 1:]
 
     # Calculating the hash of the previous block
     prevH = getBlockHash(c.BC_CHAIN[blockI - 1])
 
+    # Check if block as changed (e.g. new transaction, block validated by someone else)
     if(c.BC_CHAIN[blockI] != original):
         addLog(user, 9, [blockI])
         return (i, cBlock, cUTXO)
@@ -318,6 +332,7 @@ def validBlock(blockI, user, validated=(-1, [], [])):
     addLog(user, 5, [blockI, nbNullBits, len(bytesBlock)])
     proof = hf.PoW(bytesBlock, nbNullBits, ('BC_CHAIN', blockI))
 
+    # return false if block as changed before POW has been found (e.g. new transaction, block validated by someone else)
     if not proof:
         addLog(user, 9, [blockI])
         return (i, cBlock, cUTXO)
@@ -325,19 +340,20 @@ def validBlock(blockI, user, validated=(-1, [], [])):
     # POW found
     addLog(user, 6, [blockI, proof])
 
+    # Check if block as changed (e.g. new transaction, block validated by someone else)
     if(c.BC_CHAIN[blockI] != original):
         addLog(user, 9, [blockI])
         return (i, cBlock, cUTXO)
 
     # Send the validation to the block-chain by validating the real block
     c.BC_CHAIN[blockI] = cBlock + [prevH, proof]
-
     addLog(user, 7, [blockI])
 
-    # Perform all transactions in 
+    # Perform all transactions
     for t in cBlock:
         if isinstance(t, list):
 
+            # Not supposed to happen, valided transaction can't be proceeded 
             if not transitUTXO(t[0], t[1], t[2]):
                 raise Exception("Valided transaction can't be proceeded")
 
@@ -352,13 +368,13 @@ def validBlock(blockI, user, validated=(-1, [], [])):
     return True
 
 
-def addUser(username, autoGenerateKeys=True, keys=[]):
+def addUser(username:str, autoGenerateKeys:bool=True, keys:list=[]):
     
     '''
         Create an user with the corresponding username to the users list and return the corresponding user id which can be used as index
 
         username: name of the user
-        autoGenerateKeys: generate 2048 bits elGammal keys for the user
+        autoGenerateKeys: generate elGammal keys for the user
         keys: base64 of tuple (public key, private key) if keys are not generated for the user
     '''
 
@@ -371,7 +387,6 @@ def addUser(username, autoGenerateKeys=True, keys=[]):
         publicKey, privateKey = key_gen(c.BC_KEY_SIZE, primes)
     else:
         # decode base64 tuple of key
-
         publicKey, privateKey = getIntKey(keys, 2)
     
     userID = len(c.BC_USERS)
@@ -381,7 +396,7 @@ def addUser(username, autoGenerateKeys=True, keys=[]):
     return userID
 
 
-def addTransaction(sender, receiver, amount):
+def addTransaction(sender:int, receiver:int, amount:int):
     
     '''
         Add the transaction to the last block of the block-chain
@@ -397,6 +412,8 @@ def addTransaction(sender, receiver, amount):
     curBlock = c.BC_CHAIN[-1]
 
     transaction = [sender, receiver, amount]
+
+    # sign the transaction using El Gammal
     signature = signing(arrayToBytes(transaction), getUserKey(sender, 1))
 
     transaction.append(signature)
@@ -405,7 +422,7 @@ def addTransaction(sender, receiver, amount):
     addLog(0, 10, [len(c.BC_CHAIN) - 1, transactionToString(transaction)])
 
 
-def getUserKey(user, key):
+def getUserKey(user:int, key:int):
     '''
         Get the corresponding key of the user reprensented by its user id
 
@@ -416,12 +433,13 @@ def getUserKey(user, key):
     return c.BC_USERS[user][2 + key]
 
 
-def validTransaction(user, transaction, UTXO=c.BC_UTXO):
+def validTransaction(user:int, transaction:list, UTXO:list=c.BC_UTXO):
     '''
         Verify the given transaction
 
         user: user if of the user who perform the check
         transaction: array containing transaction information of the format {sender ID -> receiver ID :: amount} -> signed by sender
+        UTXO: array of UTXO to use instead of default one: c.BC_UTXO
     '''
 
     from core.asymmetric.elGamal import verifying
@@ -431,8 +449,10 @@ def validTransaction(user, transaction, UTXO=c.BC_UTXO):
 
     sender = core[0]
         
-
+    # First verify the transaction signature
     if verifying(arrayToBytes(core), getUserKey(sender, 0), signature):
+
+        # Then perform the transaction, return true if the transaction can be performed
         if transitUTXO(sender, core[1], core[2], UTXO):
             return True
         else:
@@ -443,15 +463,22 @@ def validTransaction(user, transaction, UTXO=c.BC_UTXO):
         return False
 
 
-def getUserBalance(user, UTXO=c.BC_UTXO):
+def getUserBalance(user:int, UTXO:list=c.BC_UTXO):
+    '''
+        Get the balance of an user by counting all of his UTXO
+
+        user: user ID of the user whose balance you want to get
+        UTXO: array of UTXO to use instead of default one: c.BC_UTXO
+    '''
     return sum([x[1] for x in getUserUTXO(user, UTXO)])
 
 
-def getUserUTXO(user, UTXO=c.BC_UTXO):
+def getUserUTXO(user:int, UTXO:list=c.BC_UTXO):
     '''
         Get a list containing the amount of each UTXO for a given user
 
-        user: user id
+        user: user ID of the user whose UTXO you want to get
+        UTXO: array of UTXO to use instead of default one: c.BC_UTXO
     '''
 
     amounts = []
@@ -462,7 +489,7 @@ def getUserUTXO(user, UTXO=c.BC_UTXO):
     return amounts
 
 
-def transitUTXO(sender, receiver, amount, UTXO=c.BC_UTXO):
+def transitUTXO(sender:int, receiver:int, amount:int, UTXO:list=c.BC_UTXO):
     '''
         Manage the transaction with UTXO
 
@@ -481,9 +508,13 @@ def transitUTXO(sender, receiver, amount, UTXO=c.BC_UTXO):
     if not receiver:
         raise ValueError("Network can't be the destination of any transaction")
 
+    # User UTXO
     senderUTXO = getUserUTXO(sender, UTXO)
+
+    # User UTXO value
     senderUTXOam = [x[1] for x in senderUTXO]
 
+    # Check if the user have enough money
     if sum(senderUTXOam) < amount:
         return False
 
@@ -494,6 +525,7 @@ def transitUTXO(sender, receiver, amount, UTXO=c.BC_UTXO):
     Ui = []
     Uo = 0
 
+    # Find a combinaison of UTXO to reach the amount
     if amount in senderUTXOam:
         Ui.append(amount)
     else:
@@ -503,7 +535,7 @@ def transitUTXO(sender, receiver, amount, UTXO=c.BC_UTXO):
                     Uo = (sum(Ui) + Uam) - amount
                 Ui.append(Uam)
 
-    # Send a full UTXO
+    # Send one or more full UTXO
     senderUTXOam = [x[1] for x in senderUTXO]
     for i, Uam in enumerate(Ui):
         UTXOindex = senderUTXO[senderUTXOam.index(Uam)][0]
@@ -519,11 +551,14 @@ def transitUTXO(sender, receiver, amount, UTXO=c.BC_UTXO):
 
     return True
 
-def getAdaptativePOWnb(blockSize:int, firstBlock=False):
+def getAdaptativePOWnb(blockSize:int, firstBlock:bool=False):
     '''
-        Returns the adaptive number of null bits required for POW validation
+        Returns an adaptive number of null bits required for POW validation
 
-        Computed to get a constant POW execution time's depending of the size of a block
+        Computed to get regressing POW execution time's depending of the size of a block
+
+        blockSize: size of the block
+        firstBlock: first block is not growing due to new transactions, it needs to have a fixed POW null bits size, this can be configured using c.BC_POW_FIRST
     '''
 
     import math
@@ -531,10 +566,19 @@ def getAdaptativePOWnb(blockSize:int, firstBlock=False):
     if firstBlock:
         return c.BC_POW_FIRST
 
+    # Number of null bits = 100 >  (14131*x^-1.024) * c.BC_POW_RATIO > 1
     return round(min(max(14131 * math.pow(blockSize, -1.024), 1) * c.BC_POW_RATIO, 100))
 
 
-def addLog(user, logID, params=[]):
+def addLog(user:int, logID:int, params:list=[]):
+    '''
+        Add a log to the list
+
+        user: user id of the emitter
+        logID: id of the log, see displayLogs() to have the log id association
+        params: list of param associated with the log
+    '''
+
     import time
     c.BC_LOGS.append([time.time() - c.BC_TIME_START, user, logID, params])
 
@@ -545,6 +589,7 @@ def addLog(user, logID, params=[]):
 
 import base64
 
+# Define colors for logs
 class bcolors:
     OKGREEN = '\033[92m'
     OKBLUE = '\033[94m'
@@ -554,7 +599,14 @@ class bcolors:
     ENDC = '\033[0m'
     BOLD = '\033[1m'
 
-def transactionToString(transaction, UTXO=c.BC_UTXO):
+
+def transactionToString(transaction:list, UTXO:list=c.BC_UTXO):
+    '''
+        Return a string from a transaction
+
+        tansaction: array of the transaction
+        UTXO: array of UTXO to use instead of default one: c.BC_UTXO, use to get balance of the users
+    '''
 
     from ressources.interactions import getB64Keys
 
@@ -564,11 +616,15 @@ def transactionToString(transaction, UTXO=c.BC_UTXO):
     senderBalance = getUserBalance(sender[0], UTXO)
     receiverBalance = getUserBalance(receiver[0], UTXO)
 
-
     return f"{'{'}{sender[0]}.{sender[1]} ({senderBalance} $) -> {receiver[0]}.{receiver[1]} ({receiverBalance} $) :: {transaction[2]} ${'}'} -> {getB64Keys(transaction[3])}"
 
 
-def displayLogs(last=0):
+def displayLogs(last:int=0):
+    '''
+        Display logs contained in c.BC_LOGS
+
+        last: log id, display every logs after the id of the last one
+    '''
 
     if not c.BC_LOGS:
         return 0
@@ -626,6 +682,9 @@ def displayLogs(last=0):
     return i
 
 def displayBC():
+    '''
+        Display the content of the blockchain
+    '''
 
     print (f"{bcolors.BOLD}==================== BLOCK-CHAIN ({len(c.BC_CHAIN)} blocks) ===================={bcolors.ENDC}")
     print()
@@ -663,9 +722,9 @@ def displayBC():
     
     print()
 
-def arrayToBytes(array):
+def arrayToBytes(array:list):
     '''
-        Convert an array to bytes, return bytearray
+        Convert an array to bytes, return base64 of array data
 
         array: data to convert
     '''
@@ -682,11 +741,12 @@ def arrayToBytes(array):
     return base64.b64encode(byts)
 
 
-def getBlockHash(block, ignoreSalt=True):
+def getBlockHash(block:(int,list), ignoreSalt:bool=True):
     '''
         Get an hash of the block
 
         block: block to hash -> format [transaction #0, transaction #1, transaction #2, ..., hash of block n-1, salt]
+        ignoreSalt: if false, does not convert the the salt (last array index) to base64, used for POW verification
     '''
     from core.hashbased.hashFunctions import sponge
 
