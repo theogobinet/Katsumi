@@ -1,5 +1,5 @@
 <a>
-    <img src="images/Katsumi.png" alt="Katsumi logo" title="katsumi" align="right" />
+    <img src="images/Katsumi.png" alt="Katsumi logo" title="katsumi" align="center" />
 </a>
 
 `Katsumi` is an interactive cryptographical tool.
@@ -37,7 +37,7 @@ To overcome this problem, we have imagined storing our safe primes in an accessi
 We decided to call this thing: ** The Prime Number's Fountain **
 
 <a>
-    <img src="images/PrimeFount.png" alt="Fount" title="Prime Number's Fountain" align="right" />
+    <img src="images/PrimeFount.png" alt="Fount" title="Prime Number's Fountain" align="center" />
 </a>
 
 With this method, the user can have safe prime numbers loaded in his free time and use them appropriately at the right time.
