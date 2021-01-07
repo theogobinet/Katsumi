@@ -43,8 +43,6 @@ def cipher(arr, method=3, encrypt=True, aad=""):
         config.WATCH_CIPHER_TYPE = "GCM"
         return GCM(arr, encrypt, aad)
 
-    return None
-
 ###### Running method to run everything:
 
 def run(data, inFile="", encrypt=False, method=3, aad="", key=config.KEY):
@@ -70,6 +68,7 @@ def run(data, inFile="", encrypt=False, method=3, aad="", key=config.KEY):
 
     if(len(data) > 0):
         splitted=bm.splitBytes(data)
+        print(splitted)
         ciphered=cipher(splitted, method, encrypt, aad)
         
         return bm.codeOut(ciphered, encrypt, inFile)
@@ -367,7 +366,6 @@ def IV_action(arr, iv=None, action="extract"):
 
     if action == "store" and iv != None:
         arr.append(iv)
-        return None
 
     elif action == "extract" and iv == None:
         iv=arr.pop()

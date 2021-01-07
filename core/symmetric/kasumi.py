@@ -37,8 +37,6 @@ def set_key(km=config.KEY):
 
     # SBoxes initialization considering the given master key !
     initRC4(km)
-
-    return None
  
 
 

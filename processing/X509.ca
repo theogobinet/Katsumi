@@ -1,0 +1,20 @@
+
+    Certificate:
+    Data:
+        Version: 3 (0x2)
+        Serial Number: C3ZwRPa32DYx5qiJHXYQnP3zBU8=
+        Signature Algorithm: El-Gamal
+        Issuer: CN = BARK_CA
+        Validity
+            Not Before: Jan-07-2021
+            Not After : Jan-07-2022
+        Subject: CN = Katsumi User
+        Subject Public Key Info:
+            Public Key Algorithm: El-Gamal
+                Public-Key: (512 bit)
+                pub:
+                    AEAAQABAo72GrymQow4Nzu86qOSQZJoeC6yJs158ZEPr0UziUxyXoILcPVThWKKd8wfPXkx/3yjLt91nTc4vI2/PKESutzlyMT/ZAyNntabh62VAuFrp2n9fE+EH/BiXy/C2446j5MlYU7unjwiOTothOz6oEcVyC+yh3qJGOQQDLRKCcLGGHAUgW9qsSxQmGuybodI//AgIlHh7B5wPmyU2eDigV/IJIKFw2TcAiF4SWugBAZbin9s5ClCPXPPbUcHFO5ya
+    
+    Signature Algorithm: El-Gamal
+         AEAAQM2WPko59dVmJcauVJ6hQwdrEUPCp9mLqNLBXBoR04AACq+kN2z0mTmz5eq6JBYfY9HE9k0s09FO3IXOlcZK/nJnnD7+iVZB5BD1UfkBmk5z2SyLkgY0iUn2JOwnfBZBkw5TV4zPgstp7Y+CjEiTgvYNvrKkEtZVo9kH3P70a91o
+    
