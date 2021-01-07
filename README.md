@@ -28,7 +28,7 @@
         - [Symmetric](#Symmetric)
         - [Asymmetric](#Asymmetric)
         - [BlockChain](#BlockChain)
-    - [Features](#Features)
+    - [Implementation choices](#Implementation_choices)
     - [Performances](#Performances)
     - [Improvements](#Improvements)
 - [Authors](#Authors)
@@ -57,7 +57,7 @@ The source code is ordered as follows:
 
 #### BlockChain
 
-### Features
+### Implementation choices
 
 * The primitive polynomial of the binary extension field GF(2) of degree 16 was found [online](https://www.partow.net/programming/polynomials/index.html) and hard-coded into a [config file](ressources/config.py)
 

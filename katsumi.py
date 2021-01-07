@@ -30,27 +30,17 @@ def work_with_selection(pSelection):
 
     elif pSelection == 4 :
         print("Test")
-    elif pSelection == 5 :
-        print("kk")
-    elif pSelection == 6 :
-        print("Test")
-    elif pSelection == 7 :
-        print("Test")
-    elif pSelection == 8 :
-        print("Test")
-    elif pSelection == 9:
+ 
+    elif pSelection == 5:
         return it.primeNumbersFountain()
-    elif pSelection == 10 :
+    elif pSelection == 6 or pSelection == -1:
         it.clear()
         print("\t --- Goodbye M'Lord. --- \n")
         sys.exit
     else:
         it.clear()
-        print("\n Not available in the menu. Getting back ... ")
-        time.sleep(1)
         menu()
     
-    return None
 
 #################################################
 ################## MENU  ########################

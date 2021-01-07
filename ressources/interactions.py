@@ -421,7 +421,8 @@ def askForKey():
     else:
         import secrets as sr
         key = sr.randbits(128).to_bytes(16,"big")
-        print("Your key was randomly generated:", base64.b64encode(key).decode())
+        print("Your key was randomly generated: ", end="")
+        prGreen(base64.b64encode(key).decode())
     
     answer=query_yn("Do you want to keep your key in cache ?")
     
@@ -486,7 +487,7 @@ def doSomethingElse(m=None):
             return m()
     else:
         clear()
-        return katsumi.work_with_selection(11)
+        return katsumi.work_with_selection(-1)
 
 #########################################
 ##### Prime number's fount gestion ######
@@ -664,8 +665,6 @@ def primeNumbersFountain():
             katsumi.menu()
         else:
             clear()
-            print("\n Not available. Getting back...")
-            time.sleep(1)
             primeNumbersFountain()
         
     return doSomethingFount(selection)
@@ -770,7 +769,7 @@ def keysVerif(verif:bool=True):
                     asc.asciiCat()
 
         else:
-            print("Private key's missing.\n")
+            prRed("Private key's missing.\n")
         
             if query_yn("Do you want to add them now ?\n"):
 
@@ -935,7 +934,7 @@ def dHgestion():
             accord = dH.agreement(size,fountain)
 
             accord = writeKeytoFile(accord,"dH_agreement")
-            print(f"According to the size of the private key, your agreement is: {accord} ")
+            prGreen(f"According to the size of the private key, your agreement is: {accord} ")
 
             doSomethingElse(dHgestion)
 
@@ -968,7 +967,7 @@ def dHgestion():
             asc.asciiKeys()
 
             print("Shared key created.")
-            print(f"\t > {dH_shared}\n")
+            prGreen(f"\t > {dH_shared}\n")
 
             doSomethingElse(dHgestion)
 
@@ -1028,7 +1027,7 @@ def katsuSymm():
                     clear()
                     asc.asciiCat()
 
-            if query_yn("Do you want to encrypt a file ?"):
+            if query_yn("Do you want to encrypt a file ?","no"):
                 inFile = getFile()
                 if inFile:
                     data = bm.fileToBytes(inFile)
@@ -1041,7 +1040,8 @@ def katsuSymm():
             print("Encryption started....")
 
             begin_time = datetime.now()
-            print(ciphers.run(data, inFile, True, cipher, aad, key))
+            print("Here is your ciphered message, copy it and send it !\n")
+            prGreen(ciphers.run(data, inFile, True, cipher, aad, key))
             end=datetime.now() - begin_time
             input(f"Encryption finished in {end} seconds !\n")
 
@@ -1056,7 +1056,7 @@ def katsuSymm():
             cipher = cipher_choice()
             inFile = False
 
-            if query_yn("Do you want to decrypt a file ?"):
+            if query_yn("Do you want to decrypt a file ?","no"):
                 inFile = getFile()
                 if inFile:
                     data = bm.fileToBytes(inFile)
@@ -1071,7 +1071,9 @@ def katsuSymm():
             print("Decryption started....")
 
             begin_time = datetime.now()
-            print(ciphers.run(data, inFile, False, cipher, "", key))
+
+            prGreen(ciphers.run(data, inFile, False, cipher, "", key))
+            
             end = datetime.now() - begin_time
             input(f"Decryption finished in {end} seconds !")
 
