@@ -46,6 +46,8 @@ The source code is ordered as follows:
 
 * The generation of safe prime numbers is done by optimizing the search. We start from p prime number and check if 2p+1 is also prime OR if (p-1)/2 is also prime. [The source code dedicated to this subject](ressources/prng.py) has been commented in order to understand the thinking process.
 
+* The difficulty of the [proof of work](https://en.wikipedia.org/wiki/Proof_of_work) established is adjusted according to the size of the blocks using a logarithmic function approximated by induction (i.e. by experimentation).
+
 #### Prime Number's Fountain
 
 Generating safe primes can take a lot of computing time. 
@@ -65,7 +67,7 @@ With this method, the user can have safe prime numbers loaded in his free time a
 
 * The generation of the inverses in a binary Galois field (Z2) of degree 16 takes about 46.7 secondes (average over 5 trials).
 * Generating a safe prime of 512 bits take at average 12.4 secondes for 10 tests.
-* Generating a safe prime of 2048 bits take at average 1h10 for 4 tests.
+* Generating a safe prime of 2048 bits take at average 71 minutes for 4 tests.
 
 ## Authors
 * **Azaël MARTIN** - [n3rada](https://github.com/n3rada)
