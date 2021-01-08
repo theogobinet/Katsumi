@@ -53,7 +53,9 @@ The source code is ordered as follows:
 * The ["resources" folder](ressources/) contains all the largest code files. This is where most of the primary functions reside.
 
 #### Symmetric
-![Symmetric usage](images/sym.gif)
+<p align="center">
+  <img src="images/sym.gif" alt="animated" />
+</p>
 #### Asymmetric
 
 #### BlockChain
@@ -80,27 +82,9 @@ Generating safe primes can take a lot of computing time.
 To overcome this problem, we have imagined storing our safe primes in an accessible and editable location.
 We decided to call this thing: [**The Prime Numbers Fountain's**](ressources/generated/PrimeNumber's_Fount)
 
-                                        .      .       .       .
-            .   .       .   1217   .      . .      .         .     337   .    .
-                    .       .         .    .   .         .         .            .
-            .   .    .       .         . . .        .  2027   .     .    .
-            .     13    .   .       .       . .      .        .  .              .
-                .  .    .  .       .     . .    .       . .      .   .        .
-            .   .       .    . .   89 .    . .   .      .     .    109    .     .
-            .            .    .     .   . .  .     .   .               .
-                .               .  .    .  . . .    .  .                 .
-                                . .  .  . . .  . .
-                                    . . . . . .
-                                        . . . .
-                                        I . I
-                          _______________III_______________
-                         |    .   Prime   .  Numbers   .   |
-                          \SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS/
-                             \ ======================= /
-                                  \SSSSSSSSSSSSSSSSS/
-                               ________\       /________
-                              (=+=+=+=+=+=+=+=+=+=+=+=+=)
-                               ~~~~~~~~~~~~~~~~~~~~~~~~~
+<p align="center">
+  <img src="images/primeF.gif" alt="animated" />
+</p>
 
 With this method, the user can have safe prime numbers loaded in his free time and use them appropriately at the right time.
 
