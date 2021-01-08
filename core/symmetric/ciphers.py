@@ -68,7 +68,6 @@ def run(data, inFile="", encrypt=False, method=3, aad="", key=config.KEY):
 
     if(len(data) > 0):
         splitted=bm.splitBytes(data)
-        print(splitted)
         ciphered=cipher(splitted, method, encrypt, aad)
         
         return bm.codeOut(ciphered, encrypt, inFile)

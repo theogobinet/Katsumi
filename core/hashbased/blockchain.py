@@ -741,7 +741,7 @@ def arrayToBytes(array:list):
     return base64.b64encode(byts)
 
 
-def getBlockHash(block:(int,list), ignoreSalt:bool=True):
+def getBlockHash(block, ignoreSalt:bool=True):
     '''
         Get an hash of the block
 

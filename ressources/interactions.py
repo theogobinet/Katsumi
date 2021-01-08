@@ -172,7 +172,7 @@ def getb64(expected="message", size=-1):
                 else:
                     print(f'Error: {expected} must be {size} bytes long, enter [c] to go back or enter a valid base64')
             except binascii.Error:
-                print('Error: Unable to decode, the format is not in base64, enter [c] to go back or enter a valid base64')
+                print(f'Error: Unable to decode "{i}", the format is not in base64, enter [c] to go back or enter a valid base64')
 
 
 def cipher_choice():
@@ -276,7 +276,10 @@ def extractVarFromFile(fileName:str,directory=config.DIRECTORY_GEN,ext:str=".kat
     import ast
     with open(directory+fileName+ext,"r+") as f:
         contents=f.read()
-        extracted=ast.literal_eval(contents)
+        try:
+            extracted = ast.literal_eval(contents)
+        except Exception:
+            extracted = contents
 
     return extracted
 
@@ -369,13 +372,13 @@ def writeKeytoFile(key,fileName:str,directory=config.DIRECTORY_PROCESSING,ext:st
         size = "1"
           
           
-    b64Key = getB64Keys(key)
+    b64K = getB64Keys(key)
 
-    b64Key = size + b64Key
+    b64Key = size + b64K
 
     writeVartoFile(b64Key,fileName,directory,ext)
 
-    return b64Key
+    return b64K
 
 
 def extractKeyFromFile(fileName:str,directory=config.DIRECTORY_PROCESSING,ext:str=".kpk"):
@@ -764,6 +767,7 @@ def keysVerif(verif:bool=True):
                     rmFile("public_key.kpk",config.DIRECTORY_PROCESSING)
                     rmFile("private_key.kpk",config.DIRECTORY_PROCESSING)
                     rmFile("encrypted.kat",config.DIRECTORY_PROCESSING)
+                    return True
                 else:
                     clear()
                     asc.asciiCat()
@@ -798,10 +802,12 @@ def keysVerif(verif:bool=True):
 
                 keysVerif()
         else:
-            katsuAsymm()
+            return True
 
     else:
-        elGamalKeysGeneration()
+        return True
+    
+    return False
 
 def dlogAttack():
     
@@ -934,7 +940,8 @@ def dHgestion():
             accord = dH.agreement(size,fountain)
 
             accord = writeKeytoFile(accord,"dH_agreement")
-            prGreen(f"According to the size of the private key, your agreement is: {accord} ")
+            print("According to the size of the private key, your agreement is : ",end="")
+            prGreen(accord)
 
             doSomethingElse(dHgestion)
 
@@ -983,7 +990,7 @@ def dHgestion():
 
 
 #########################################
-############ Other Menus  ###############
+############ Symmetric Menu #############
 #########################################
 
 def katsuSymm():
@@ -1068,14 +1075,14 @@ def katsuSymm():
                     katsuSymm()
 
 
-            print("Decryption started....")
+            print("Decryption started....\n")
 
             begin_time = datetime.now()
 
-            prGreen(ciphers.run(data, inFile, False, cipher, "", key))
+            print(ciphers.run(data, inFile, False, cipher, "", key))
             
             end = datetime.now() - begin_time
-            input(f"Decryption finished in {end} seconds !")
+            input(f"\nDecryption finished in {end} seconds !")
 
             clear()
             asc.asciiCat()
@@ -1090,6 +1097,9 @@ def katsuSymm():
         
     doSomethingSymm(selection)
 
+#########################################
+############ Asymmetric Menu ############
+#########################################
 
 def katsuAsymm():
 
@@ -1099,7 +1109,7 @@ def katsuAsymm():
     clear()
     asc.asciiCat()
 
-    asymmetric_choices= ["Using ElGamal to generate public/private key pairs.","Encrypt a message with ElGamal","Decrypt a message encrypted by ElGamal.","Share private key with Diffie-Hellman.","Discrete Logarithmic attack on ElGamal.","Keys deletion","Back"]
+    asymmetric_choices= ["Using ElGamal to generate public/private key pairs.","Show keys","Encrypt a message with ElGamal","Decrypt a message encrypted by ElGamal.","Share private key with Diffie-Hellman.","Discrete Logarithmic attack on ElGamal.","Keys deletion","Back"]
 
     enumerateMenu(asymmetric_choices)
 
@@ -1112,11 +1122,37 @@ def katsuAsymm():
 
         if i == 1:
             print("You are going to generate public/private key pairs with ElGamal algorithm.")
-            time.sleep(1)
-            keysVerif()
-            elGamalKeysGeneration()
+            
+            if keysVerif():
+                elGamalKeysGeneration()
+            else:
+                clear()
+                asc.asciiCat()
+
+                print("Your current public key is: ",end="")
+                prGreen(getB64Keys(extractKeyFromFile("public_key")))
+
+                doSomethingElse(katsuAsymm)
 
         elif i == 2:
+
+            try:
+                publicK = getB64Keys(extractKeyFromFile("public_key"))
+                privateK = getB64Keys(extractKeyFromFile("private_key"))
+
+                print("Public Key : ",end="")
+                prGreen(publicK)
+                print()
+                print("Private Key : ",end="")
+                prGreen(privateK)
+
+            except FileNotFoundError:
+                print("One key doesn't exist. Please regenerate them.")
+            
+            doSomethingElse(katsuAsymm)
+
+
+        elif i == 3:
             
             if not isFileHere("public_key.kpk",config.DIRECTORY_PROCESSING):
                 print("No public key found into the system...")
@@ -1127,11 +1163,12 @@ def katsuAsymm():
                 answer = readFromUser().encode()
                 e = elG.encrypt(answer,extractKeyFromFile("public_key",config.DIRECTORY_PROCESSING),saving=True)
 
-                print(f"Saved encrypted message: {e} into appropriated file.")
+                print(f"Saved encrypted message into appropriated file : ",end="")
+                prGreen(e)
 
                 doSomethingElse(katsuAsymm)
 
-        elif i == 3:
+        elif i == 4:
 
             print("Let's check if everything is there.")
 
@@ -1167,12 +1204,13 @@ def katsuAsymm():
                 print(f"\t -'{phrase}'")
 
             doSomethingElse(katsuAsymm)
-        elif i == 4:
-            dHgestion()
+
         elif i == 5:
+            dHgestion()
+        elif i == 6:
             dlogAttack()
 
-        elif i == 6:
+        elif i == 7:
             clear()
             asc.asciiDeath()
             print("You're going to erase all key's from the system.\n")
@@ -1190,15 +1228,17 @@ def katsuAsymm():
             else:
                 katsuAsymm()
 
-        elif i == 7:
+        elif i == 8:
             clear()
             katsumi.menu()
         else:
-            
             katsuAsymm()
-        
+
     doSomethingAssym(selection)
 
+#########################################
+############   Hash Menu  ###############
+#########################################
 
 def katsuHash():
 
@@ -1265,4 +1305,69 @@ def katsuHash():
 
     doSomethingElse(katsuHash)
 
+#########################################
+#######  Certificate Menu    ############
+#########################################
 
+def certificate():
+
+    import core.asymmetric.certificate as ca
+    
+    clear()
+    asc.asciiBark()
+
+    choices = ["Get a public key certificate","Show current digital certificate","Back to menu"]
+
+    enumerateMenu(choices)
+
+    selection = getInt(1,"choices")
+
+    if selection == 1:
+        clear()
+        asc.asciiBark()
+
+        k=getb64("public key")
+
+        if not k:
+            certificate()
+
+        clear()
+        asc.asciiBark()
+
+        ca.x509(k,out=False)
+        print("Certifcate generated !")
+
+        doSomethingElse(certificate)
+            
+    elif selection == 2:
+
+        clear()
+        asc.asciiBark()
+        
+        if not isFileHere("X509.ca",config.DIRECTORY_PROCESSING):
+            print("Certificate not present into the system.")
+            print("Getting back ..")
+            time.sleep(1)
+            certificate()
+        else:
+            f = open(config.DIRECTORY_PROCESSING+"X509.ca")
+            for l in f.readlines():
+                print(l)
+
+        doSomethingElse(certificate)
+       
+    else:
+        import katsumi
+
+        clear()
+        katsumi.menu()
+
+    doSomethingElse(certificate)
+
+
+
+
+
+#########################################
+#######  BlockChain Menu    #############
+#########################################

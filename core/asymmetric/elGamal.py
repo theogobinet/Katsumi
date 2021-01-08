@@ -157,7 +157,9 @@ def key_gen(n:int=2048,primeFount=None,easyGenerator:bool=False,randomFunction=N
         public_key = it.writeKeytoFile(public_key,"public_key",config.DIRECTORY_PROCESSING,".kpk")
 
     if Verbose:
-        print(f"\nThe public key '{public_key}' has been generated too.")
+        print(f"\nThe public key has been generated too : ",end="")
+
+        it.prGreen(public_key)
     
     if not saving:
         return (public_key,private_key)

@@ -79,6 +79,23 @@ def asciiKeys():
             """
     )
 
+def asciiBark():
+    it.clear()
+    return print(
+        """
+    .-------------.                        .    .   *       *   
+    /_/_/_/_/_/_/_/ \    certification        *   .   )    .
+    //_/_/_/_/_/_// _ \ __      authority (CA)   .        .   
+    /_/_/_/_/_/_/_/|/ \.' .`-o                 *    .  
+    |             ||-'(/ ,--'                    
+    |    Benji    ||  _ |         BARK Trust Services                      
+    |             ||'' ||                        
+    |_____________|| |_|L                     
+
+        """
+    )
+
+
 def asciiCat():
     it.clear()
     return print('''                         

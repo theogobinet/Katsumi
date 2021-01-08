@@ -29,6 +29,7 @@
         - [Asymmetric](#Asymmetric)
         - [BlockChain](#BlockChain)
     - [Implementation choices](#Implementation_choices)
+        -[Prime Numbers Fountain's](#Prime_Numbers_Fountain's)
     - [Performances](#Performances)
     - [Improvements](#Improvements)
 - [Authors](#Authors)
@@ -52,7 +53,7 @@ The source code is ordered as follows:
 * The ["resources" folder](ressources/) contains all the largest code files. This is where most of the primary functions reside.
 
 #### Symmetric
-
+![Symmetric usage](images/sym.gif)
 #### Asymmetric
 
 #### BlockChain
@@ -73,11 +74,11 @@ The source code is ordered as follows:
 
 * Base64 is used instead of hexadecimal for storing and displaying encrypted keys and/or messages. **Base64 takes 4 characters for every 3 bytes, so it's more efficient than hex.**
 
-#### Prime Number's Fountain
+#### Prime Numbers Fountain's
 
 Generating safe primes can take a lot of computing time. 
 To overcome this problem, we have imagined storing our safe primes in an accessible and editable location.
-We decided to call this thing: [**The Prime Number's Fountain**](ressources/generated/PrimeNumber's_Fount)
+We decided to call this thing: [**The Prime Numbers Fountain's**](ressources/generated/PrimeNumber's_Fount)
 
                                         .      .       .       .
             .   .       .   1217   .      . .      .         .     337   .    .

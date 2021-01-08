@@ -29,11 +29,14 @@ def work_with_selection(pSelection):
         it.katsuHash()
 
     elif pSelection == 4 :
+        it.certificate()
+    
+    elif pSelection == 5:
         print("Test")
  
-    elif pSelection == 5:
+    elif pSelection == 6:
         return it.primeNumbersFountain()
-    elif pSelection == 6 or pSelection == -1:
+    elif pSelection == 7 or pSelection == -1:
         it.clear()
         print("\t --- Goodbye M'Lord. --- \n")
         sys.exit
@@ -48,7 +51,7 @@ def work_with_selection(pSelection):
 
 def menu():
 
-    choices=["Symmetric","Asymmetric","Hash","BlockChain","Prime Numbers Fountain's","Exit"]
+    choices=["Symmetric","Asymmetric","Hash","Get X509 Certificate","BlockChain","Prime Numbers Fountain's","Exit"]
 
     if it.correctSizeHook():
 

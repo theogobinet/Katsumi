@@ -41,7 +41,10 @@ def x509(subjectPublicKey,name:str="X509",out:bool=True):
         Version: 3 (0x2)
         Serial Number: {serialN}
         Signature Algorithm: El-Gamal
-        Issuer: CN = BARK_CA
+        Issuer Name:
+            Country: FR
+            Organization: Bark Trust Services
+            Common Name = BARK CA 101
         Validity
             Not Before: {today.strftime("%b-%d-%Y")}
             Not After : {nextY.strftime("%b-%d-%Y")}
@@ -51,9 +54,10 @@ def x509(subjectPublicKey,name:str="X509",out:bool=True):
                 Public-Key: ({str(n)} bit)
                 pub:
                     {str(subjectPublicKey)}
-    
     Signature Algorithm: El-Gamal
          {signature}
+    Key Usages
+        Purposes: Digital Signature
     """
 
 
