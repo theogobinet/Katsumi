@@ -56,6 +56,7 @@ The source code is ordered as follows:
 <p align="center">
   <img src="images/sym.gif" alt="animated" />
 </p>
+
 #### Asymmetric
 
 #### BlockChain
