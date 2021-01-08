@@ -170,6 +170,17 @@ def getFloat(default=0.5, expected="value", limit:int=inf):
                 
             except ValueError:
                 print(f"'{f}' is not an float, leave blank or enter a valid {expected}:")
+    
+def getRange(default=(1,1)):
+    while True:
+        t1 = getInt(default[0], "min")
+        t2 = getInt(default[1], "max") 
+
+        if t1 <= t2:
+            return (t1,t2)
+        
+        else :
+            print (f'Error: ({t1}, {t2}) is not a valid range, leave blank or enter a valid range')
 
 
 def getb64(expected="message", size=-1):
@@ -1417,15 +1428,17 @@ def bcSimulationParam():
     elif selection <= len(c.BC_USER_PARAMS) + 1:
 
         param = c.BC_USER_PARAMS[selection-2]
+
+        pName = param[1].replace('\t','')
+
+        print (f'{pName} : {param[2]}')
         
         if param[3] == int:
             param[0] = getInt(param[0], "value", param[4])
         elif param[3] == float:
             param[0] = getFloat(param[0], "value")
         elif param[3] == tuple:
-            t1 = getInt(param[0][0], "min value")
-            t2 = getInt(param[0][1], "max value")
-            param[0] = (t1,t2)
+            param[0] = getRange((param[0]))
 
         bcSimulationParam()
 
