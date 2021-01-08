@@ -44,8 +44,11 @@ def key_gen(size:int=2048,randomFunction=None,saving=False,Verbose=False):
 
     while not ut.coprime(e,carmichaelTotient):
         e = rd.randrange(1,carmichaelTotient)
-    
-    #https://en.wikipedia.org/wiki/Hamming_weight
+
+        #e having a short bit-length and small Hamming weight results in more efficient encryption 
+        #https://en.wikipedia.org/wiki/Hamming_weight
+
+        
 
 
 

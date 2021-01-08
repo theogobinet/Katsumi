@@ -51,7 +51,8 @@ def mult_to_bytes(obj:object) -> bytes:
         res = obj
 
     elif isinstance(obj,str):
-        res = int(obj,2)
+        alphabet = max([int(c) for c in obj]) + 1
+        res = int(obj,alphabet)
         return mult_to_bytes(res)
         
     else:
@@ -244,13 +245,8 @@ def hammingWeight(n:object):
     The number of symbols that are different from the zero-symbol of the alphabet used.
     """
 
-    n = bytes_to_int(mult_to_bytes(n))
+    if not n.isdigit():
+        n = bits_extractor(mult_to_bytes(n))
 
-    weight=0
-
-    for i in range(n.bit_length()):
-        if ((n >> i) & 1):
-            weight += 1
-
-    return weight
+    return len(n)-n.count('0')
 
