@@ -28,7 +28,7 @@ def sponge(N:bytearray, d:int):
         # Padding using the SHA-3 pattern 10*1: a 1 bit, followed by zero or more 0 bits (maximum r − 1) and a final 1 bit.
         op = ((iN | (1 << b + lN + 1)) << 1) ^ 1
         
-        return bm.int_to_bytes(op)
+        return bm.mult_to_bytes(op)
 
     r = 8
     d = int(d/8)
@@ -90,7 +90,7 @@ def md5(block):
 
     iN = (((iN << 1) | 1) << b) ^ lN
 
-    block = bm.int_to_bytes(iN)
+    block = bm.mult_to_bytes(iN)
 
     b512 = bm.splitBytes(block, 64)
 
@@ -181,7 +181,7 @@ def PoW(block, zBits=1, interruptOnChange=('', 0)):
         raise ValueError('The number of zero bits must be lower than 2^8')
 
     salt = 1
-    H = sponge(block + bm.int_to_bytes(salt), 256)
+    H = sponge(block + bm.mult_to_bytes(salt), 256)
 
     while not nullBits(H, zBits):
 
@@ -190,6 +190,6 @@ def PoW(block, zBits=1, interruptOnChange=('', 0)):
                 return False
 
         salt = random.randint(0, 1 << 32)
-        H = sponge(block + bm.int_to_bytes(salt), 256)
+        H = sponge(block + bm.mult_to_bytes(salt), 256)
 
-    return bm.int_to_bytes(salt)
+    return bm.mult_to_bytes(salt)

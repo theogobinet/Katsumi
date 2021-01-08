@@ -75,7 +75,7 @@ def randomInt(evenOrodd:int=0,n:int=512):
     return r
 
 
-def randomPrime(nBits:int=512,gen=randomInt,condition = lambda p : p == p,k:int=1,Verbose=False):
+def randomPrime(nBits:int=512,gen=None,condition = lambda p : p == p,k:int=1,Verbose=False):
     """
     Generates prime numbers with bitlength nBits.
     Stops after the generation of k prime numbers.
@@ -85,6 +85,9 @@ def randomPrime(nBits:int=512,gen=randomInt,condition = lambda p : p == p,k:int=
 
     # Generate random odd number of nBits
     assert nBits >= 8 and nBits <= 4096
+
+    if not gen:
+            gen = randomInt
 
     def find(Verbose:bool):
         maybe=gen(0,nBits)
@@ -117,7 +120,7 @@ def randomPrime(nBits:int=512,gen=randomInt,condition = lambda p : p == p,k:int=
     else:
         return primes
     
-def safePrime(nBits:int=1024,randomFunction=xorshiftperso,easyGenerator=False,cpu_percentage:int=100):
+def safePrime(nBits:int=1024,randomFunction=xorshiftperso,easyGenerator=False):
     """
     The number 2p + 1 associated with a Sophie Germain prime is called a safe prime.
     In number theory, a prime number p is a Sophie Germain prime if 2p + 1 is also prime

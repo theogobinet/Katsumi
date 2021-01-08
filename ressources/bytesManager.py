@@ -15,10 +15,6 @@ def int_to_bits(i:int):
     """Take an integer as input and return the bits written version."""
     return "{:0{}b}".format(i,i.bit_length())
 
-def int_to_bytes(i:int):
-    """Take an integer as input and return the bytes written version"""
-    return i.to_bytes(bytes_needed(i),"big")
-
 def isBase64(sb):
     """
     Check if both string and bytes objects are in base64.
@@ -37,21 +33,29 @@ def isBase64(sb):
             return False
 
 
-def mult_to_bytes(obj:object):
-    """Convert given {array of bits, bytes, int, b64} to bytes"""
+def mult_to_bytes(obj:object) -> bytes:
+    """Convert given {array of bits, bytes, int, str, b64} to bytes"""
 
     if isinstance(obj,list):
-        res=bits_compactor(obj)
+        i = int(''.join(['{:01b}'.format(x) for x in obj]),2)
+        res = i.to_bytes(bytes_needed(i), byteorder='big')
+
     elif isinstance(obj,int):
-        res=int_to_bytes(obj)
+        res = obj.to_bytes(bytes_needed(obj),"big")
+
     elif isBase64(obj):
         import base64
         res = base64.b64decode(obj)
+
     elif isinstance(obj,bytes):
         res = obj
+
+    elif isinstance(obj,str):
+        res = int(obj,2)
+        return mult_to_bytes(res)
+        
     else:
         res = bytes(obj)
-        
 
     return res
 
@@ -68,15 +72,6 @@ def bytes_needed(n:int):
 def bits_extractor(byteA):
     """Take ether bytes or bytearray and return an array of bits."""
     return [int(b) for b in ''.join(['{:08b}'.format(x) for x in byteA])]
-
-def bits_compactor(bits:list):
-    """Take an array of bits as input and return bytes."""
-
-    s=''.join(['{:01b}'.format(x) for x in bits])
-    i=int(s,2)
-
-    return i.to_bytes(bytes_needed(i), byteorder='big')
-
 
 file_name=""
 without_ext=""
@@ -242,3 +237,20 @@ def circularRotation(arr, dir=0,n=1):
         r = (((arrInt >> n)|(arrInt << (nB - n))) & size)
 
     return r.to_bytes(len(arr), 'big')
+
+
+def hammingWeight(n:object):
+    """
+    The number of symbols that are different from the zero-symbol of the alphabet used.
+    """
+
+    n = bytes_to_int(mult_to_bytes(n))
+
+    weight=0
+
+    for i in range(n.bit_length()):
+        if ((n >> i) & 1):
+            weight += 1
+
+    return weight
+

@@ -461,7 +461,15 @@ def isGenerator(e:int,n:int,lagrangeWay=True,printOther=False,Verbose=False):
 
             return True
 
+def carmichaelFunction(n):
+    """
+    The Carmichael function associates to every positive integer n a positive integer λ(n), defined as the smallest positive integer m such that
+    a^m ≡ 1   (mod n)
+    for every integer a between 1 and n that is coprime to n. In algebraic terms, λ(n) is the exponent of the multiplicative group of integers modulo n.
 
+    https://mathworld.wolfram.com/CarmichaelFunction.html
+    """
+    return max(multiplicativeOrder(a,n) for a in range(n+1) if ut.coprime(a,n))
 
         
 def quadraticsResidues(n:int,sortedList=True):

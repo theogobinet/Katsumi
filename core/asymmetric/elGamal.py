@@ -17,7 +17,7 @@ import random as rd
 # the message itself is encrypted using a symmetric cryptosystem and ElGamal is then used to encrypt only the symmetric key.
 ############
 
-def generator(p:int,q:int,r:int=2):
+def generator(p:int,q:int,r:int=2) -> int:
     """
     Find a generator g such as g order is q (Sophie Germain prime) with p = 2q + 1.
     That's a generator for Gq. Not Zp* and any other subgroup. Very important point.
@@ -62,7 +62,7 @@ def generator(p:int,q:int,r:int=2):
         return g
 
 
-def isEasyGeneratorPossible(s:tuple):
+def isEasyGeneratorPossible(s:tuple) -> int:
     """
     Return True is it's possible to generate easly a generator.
     """
@@ -83,7 +83,7 @@ def isEasyGeneratorPossible(s:tuple):
 #############################################
 
 
-def key_gen(n:int=2048,primeFount=None,easyGenerator:bool=False,randomFunction=None,saving=False,Verbose=False):
+def key_gen(n:int=2048,primeFount=True,easyGenerator:bool=False,randomFunction=None,saving=False,Verbose=False) -> tuple :
     """
     ElGamal key generation.
 
@@ -104,12 +104,12 @@ def key_gen(n:int=2048,primeFount=None,easyGenerator:bool=False,randomFunction=N
         if Verbose: print(f"Let's try to generate a safe prime number of {n} bits.")
 
         s = prng.safePrime(n,randomFunction,easyGenerator,Verbose)
-        p,q = s # safe_prime and Sophie Germain prime
     
     else:
         primeFount = it.extractSafePrimes(n,False,Verbose)
         s = primeFount
-        p,q = s # safe_prime and Sophie Germain prime
+        
+    p,q = s # safe_prime and Sophie Germain prime
 
 
     if Verbose: print(f"Let's find the generator for p: {p} , safe prime number.\n")
@@ -165,7 +165,7 @@ def key_gen(n:int=2048,primeFount=None,easyGenerator:bool=False,randomFunction=N
         return (public_key,private_key)
 
 
-def getSize(key:object="public_key"):
+def getSize(key:object="public_key") -> int:
     """
     Return size of current key based on prime fount's.
     """
@@ -236,7 +236,7 @@ def decrypt(ciphertext,sK:tuple,asTxt=False):
         # This calculation produces the original message
         m = (c2 * s1) % p
 
-        return bm.int_to_bytes(m)
+        return bm.mult_to_bytes(m)
     
     if isinstance(ciphertext,list):
         

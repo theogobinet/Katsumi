@@ -185,7 +185,7 @@ def invertGalois(A,output=1):
     elif output==1:
         return res
     elif output==2:
-        return bm.bits_compactor(list(res))
+        return bm.mult_to_bytes(list(res))
     else:
         return None
 

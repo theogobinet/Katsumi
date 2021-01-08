@@ -5,3 +5,4 @@
 from . import elGamal as elG 
 from . import diffieHellman as dH
 from . import certificate as ca
+from . import RSA as rsa

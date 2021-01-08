@@ -486,8 +486,8 @@ def pohlig_hellman(g,h,n):
 # Function to calculate k for given a, b, m  
 def discreteLog(g:int, h:int, p:int,method:int=1):
     """
-    Given a cyclic group of order 'p' a generator 'g' and a group element r, 
-    the problem is to find an integer 'k' such that g^k = r (mod p) by using
+    Given a cyclic group of order 'p' a generator 'g' and a group element h, 
+    the problem is to find an integer 'k' such that g^k = h (mod p) by using
     baby-step,giant-step algorithm or Pohlig-Hellman algorithm.
 
     method:

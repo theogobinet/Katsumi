@@ -215,7 +215,7 @@ def genInverses2():
     print("\n\t || Inverses are going to be generated || \n")
     config.IN_CREATION = True
 
-    config.INVERSIONS_BOX = [invertGalois2(bm.int_to_bytes(elt)) for elt in config.ELEMENTS]
+    config.INVERSIONS_BOX = [invertGalois2(bm.mult_to_bytes(elt)) for elt in config.ELEMENTS]
     it.writeVartoFile(config.INVERSIONS_BOX,"inversion_Sbox")
 
     config.IN_CREATION = False
@@ -226,7 +226,7 @@ def GF2(degree):
     """Initialize the Galois Field GF(p^degree) in Zn."""
     config.DEGREE=degree
     config.NBR_ELEMENTS = 2 ** degree
-    config.IRRED_POLYNOMIAL = int.from_bytes(bm.bits_compactor(config.IRRED_POLYNOMIAL),"big")
+    config.IRRED_POLYNOMIAL = int.from_bytes(bm.mult_to_bytes(config.IRRED_POLYNOMIAL),"big")
     config.GENERATOR = gen_GL_2(config.IRRED_POLYNOMIAL,degree)
 
     it.handleInvBox()

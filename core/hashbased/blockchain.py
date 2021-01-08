@@ -396,12 +396,11 @@ def addUser(username:str, autoGenerateKeys:bool=True, keys:list=[]):
     '''
 
     from core.asymmetric.elGamal import key_gen
-    from ressources.interactions import getIntKey, extractSafePrimes 
+    from ressources.interactions import getIntKey
 
     if autoGenerateKeys:
         # generate keys
-        primes = extractSafePrimes(c.BC_KEY_SIZE)
-        publicKey, privateKey = key_gen(c.BC_KEY_SIZE, primes)
+        publicKey, privateKey = key_gen(c.BC_KEY_SIZE)
     else:
         # decode base64 tuple of key
         publicKey, privateKey = getIntKey(keys, 2)

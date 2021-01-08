@@ -385,7 +385,7 @@ def IV(arr,key="y/B?E(H+MbQeThVm".encode()):
     r1=sr.randbelow(len(arr))
     r2=sr.randbits(8)
     message=bm.bytes_to_int(arr[r1]) ^ r2
-    message=bm.int_to_bytes(message)
+    message=bm.mult_to_bytes(message)
 
     # Let's use the principle of hmac
     # The basic idea is to concatenate the key and the message, and hash them together. 

@@ -29,7 +29,7 @@
         - [Asymmetric](#Asymmetric)
         - [BlockChain](#BlockChain)
     - [Implementation choices](#Implementation_choices)
-        -[Prime Numbers Fountain's](#Prime_Numbers_Fountain's)
+        - [Prime Numbers Fountain's](#Prime_Numbers_Fountain's)
     - [Performances](#Performances)
     - [Improvements](#Improvements)
 - [Authors](#Authors)
@@ -77,6 +77,7 @@ The source code is ordered as follows:
 
 * Base64 is used instead of hexadecimal for storing and displaying encrypted keys and/or messages. **Base64 takes 4 characters for every 3 bytes, so it's more efficient than hex.**
 
+
 #### Prime Numbers Fountain's
 
 Generating safe primes can take a lot of computing time. 
@@ -116,3 +117,4 @@ Here is some useful links for documentation concerning related subjects:
 * https://en.wikipedia.org/wiki/Cryptographically_secure_pseudorandom_number_generator
 * https://andersbrownworth.com/blockchain/
 * https://www.random.org/analysis/
+* https://en.wikipedia.org/wiki/Hamming_weight

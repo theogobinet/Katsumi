@@ -378,12 +378,12 @@ def getB64Keys(key):
         tw = key
     else:
         #uniq key
-        tw = bm.int_to_bytes(key)
+        tw = bm.mult_to_bytes(key)
 
     return base64.b64encode(tw).decode()
 
 
-def writeKeytoFile(key,fileName:str,directory=config.DIRECTORY_PROCESSING,ext:str=".kpk"):
+def writeKeytoFile(key,fileName:str,directory=config.DIRECTORY_PROCESSING,ext:str=".kpk") -> str:
     """
     Write key in b64 format to file .kpk with key length's as header.
     """
@@ -727,7 +727,7 @@ def elGamalKeysGeneration():
         if query_yn("Do you want to use the Prime Number's Fountain to generate the keys (fastest) (default: yes) ?"):
             primes = extractSafePrimes(n,False,eGen,Verbose=True)
         else:
-            primes = None
+            primes = False
 
         clear()
         asc.asciiCat()
