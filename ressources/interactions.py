@@ -139,9 +139,7 @@ def getInt(default=256, expected="hash", size=False, limit:int=inf):
 
     while True:
         i = input("> ")
-        if i == "c":
-            return None
-        elif i == "":
+        if i == "":
             return default
         else:
             try:
@@ -153,6 +151,25 @@ def getInt(default=256, expected="hash", size=False, limit:int=inf):
                 
             except ValueError:
                 print(f"'{i}' is not an integer, leave blank or enter a valid {expected}:")
+
+
+def getFloat(default=0.5, expected="value", limit:int=inf):
+    print(f"Enter {expected} ({default} by default):")
+
+    while True:
+        f = input("> ")
+        if f == "":
+            return default
+        else:
+            try:
+                val = float(f)
+                if val >= 0 and val <= limit:
+                    return val
+                else:
+                    print(f"Error: {f} is not a valid {expected}, leave blank or enter a valid {expected}:")
+                
+            except ValueError:
+                print(f"'{f}' is not an float, leave blank or enter a valid {expected}:")
 
 
 def getb64(expected="message", size=-1):
@@ -1365,9 +1382,76 @@ def certificate():
     doSomethingElse(certificate)
 
 
-
-
-
 #########################################
 #######  BlockChain Menu    #############
 #########################################
+
+from core.hashbased import blockchain as bc
+from ressources import config as c
+
+def bcSimulationParam():
+
+    clear()
+    print("List of simulation parameters, select the corresponding parameter to view its description and edit it:\n")
+    params = [f"{bc.bcolors.BOLD}START THE SIMULATION{bc.bcolors.ENDC}"] + [f'{x[1]} \t\t | {x[0]}'  for x in c.BC_USER_PARAMS] + ["Back to menu"]
+
+    enumerateMenu(params)
+    selection = getInt(1,"choices")
+
+    if selection == 1:
+        values = [x[0] for x in c.BC_USER_PARAMS]
+
+        c.BC_MINER_REWARD = values[2]
+        c.BC_HASH_SIZE = values[3]
+        c.BC_KEY_SIZE = values[4]
+        c.BC_POW_RATIO = values[5]
+        c.BC_POW_FIRST = values[6]
+
+        clear()
+
+        if bc.startLive(values[0], values[1], values[7], values[8], values[9]):
+            print("Block-chain validation performed without error")
+        else:
+            print("An error occured during block-chain validation")
+    
+    elif selection <= len(c.BC_USER_PARAMS) + 1:
+
+        param = c.BC_USER_PARAMS[selection-2]
+        
+        if param[3] == int:
+            param[0] = getInt(param[0], "value", param[4])
+        elif param[3] == float:
+            param[0] = getFloat(param[0], "value")
+        elif param[3] == tuple:
+            t1 = getInt(param[0][0], "min value")
+            t2 = getInt(param[0][1], "max value")
+            param[0] = (t1,t2)
+
+        bcSimulationParam()
+
+    else:
+        katsuBlockChain()
+
+
+def katsuBlockChain():
+
+    clear()
+    choices = ["Block-chain live simulation", "Quick block-chain test","Back to menu"]
+    enumerateMenu(choices)
+
+    selection = getInt(1,"choices")
+
+    if selection == 1:
+        bcSimulationParam()
+
+    elif selection == 2:
+        clear()
+        print("Generating the test block-chain...")
+        bc.createTestBC()
+
+    else:
+        import katsumi
+        clear()
+        katsumi.menu()
+
+    doSomethingElse(katsuBlockChain)

@@ -64,5 +64,19 @@ BC_POW_FIRST = 10
 BC_POW_RATIO = 1 # Factor of POW difficulty (0.5 is easier than 2)
 BC_HASH_SIZE = 256
 BC_KEY_SIZE = 128
-BC_MINER_REWARD = 50
+BC_MINER_REWARD = 20
 BC_TIME_START = 0
+
+BC_USER_PARAMS = [
+    # Default value, param name, param desc, param type, is param a size
+    [10, "Bloc limit\t", "Block-chain simulation stops when this number of bloc is reached.", int, False],
+    [2, "Number of miners\t", "Number of miners trying to validate each block, since users are created progressively, this number will only be reached when enough users are created.", int, False],
+    [20, "Miner reward\t", "Amount of money rewarded to the miner for block validation.", int, False],
+    [256, "Hash size\t\t", "Hash size used for POW calculation and bloc hashes, increasing this value makes it harder to validate a block.", int, True],
+    [128, "Key size\t\t", "Key size used for signing transactions, increasing this value makes bloc much bigger and increases POW calculation time.", int, False],
+    [0.5, "POW ratio\t\t", "Ratio for POW calculation difficulty, 0.5 makes it easier to validate a block when 2 makes it harder. Has a direct influence on number of transaction per bloc", float, False],
+    [10, "POW first value\t", "First block is not growing with new transactions (because nobody have enough money), so POW needs to have a fixed number of null bits.", int, False],
+    [(1,2), "Cycle per second\t", "Range in seconds between which transactions are generated (e.g. new cycle between every (1,2) seconds).", tuple, False],
+    [(5,10), "Transaction per cycle", "Range between which number of transactions per cycle are generated (e.g. between (1,5) transactions are generated per cycle).", tuple, False],
+    [(1,10), "Transaction amount", "Range between which amount of the transaction is choosen (e.g. transaction amount is between (1,10))", tuple, False]
+]

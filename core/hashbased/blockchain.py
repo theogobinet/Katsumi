@@ -18,13 +18,14 @@ from ressources import config as c
     Because all the calculation time will be spent verifying the transactions for each miner rather than calculating the proof of work.
 '''
 
-def network(limit:int, rangeTB:tuple=(10,15), rangeBS:tuple=(2,3)):
+def network(limit:int, rangeBS:tuple=(1,2), rangeTB:tuple=(3,5), rangeAm:tuple=(1,10)):
     '''
         Loop that creates random users and transactions, stops when block limit is reached
 
         limit: stops when the number of block in the block-chain have reach limit
         rangeBS: range between each cycles of transactions (e.g. new cycle between every (1,2) seconds)
         rangeTB: range of transactions per cycles (e.g. between (3,5) transactions are generated per cycle)
+        rangeAm: range between which amount of the transaction is choosen (e.g. transaction amount is between (1,10)) 
 
         Transaction frequency calculation: avg(rangeTB) / avg(rangeBS) = average number of transactions per second
     '''
@@ -54,7 +55,7 @@ def network(limit:int, rangeTB:tuple=(10,15), rangeBS:tuple=(2,3)):
                 while sender == receiver:
                     receiver = random.randrange(1, nbUsers)
 
-                addTransaction(sender, receiver, random.randint(1, 5))
+                addTransaction(sender, receiver, random.randint(rangeAm[0], rangeAm[1]))
 
         time.sleep(random.randrange(rangeBS[0], rangeBS[1]))
 
@@ -85,7 +86,7 @@ def mine(user:int):
             index, cBlock, cUTXO = res
 
 
-def startLive(limit:int, maxMiner:int, rangeTB:tuple=(10,15), rangeBS:tuple=(2,3)):
+def startLive(limit:int, maxMiner:int, rangeTB:tuple=(10,15), rangeBS:tuple=(2,3), rangeAm:tuple=(1,10)):
     '''
         Main function to start the live execution of the block-chain
 
@@ -93,6 +94,7 @@ def startLive(limit:int, maxMiner:int, rangeTB:tuple=(10,15), rangeBS:tuple=(2,3
         maxMiner: maximal number of simultaneous miner
         rangeBS: range between each cycles of transactions (e.g. new cycle between every (1,2) seconds)
         rangeTB: range of transactions per cycles (e.g. between (3,5) transactions are generated per cycle)
+        rangeAm: range between which amount of the transaction is choosen (e.g. transaction amount is between (1,10)) 
     '''
 
     import threading
@@ -101,7 +103,7 @@ def startLive(limit:int, maxMiner:int, rangeTB:tuple=(10,15), rangeBS:tuple=(2,3
 
     initChain()
 
-    tN = threading.Thread(target=network, args=(limit,))
+    tN = threading.Thread(target=network, args=(limit, rangeTB, rangeBS, rangeAm, ))
     tN.daemon = True
     tN.start()
 
@@ -146,30 +148,39 @@ def createTestBC():
     c.BC_KEY_SIZE = 128
     c.BC_POW_RATIO = 0.1
 
+    logState = 0
+
     # create the 1st block
     initChain()
 
+    logState = displayLogs(logState)
+
     # create 2 users
-    Al = addUser("Alic")
-    Bo = addUser("Bobo")
+    Al = addUser("Hali")
+    Bo = addUser("Baba")
 
     # valid the block -> reward money to miner (Alice)
     validBlock(len(c.BC_CHAIN) - 1, Al)
+    logState = displayLogs(logState)
     validBlock(len(c.BC_CHAIN) - 1, Al)
+    logState = displayLogs(logState)
 
 
     # with reward, alice have enough to send to Bob
     validBlock(len(c.BC_CHAIN) - 1, Bo)
+    logState = displayLogs(logState)
 
     addTransaction(Al, Bo, 20)
+    logState = displayLogs(logState)
 
     validBlock(len(c.BC_CHAIN) - 1, Al)
+    logState = displayLogs(logState)
 
-    displayLogs()
+    print()
     displayBC()
 
-    print(validChain(Al))
-    print(isValidBlock(Al, len(c.BC_CHAIN) - 1, True))
+    print("Chain valid: ", validChain(Al))
+    print("Last block valid: ", isValidBlock(Al, len(c.BC_CHAIN) - 1, True))
 
 
 ######################
@@ -183,6 +194,12 @@ def initChain():
 
     import time
     from core.hashbased import hashFunctions as hf
+
+    # Reset variables
+    c.BC_CHAIN = []
+    c.BC_USERS = []
+    c.BC_UTXO = []
+    c.BC_LOGS = []
 
     firstBlock = [hf.sponge(b"Lorsqu'un canide aboie, ca fait BARK", c.BC_HASH_SIZE)]
     fBTB = arrayToBytes(firstBlock)

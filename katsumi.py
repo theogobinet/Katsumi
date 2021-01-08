@@ -32,7 +32,7 @@ def work_with_selection(pSelection):
         it.certificate()
     
     elif pSelection == 5:
-        print("Test")
+        it.katsuBlockChain()
  
     elif pSelection == 6:
         return it.primeNumbersFountain()
