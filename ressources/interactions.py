@@ -999,6 +999,7 @@ def dHgestion():
                 accord = extractKeyFromFile("dH_agreement")
             else:
                 accord = getIntKey(getb64("agreement"),2)
+                clear()
 
             print(f"\nNow, choose a secret value into [0,{accord[0]}]")
             
@@ -1009,12 +1010,13 @@ def dHgestion():
             clear()
             asc.asciiKeys()
 
-            dH.chooseAndSend(accord,secret,saving=True,Verbose=True)
+            secret = dH.chooseAndSend(accord,secret,saving=True,Verbose=True)
 
             clear()
             asc.asciiKeys()
 
-            dH_shared = dH.compute(accord,secret,saving=True,Verbose=True)
+            sended = getIntKey(getb64("his secret"),1)
+            dH_shared = dH.compute(accord,[secret,sended],saving=True)
             
             clear()
             asc.asciiKeys()
@@ -1420,7 +1422,7 @@ from ressources import config as c
 
 def bcSimulationParam():
 
-    clear()
+    asc.asciiBlockC()
     print("List of simulation parameters, select the corresponding parameter to view its description and edit it:\n")
     params = [f"{bc.bcolors.BOLD}START THE SIMULATION{bc.bcolors.ENDC}"] + [f'{x[1]} \t\t | {x[0]}'  for x in c.BC_USER_PARAMS] + ["Back to menu"]
 
@@ -1446,7 +1448,7 @@ def bcSimulationParam():
     
     elif selection <= len(c.BC_USER_PARAMS) + 1:
 
-        clear()
+        asc.asciiBlockC()
 
         param = c.BC_USER_PARAMS[selection-2]
 
@@ -1472,7 +1474,7 @@ def bcSimulationParam():
 
 def katsuBlockChain():
 
-    clear()
+    asc.asciiBlockC()
     choices = ["Block-chain live simulation", "Quick block-chain test","Back to menu"]
     enumerateMenu(choices)
 

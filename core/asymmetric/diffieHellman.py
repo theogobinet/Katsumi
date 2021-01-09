@@ -38,39 +38,31 @@ def chooseAndSend(accord:tuple,secret=None,n:int=2048,saving=False,Verbose=False
     p,g = accord
 
     if not secret:
-        i = rd.randrange(2,n)
+        secret_integer = rd.randrange(2,n)
         if Verbose:
-            print(f"This is your secret integer, keep it safe: {i}")
+            print(f"This is your secret integer, keep it safe: {secret_integer}")
     else:
-        i = secret
+        secret_integer = secret
 
-    toSend = ut.square_and_multiply(g,i,p)
+    toSend = ut.square_and_multiply(g,secret_integer,p)
 
     if saving:
         toSend = it.writeKeytoFile(toSend,"dH_sendable")
-    else:
-        toSend = (i,toSend)
 
     if Verbose:
         print(f"Here's what to send to the other one: {toSend}")
 
         input("Is everything good ? (Press enter for next)")
 
-    return toSend
+    return secret_integer
 
 # 4) and 5)
-def compute(accord:tuple,L:list,saving=False,Verbose=False):
+def compute(accord:tuple,L:list,saving=False):
     """
     accord <= common agreement
     L <= (secret_int,sended)
     """
-    
-    if Verbose:
-        secret_int = it.getInt(rd.randrange(2,accord[0]),"your secret integer",False,accord[0])    
-        sended = it.getIntKey(it.getb64("his secret"),1)
-    
-    else:
-        secret_int,sended = L
+    secret_int,sended = L
 
     shared_secret = ut.square_and_multiply(sended,secret_int,accord[0])
 
@@ -83,8 +75,6 @@ def compute(accord:tuple,L:list,saving=False,Verbose=False):
 
 
 # - ECDH 
-
-
 # Here we'll use ECC https://en.wikipedia.org/wiki/Elliptic-curve_cryptography
 # ECC requires a smaller key as compared to non-ECC cryptography to provide equivalent security 
 # (a 256-bit ECC security has an equivalent security attained by 3072-bit RSA cryptography).
