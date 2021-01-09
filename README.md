@@ -84,6 +84,10 @@ The source code is ordered as follows:
 
 * The difficulty of the [proof of work](https://en.wikipedia.org/wiki/Proof_of_work) established is adjusted according to the size of the blocks using a power function approximated by induction (i.e. by experimentation).
 
+* The blockchain simulation is single-threaded, so adding miners will not speed up block validation. As we can directly influe on on the block validation difficulty this is not problematic for the simulation understanding.
+
+* The simulation uses the [UTXO](https://medium.com/bitbees/what-the-heck-is-utxo-ca68f2651819) system which is for example used in Bitcoin.
+
 * For [RSA](core/asymmetric/RSA.py) or [ElGamal](core/asymmetric/elGamal.py) encryption/decryption, **if the message is longer than our current modulus, it causes problem to process** (i.e. Mathematically outside the modulus). To overcome this, we **use a reversible mapping function** : *If the input message is larger (after conversion in integer) than the module of our encryption algorithm, we divide said message into several parts strictly smaller than the size of the module (i.e. With a 128-bit key, a 488-bit message is divided into 120-bit sub-messages)*.
 
 * Base64 is used instead of hexadecimal for storing and displaying encrypted keys and/or messages. **Base64 takes 4 characters for every 3 bytes, so it's more efficient than hex.**
@@ -131,3 +135,4 @@ Here is some useful links for documentation concerning related subjects:
 * https://www.random.org/analysis/
 * https://en.wikipedia.org/wiki/Hamming_weight
 * https://www.keylength.com/  - for choosing appropriated key length's.
+* https://blkcipher.pl/assets/pdfs/gcm-spec.pdf - for GCM implementation
