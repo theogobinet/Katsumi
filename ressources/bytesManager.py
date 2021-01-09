@@ -245,7 +245,10 @@ def hammingWeight(n:object):
     The number of symbols that are different from the zero-symbol of the alphabet used.
     """
 
-    if not n.isdigit():
+    try:
+        if not n.isdigit():
+            n = bits_extractor(mult_to_bytes(n))
+    except AttributeError:
         n = bits_extractor(mult_to_bytes(n))
 
     return len(n)-n.count('0')

@@ -75,8 +75,44 @@ The source code is ordered as follows:
 
 * The difficulty of the [proof of work](https://en.wikipedia.org/wiki/Proof_of_work) established is adjusted according to the size of the blocks using a power function approximated by induction (i.e. by experimentation).
 
-* Base64 is used instead of hexadecimal for storing and displaying encrypted keys and/or messages. **Base64 takes 4 characters for every 3 bytes, so it's more efficient than hex.**
+* For [RSA](core/asymmetric/RSA.py) or [ElGamal](core/asymmetric/elGamal.py) encryption/decryption, **if the message is longer than our current modulus, it causes problem to process** (i.e. Mathematically outside the modulus). To overcome this, we **use a reversible mapping function** : 
 
+```pyhton
+import ressources.bytesManager as bm
+import ressources.interactions as it
+
+def process(m):
+    # Used function to process the encryption or decrytion scheme
+    # Depending on the cipher chosen (RSA, ElGamal)
+
+###########################
+## Mapping piece of code ##
+###########################
+
+# M <- Message in bytes
+Mint = bm.bytes_to_int(M)
+if Mint < modulus:
+    # That's a short message
+    m = Mint
+    e = process(m)
+else:
+    # M is a longer message, so it's divided into blocks
+    size = it.getKeySize(pKey) # To get current bit size of given key.
+    e = [process(bm.bytes_to_int(elt)) for elt in bm.splitBytes(M,size//8)]
+
+#############################
+## Unmapping piece of code ##
+#############################
+
+# ciphertext <- ciphered message to decrypt
+if isinstance(ciphertext,list):
+    decrypted=[process(elt) for elt in ciphertext]
+    r = bm.packSplittedBytes(decrypted)
+else:
+    r = process(ciphertext)
+```
+
+* Base64 is used instead of hexadecimal for storing and displaying encrypted keys and/or messages. **Base64 takes 4 characters for every 3 bytes, so it's more efficient than hex.**
 
 #### Prime Numbers Fountain's
 
@@ -106,7 +142,7 @@ With this method, the user can have safe prime numbers loaded in his free time a
 ## Authors
 * **Azaël MARTIN** - [n3rada](https://github.com/n3rada)
 * **Théo GOBINET** - [Elec](https://github.com/theogobinet)
-## Licence
+## License
 Katsumi is licensed under the terms of the MIT Licence 
 and is available for free - see the [LICENSE.md](LICENSE.md) file for details.
 
@@ -118,3 +154,4 @@ Here is some useful links for documentation concerning related subjects:
 * https://andersbrownworth.com/blockchain/
 * https://www.random.org/analysis/
 * https://en.wikipedia.org/wiki/Hamming_weight
+* https://www.keylength.com/  - for choosing appropriated key length's.

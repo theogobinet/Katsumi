@@ -462,6 +462,25 @@ def askForKey():
 
     return key
 
+def getKeySize(key:object="public_key") -> int:
+    """
+    Return size of current key based on prime fount's.
+    """
+
+    sizes = [int(elt.split("_")[0]) for elt in whatInThere()]
+    
+    if isinstance(key,str):
+        pK = extractKeyFromFile(key,config.DIRECTORY_PROCESSING,".kpk")
+    else:
+        pK = key
+
+    bits = bm.bytes_needed(pK[0])*8
+
+    import ressources.utils as ut
+
+    return ut.closestValue(bits,sizes)
+
+
 ##############################
 ######## Inversion Box #######
 ##############################
@@ -764,12 +783,12 @@ def keysVerif(verif:bool=True):
 
         from core.asymmetric import elGamal as elG
 
-        publicS = elG.getSize()
+        publicS = getKeySize()
         print(f"\nPublic key's of {publicS} bits already here.\n")
 
         if isFileHere("private_key.kpk",config.DIRECTORY_PROCESSING):
             
-            privateS = elG.getSize("private_key")
+            privateS = getKeySize("private_key")
             print(f"Private key's of {privateS} bits too.\n")
 
             if publicS != privateS:

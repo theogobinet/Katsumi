@@ -164,23 +164,6 @@ def key_gen(n:int=2048,primeFount=True,easyGenerator:bool=False,randomFunction=N
     if not saving:
         return (public_key,private_key)
 
-
-def getSize(key:object="public_key") -> int:
-    """
-    Return size of current key based on prime fount's.
-    """
-
-    sizes = [int(elt.split("_")[0]) for elt in it.whatInThere()]
-    
-    if isinstance(key,str):
-        pK = it.extractKeyFromFile(key,config.DIRECTORY_PROCESSING,".kpk")
-    else:
-        pK = key
-
-    bits = bm.bytes_needed(pK[0])*8
-
-    return ut.closestValue(bits,sizes)
-
 #############################################
 ########### -   Encryption   - ##############
 #############################################
@@ -201,11 +184,12 @@ def encrypt(M:bytes,pKey,saving:bool=False):
         c2 = (m*s)%p
 
         return (c1,c2)
+    
+    Mint = bm.bytes_to_int(M)
 
-    if bm.bytes_to_int(M) <= p-1:
+    if Mint < p:
         # That's a short message
-        m=bm.bytes_to_int(M)
-
+        m = Mint
         e = process(m)
 
     else:
@@ -213,7 +197,9 @@ def encrypt(M:bytes,pKey,saving:bool=False):
         # You need to choose a different y for each block to prevent
         # from Eve's attacks.
 
-        e = [process(bm.bytes_to_int(elt)) for elt in bm.splitBytes(M,1)]
+        size = it.getKeySize(pKey)
+
+        e = [process(bm.bytes_to_int(elt)) for elt in bm.splitBytes(M,size//8)]
 
     if saving:
         e = it.writeKeytoFile(e,"encrypted",config.DIRECTORY_PROCESSING,".kat")

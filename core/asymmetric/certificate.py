@@ -18,7 +18,7 @@ def x509(subjectPublicKey,name:str="X509",out:bool=True):
         subjectPublicKey = it.getB64Keys(subjectPublicKey)
 
     # Get key size's
-    n = elG.getSize(it.getIntKey(subjectPublicKey,3))
+    n = it.getKeySize(it.getIntKey(subjectPublicKey,3))
     CA_public_key,CA_private_key = elG.key_gen(n,primeFount=True)
 
     import os
