@@ -3,14 +3,13 @@
 from math import sqrt
 import random
 
-def integer_sqrt(x):
+def integer_sqrt(x:int):
     """
-    Return the integer part of the square root of x, even for very
-    large integer values.
+    Return the integer part of the square root of x, even for very large integer values.
 
-    Python 'math' module does strange things with large integers...
+    Python 'math' module does not operate as expected for large integers.
 
-    Got from https://stackoverflow.com/questions/47854635/square-root-of-a-number-greater-than-102000-in-python-3 .
+    Got from https://stackoverflow.com/questions/47854635/square-root-of-a-number-greater-than-102000-in-python-3.
     """
 
     assert x > 0
@@ -36,22 +35,27 @@ def integer_sqrt(x):
         r = newr
 
 
-def swapPos(list, pos1, pos2): 
-    """Swap two elements in list."""
+def swapPos(list:list, pos1:int, pos2:int): 
+    """
+    Swap two elements in list. Return modified list
+    """
+
     list[pos1], list[pos2] = list[pos2], list[pos1] 
     return list
 
-def closestValue(givenV:int,aList:list):
+
+def closestValue(aList:list, givenV:int):
     """
-    Finding the nearest value in a list to a given one.
+    Return the nearest value to a given one in a list.
     """
     abs_diff = lambda list_value : abs(list_value - givenV)
 
     return min(aList, key=abs_diff)
 
+
 def randomClosureChoice(bucket:list):
     """
-    Pick randomly elements from a given list till is empty.
+    Return a randomly-chosen element from a list and remove it.
 
     Be careful to set bucket = GivenList.copy() to not loose original variable !
     """
@@ -63,9 +67,9 @@ def randomClosureChoice(bucket:list):
     return choice
 
 
-def euclid(a:int,b:int,Verbose=False):  
+def euclid(a:int, b:int, Verbose=False):  
     
-    """Find the Greatest Common Divisor of number a and b."""
+    """Return the Greatest Common Divisor (GCD) of number a and b."""
     
     # The GCD of two relative integers is equal to the GCD of their absolute values.
     a,b=abs(a),abs(b) 
@@ -86,12 +90,20 @@ def euclid(a:int,b:int,Verbose=False):
         return euclid(b,r,Verbose)
 
 def lcm(a:int, b:int):
-    """Find the Least Common Multiple of number a and b."""
+    """Return the Least Common Multiple (LCM) of number a and b."""
     return (a*b) // euclid(a, b)
+
 
 def euclid_ext(a:int, b:int, Verbose=False):
     
-    """Extension to the Euclidean algorithm, and computes, in addition to the greatest common divisor of integers a and b, also the coefficients of Bézout's identity, which are integers x and y such that a x + b y = gcd ( a , b )."""
+    """
+    Extension to the Euclidean algorithm:
+    Computes, in addition to the greatest common divisor of integers a and b, the coefficients of Bézout's identity.
+    Which are integers x and y such that a x + b y = gcd ( a , b ).
+
+    Returns b, x, y, s (explanation), n (number of iteration)
+    """
+
     x0, x1, y0, y1 = 0, 1, 1, 0
     a_buffer,b_buffer=a,b
     n=1 # iterations
@@ -108,8 +120,11 @@ def euclid_ext(a:int, b:int, Verbose=False):
     
     return b, x0, y0, s, n
 
-def coprime(a:int,b:int):
+
+def coprime(a:int, b:int):
     """
+    Return a boolean of if the value are coprime.
+
     Two values are said to be coprime if they have no common prime factors.
     This is equivalent to their greatest common divisor (gcd) being 1.
     """
@@ -136,8 +151,11 @@ def pairwise_coprime(listing:list):
 def square_and_multiply(x, k, p=None):
     """
     Square and Multiply Algorithm
-    Parameters: positive integer x and integer exponent k,
-                optional modulus p
+
+        x: positive integer
+        k: exponent integer
+        p: module
+
     Returns: x**k or x**k mod p when p is given
     """
     b = bin(k).lstrip('0b')
@@ -154,7 +172,7 @@ def square_and_multiply(x, k, p=None):
 def millerRabin(p, s=40):
     """
     Probalistic compositeness test.
-    Determines whether a given number is likely to be prime (not composite).
+    Return whether a given number is likely to be prime (not composite).
     """
 
     if p == 2: # 2 is the only prime that is even
@@ -175,8 +193,9 @@ def millerRabin(p, s=40):
 
     def witness(a):
         """
-        Returns: True, if there is a witness that p is not prime.
-                False, when p might be prime
+        Returns: 
+            True, if there is a witness that p is not prime.
+            False, when p might be prime
         """
         z = square_and_multiply(a, r, p)
         if z == 1:
@@ -196,9 +215,9 @@ def millerRabin(p, s=40):
     return True
 
 
-def findPrimeFactors(n:int,exponent:bool = False) : 
+def findPrimeFactors(n:int, exponent:bool = False) : 
     """
-    Decomposes an integer n into prime factors and store in a set.
+    Decomposes an integer n into prime factors and returns the corresponding set.
 
     A prime number can only be divided by 1 or itself, so it cannot be factored any further!
     Every other whole number can be broken down into prime number factors. 
@@ -207,8 +226,8 @@ def findPrimeFactors(n:int,exponent:bool = False) :
     Set exponent to True if you want to print p^e. 
     """
     s = []
-    # Print the number of 2s that divide n  
 
+    # Number of 2s that divide n  
     while (n % 2 == 0) : 
         s.append(2)  
         n = n // 2
@@ -236,17 +255,20 @@ def findPrimeFactors(n:int,exponent:bool = False) :
         return dict(zip(uniqSorted,[s.count(e) for e in uniqSorted]))
     else:
         return uniqSorted
+
+
 #########################################
 ############# - CRT - ###################
 #########################################
 
-def ChineseRemainder(integers:list,modulis:list,Verbose=False):
+def ChineseRemainder(integers:list, modulis:list, Verbose=False):
     
     """
-    x congruent to a modulo n 
-    [a1,..,ak] - integers
-    [n1,..,nk] - modulis
-    return result of Chinese Remainder.
+    Return result of Chinese Remainder.
+
+        integers: [a1,..,ak]
+        modulis: [n1,..,nk] 
+        Verbose: wether print or not the function steps
     """
 
     from ressources.multGroup import inv
@@ -272,8 +294,6 @@ def ChineseRemainder(integers:list,modulis:list,Verbose=False):
          solution = b*m1*m + a*n1*n
 
     else: 
-
-        i=None
         
         # Condition one
         if not pairwise_coprime(modulis): raise ValueError("Error: n elements aren't pairwise coprime.")
@@ -309,14 +329,14 @@ def ChineseRemainder(integers:list,modulis:list,Verbose=False):
         return solution%product
 
 
-def mapperCRT(elt,p:int,q:int,action:bool=True,Verbose:bool=False):
+def mapperCRT(elt, p:int, q:int, action:bool=True, Verbose:bool=False):
     """
     Reversible mapping using Chinese Remainder Theorem into/from Zpq.
 
     Bijection : 
         Zpq = Zp * Zq
 
-    action: 
+    Action: 
         True - map
         False - unmap 
     """
@@ -334,11 +354,12 @@ def mapperCRT(elt,p:int,q:int,action:bool=True,Verbose:bool=False):
         x = ChineseRemainder(elt,[p,q],Verbose)
         return x
 
+
 #########################################
 ############# - DLOG- ###################
 #########################################
 
-def bsgs(g:int,res:int,modulo:int):
+def bsgs(g:int, res:int, modulo:int):
     """
     Baby-Step Giant-Step solution for discrete algorithm problem.
 
@@ -353,7 +374,7 @@ def bsgs(g:int,res:int,modulo:int):
 
     from ressources.multGroup import inv
 
-    m = integer_sqrt(modulo) + 1;  
+    m = integer_sqrt(modulo) + 1
   
     hashTable = {square_and_multiply(g, j, modulo): j for j in range(m)} # Baby-Step
     
@@ -371,13 +392,13 @@ def bsgs(g:int,res:int,modulo:int):
 
         y = (y * invGm) % modulo
       
-    return -1;
+    return -1
 
 ###
 # Pollard Roh
 ###
 
-def pollard_rho(g, h, n , order = None):
+def pollard_rho(g:int, h:int, n:int , order:int = None):
     """
     Pollard's Rho algorithm for discrete logarithm (HAC 3.60).
     Returns the dlog of h on the basis g and field Zn*
@@ -445,8 +466,9 @@ def pollard_rho(g, h, n , order = None):
 ###
 # Pohlig_Hellman
 ###
-def pohlig_hellman(g,h,n):
+def pohlig_hellman(g:int, h:int, n:int):
     """
+    Compute discrete logarithms in a finite abelian group whose order is a smooth integer.
     Based on https://en.wikipedia.org/wiki/Pohlig%E2%80%93Hellman_algorithm
     """
 
@@ -479,12 +501,11 @@ def pohlig_hellman(g,h,n):
         integers.append(xi)
         modulis.append(ni)
 
-
     return ChineseRemainder(integers,modulis)
 
 
 # Function to calculate k for given a, b, m  
-def discreteLog(g:int, h:int, p:int,method:int=1):
+def discreteLog(g:int, h:int, p:int, method:int=1):
     """
     Given a cyclic group of order 'p' a generator 'g' and a group element h, 
     the problem is to find an integer 'k' such that g^k = h (mod p) by using

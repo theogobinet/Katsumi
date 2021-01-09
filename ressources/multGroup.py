@@ -3,9 +3,13 @@
 
 import ressources.utils as ut
 
+def inv(a:int, m:int, Verbose:bool=False):
+    """
+    Returns inverse of a mod m.
 
-def inv(a:int,m:int,Verbose=False):
-    """If a and m are prime to each other, then there is an a^(-1) such that a^(-1) * a is congruent to 1 mod m."""
+    If a and m are prime to each other, then there is an a^(-1) such that a^(-1) * a is congruent to 1 mod m.
+    """
+
     if ut.euclid(a,m) != 1 :
         if Verbose:
             print(f"gcd({a},{m}) = {ut.euclid(a,m)} != 1 thus you cannot get an invert of a.")
@@ -14,7 +18,7 @@ def inv(a:int,m:int,Verbose=False):
     
     elif a == 0:
         if Verbose:
-            print(f" a = 0 and 0 cannot have multiplicative inverse ( 0 * nothing = 1 ) .")
+            print(f"a = 0 and 0 cannot have multiplicative inverse ( 0 * nothing = 1 ) .")
         raise ValueError("0 cannot have multiplicative inverse.")
 
     elif ut.millerRabin(m) and m%a != 0:
@@ -32,7 +36,6 @@ def inv(a:int,m:int,Verbose=False):
         u = ut.square_and_multiply(a,phi(m,1,1,Verbose)-1,m)
 
     else:
-        
         if Verbose:
             print(f"Modular inverse u solves the given equation: a.u+m.v=1.\n Let's use the euclid extended algorithm tho.")
         
@@ -43,16 +46,16 @@ def inv(a:int,m:int,Verbose=False):
         if u < 0 : u+=m
     
     if Verbose:
-        return u,f"u = {u} + {m}k, k in Z"
+        return u, f"u = {u} + {m}k, k in Z"
     else:
         return u
 
-def phi(n:int,m:int=1,k:int=1,Verbose:bool=False):
+def phi(n:int, m:int=1, k:int=1, Verbose:bool=False):
     """
     Totient recurcive function for integer n.
     Can compute:
-         phi(n*m) with phi(n,m).
-         phi(p^k) with phi(p,1,k)
+        phi(n*m) with phi(n,m).
+        phi(p^k) with phi(p,1,k)
     """
 
     if Verbose:
@@ -79,7 +82,6 @@ def phi(n:int,m:int=1,k:int=1,Verbose:bool=False):
         return mult * phi(n,1,1,Verbose)
 
     else:
-
         if n>=0 and n<=123 :
             # Fastest results for common totients (sequence A000010 in the OEIS)
             totients=[0,1,1,2,2,4,2,6,4,6,4,10,
@@ -118,7 +120,6 @@ def phi(n:int,m:int=1,k:int=1,Verbose:bool=False):
             return 2*phi(twoN,m,k,Verbose)
 
     ## Special cases ##
-
         else:
 
             if Verbose:
@@ -133,11 +134,13 @@ def phi(n:int,m:int=1,k:int=1,Verbose:bool=False):
             return tot
 
 
-def multiplicativeOrder(n:int,p:int,iterativeWay=False,Verbose=False):
+def multiplicativeOrder(n:int ,p:int, iterativeWay:bool=False, Verbose:bool=False):
     """
+    Returns the multiplicative order of n mod p.
+
     The minimum period of the sequence of powers of a is called the order of a.
     So a is a primitive root mod n if and only if the order of a is ϕ(n). 
-    Order of n in p is the smallest number M or n^M = 1 mod p
+    Order of n in p is the smallest number M or n^M = 1 mod p.
 
     Set iterative way to true if you want to use iterations.
     """
@@ -164,11 +167,8 @@ def multiplicativeOrder(n:int,p:int,iterativeWay=False,Verbose=False):
             qs.sort()
 
             for q in qs:
-
                 if ut.square_and_multiply(a,q,m) == 1:
                     break
-                else:
-                    continue
                 
             return q
 
@@ -202,7 +202,7 @@ def multiplicativeOrder(n:int,p:int,iterativeWay=False,Verbose=False):
 
 def congruenceClasses(e:int):
     """
-    Find coprimes elements of e.
+    Returns coprimes elements of e.
     If n is a positive integer, the integers between 0 and n − 1 that are coprime to n (or equivalently, the congruence classes coprime to n) form a group.
     """
     elements = []
@@ -213,9 +213,9 @@ def congruenceClasses(e:int):
     return elements
 
 
-def primitiveRoot(n:int,totient=None,Verbose=False):
+def primitiveRoot(n:int, totient=None, Verbose:bool=False):
     """ 
-    Find primitive root modulo n.
+    Returns primitive root modulo n.
 
     https://en.wikipedia.org/wiki/Fermat%27s_little_theorem
     """
@@ -306,10 +306,9 @@ def primitiveRoot(n:int,totient=None,Verbose=False):
         return -1
 
 
-
-def genSubGroup(n:int,m:int):
+def genSubGroup(n:int, m:int):
     """
-    Generate subgroup of n in Zm* with multiplicative order q.
+    Returns subgroup of n in Zm* with multiplicative order q.
     E.g, genSubGroup(5,10) = > [1,5,10] and q = 3.
     """
 
@@ -319,16 +318,15 @@ def genSubGroup(n:int,m:int):
         t = ut.square_and_multiply(n,e,m)
         if t not in res:
             res.append(t)
-        else:
-            continue
 
     return sorted(res)
 
 
-def reducedResidueSystem(n:int,g:int=None,Verbose=False):
+def reducedResidueSystem(n:int, g:int=None, Verbose:bool=False):
     """
     Return all elements of Zn* with generator g.
     """
+
     totient = phi(n,Verbose)
     if g == None:
         if Verbose:
@@ -343,6 +341,7 @@ def reducedResidueSystem(n:int,g:int=None,Verbose=False):
         res.append(ut.square_and_multiply(g,elt,n))
 
     return sorted(set(res))
+
 
 def findOtherGenerators(gen:int,mod:int,Verbose=False):
     """
@@ -366,9 +365,9 @@ def findOtherGenerators(gen:int,mod:int,Verbose=False):
 
 
 
-def isGenerator(e:int,n:int,lagrangeWay=True,printOther=False,Verbose=False):
+def isGenerator(e:int ,n:int, lagrangeWay:bool=True, printOther:bool=False, Verbose:bool=False):
     """
-    Tell if an element e is generator of Zn.
+    Returns whether an element e is generator of Zn.
     A unit g ∈ Zn* is called a generator or primitive root of Zn* if for every a ∈ Zn* we have g^k = a for some integer k. 
     In other words, if we start with g, and keep multiplying by g eventually we see every element.
     By definition, g is a generator of Zn* if and only if that cycling does not occur before these n−1 iterations.

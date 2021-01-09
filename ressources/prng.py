@@ -10,9 +10,9 @@ from .bytesManager import bytes_to_int, circularRotation, bytes_needed
 from ressources.utils import millerRabin
 from secrets import randbits
 
-def xorshiftperso(evenOrodd=0,nBits:int=512):
+def xorshiftperso(evenOrodd:int=0, nBits:int=512):
     '''
-    xorshift perso
+    Personal implementation of a random number generator using XORshift 
 
     nBits : number of bits needed (e.g 2048 bits to output 2048 bits lenght's number).
 
@@ -21,6 +21,7 @@ def xorshiftperso(evenOrodd=0,nBits:int=512):
          - 1 even
          - both
     '''
+
     assert nBits > 23 
     bytes=int(nBits/8)
 
@@ -75,9 +76,9 @@ def randomInt(evenOrodd:int=0,n:int=512):
     return r
 
 
-def randomPrime(nBits:int=512,gen=None,condition = lambda p : p == p,k:int=1,Verbose=False):
+def randomPrime(nBits:int=512, gen=None ,condition = lambda p : p == p, k:int=1, Verbose=False):
     """
-    Generates prime numbers with bitlength nBits.
+    Return generated prime numbers with bitlength nBits.
     Stops after the generation of k prime numbers.
 
     You can verify a condition with condition method.
@@ -120,12 +121,12 @@ def randomPrime(nBits:int=512,gen=None,condition = lambda p : p == p,k:int=1,Ver
     else:
         return primes
     
-def safePrime(nBits:int=1024,randomFunction=xorshiftperso,easyGenerator=False):
+def safePrime(nBits:int=1024, randomFunction=xorshiftperso, easyGenerator:bool=False):
     """
     The number 2p + 1 associated with a Sophie Germain prime is called a safe prime.
     In number theory, a prime number p is a Sophie Germain prime if 2p + 1 is also prime
 
-    nBits: number of bits wanted for output prime number.
+        nBits: number of bits wanted for output prime number.
 
     Based on:
     https://eprint.iacr.org/2003/186.pdf
@@ -157,8 +158,12 @@ def safePrime(nBits:int=1024,randomFunction=xorshiftperso,easyGenerator=False):
     return list(return_list)[0]
 
 
-def safePrime_worker(nBits:int=1024,randomFunction=None,easyGenerator=False,Verbose=False,flag=None,returnL=[]):
-    import  ressources.interactions as it
+def safePrime_worker(nBits:int=1024, randomFunction=None, easyGenerator:bool=False, Verbose:bool=False, flag=None, returnL:list=[]):
+    '''
+        Function executed on each process for safe prime generation
+    '''
+
+    import ressources.interactions as it
     from multiprocessing import Manager 
 
     if not flag:
@@ -186,12 +191,10 @@ def safePrime_worker(nBits:int=1024,randomFunction=None,easyGenerator=False,Verb
         
         p2 = (q - 1) // 2
 
-
         if Verbose:
             it.clear()
             print(f"Prime {q} candidate's.")
 
-        
         if millerRabin(p1):
 
             if Verbose:
@@ -219,12 +222,9 @@ def safePrime_worker(nBits:int=1024,randomFunction=None,easyGenerator=False,Verb
         else:
             if Verbose:
                 print(f"But 2 * him + 1 and (him - 1) / 2 doesn't seem to be primes...\n")
-            continue
 
 
-
-
-def genSafePrimes(n:int,L:list,nBits:int,randomFunction=None):
+def genSafePrimes(n:int, L:list, nBits:int, randomFunction=None):
     """
     Generate n tuples of distincts safe primes number's and append them into a list L.
     Randomly choosing easy generator or not.
@@ -236,6 +236,3 @@ def genSafePrimes(n:int,L:list,nBits:int,randomFunction=None):
         s = safePrime(nBits,randomFunction,bool(rd.getrandbits(1)))
         if s not in L:
             L.append(s)
-        else:
-            continue
-

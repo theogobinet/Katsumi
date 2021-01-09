@@ -1433,12 +1433,13 @@ def bcSimulationParam():
         c.BC_MINER_REWARD = values[2]
         c.BC_HASH_SIZE = values[3]
         c.BC_KEY_SIZE = values[4]
-        c.BC_POW_RATIO = values[5]
-        c.BC_POW_FIRST = values[6]
+        c.BC_SIGNING_ALG = values[5]
+        c.BC_POW_RATIO = values[6]
+        c.BC_POW_FIRST = values[7]
 
         clear()
 
-        if bc.startLive(values[0], values[1], values[7], values[8], values[9]):
+        if bc.startLive(values[0], values[1], values[8], values[9], values[10]):
             print("Block-chain validation performed without error")
         else:
             print("An error occured during block-chain validation")
@@ -1457,6 +1458,9 @@ def bcSimulationParam():
             param[0] = getFloat(param[0], "value")
         elif param[3] == tuple:
             param[0] = getRange((param[0]))
+        elif param[3] == str:
+            enumerateMenu(param[5])
+            param[0] = param[5][getInt(param[5].index(param[0]) + 1, "algorithm", False, len(param[5])) - 1]
 
         bcSimulationParam()
 

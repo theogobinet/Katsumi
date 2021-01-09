@@ -395,12 +395,12 @@ def addUser(username:str, autoGenerateKeys:bool=True, keys:list=[]):
         keys: base64 of tuple (public key, private key) if keys are not generated for the user
     '''
 
-    from core.asymmetric.elGamal import key_gen
     from ressources.interactions import getIntKey
 
     if autoGenerateKeys:
         # generate keys
-        publicKey, privateKey = key_gen(c.BC_KEY_SIZE)
+        algModule = __import__("core.asymmetric." + c.BC_SIGNING_ALG, fromlist=[''])
+        publicKey, privateKey = algModule.key_gen(c.BC_KEY_SIZE)
     else:
         # decode base64 tuple of key
         publicKey, privateKey = getIntKey(keys, 2)
@@ -423,14 +423,13 @@ def addTransaction(sender:int, receiver:int, amount:int):
         amount: amount send
     '''
 
-    from core.asymmetric.elGamal import signing
-
     curBlock = c.BC_CHAIN[-1]
 
     transaction = [sender, receiver, amount]
 
-    # sign the transaction using El Gammal
-    signature = signing(arrayToBytes(transaction), getUserKey(sender, 1))
+    # sign the transaction using user defined transaction alogorithm
+    algModule = __import__("core.asymmetric." + c.BC_SIGNING_ALG, fromlist=[''])
+    signature = algModule.signing(arrayToBytes(transaction), getUserKey(sender, 1))
 
     transaction.append(signature)
 
@@ -458,15 +457,14 @@ def validTransaction(user:int, transaction:list, UTXO:list=c.BC_UTXO):
         UTXO: array of UTXO to use instead of default one: c.BC_UTXO
     '''
 
-    from core.asymmetric.elGamal import verifying
-
     core = transaction[:-1]
     signature = transaction[-1]
 
     sender = core[0]
         
     # First verify the transaction signature
-    if verifying(arrayToBytes(core), getUserKey(sender, 0), signature):
+    algModule = __import__("core.asymmetric." + c.BC_SIGNING_ALG, fromlist=[''])
+    if algModule.verifying(arrayToBytes(core), getUserKey(sender, 0), signature):
 
         # Then perform the transaction, return true if the transaction can be performed
         if transitUTXO(sender, core[1], core[2], UTXO):

@@ -36,10 +36,12 @@ def work_with_selection(pSelection):
  
     elif pSelection == 6:
         return it.primeNumbersFountain()
+
     elif pSelection in [7,-1]:
         it.clear()
         print("\t --- Goodbye M'Lord. --- \n")
         sys.exit()
+
     else:
         it.clear()
         menu()
@@ -67,8 +69,7 @@ def menu():
 
         selection = it.getInt(1,"choices")
 
-
-        return work_with_selection(selection)
+        work_with_selection(selection)
         
     else:
         menu()
@@ -80,8 +81,7 @@ def main():
     #Galois field's initialization
     GF2(16)
 
-    return menu()
-
+    menu()
 
 if __name__ == '__main__':
     main()
