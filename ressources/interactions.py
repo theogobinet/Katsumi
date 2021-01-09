@@ -478,7 +478,7 @@ def getKeySize(key:object="public_key") -> int:
 
     import ressources.utils as ut
 
-    return ut.closestValue(bits,sizes)
+    return ut.closestValue(sizes,bits)
 
 
 ##############################
