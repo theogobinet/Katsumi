@@ -103,7 +103,7 @@ def key_gen(n:int=2048,primeFount=True,easyGenerator:bool=False,randomFunction=N
 
         if Verbose: print(f"Let's try to generate a safe prime number of {n} bits.")
 
-        s = prng.safePrime(n,randomFunction,easyGenerator,Verbose)
+        s = prng.safePrime(n,randomFunction,easyGenerator)
     
     else:
         primeFount = it.extractSafePrimes(n,False,Verbose)

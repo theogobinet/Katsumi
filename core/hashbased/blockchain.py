@@ -403,8 +403,9 @@ def addUser(username:str, autoGenerateKeys:bool=True, keys:list=[]):
         publicKey, privateKey = algModule.key_gen(c.BC_KEY_SIZE)
     else:
         # decode base64 tuple of key
-        publicKey, privateKey = getIntKey(keys, 2)
-    
+        publicKey = getIntKey(keys[0], [2,3][c.BC_SIGNING_ALG == "elGamal"])
+        privateKey = getIntKey(keys[1], [2,3][c.BC_SIGNING_ALG == "elGamal"])
+
     userID = len(c.BC_USERS)
     
     c.BC_USERS.append([userID, username, publicKey, privateKey])
@@ -464,7 +465,7 @@ def validTransaction(user:int, transaction:list, UTXO:list=c.BC_UTXO):
         
     # First verify the transaction signature
     algModule = __import__("core.asymmetric." + c.BC_SIGNING_ALG, fromlist=[''])
-    if algModule.verifying(arrayToBytes(core), getUserKey(sender, 0), signature):
+    if algModule.verifying(arrayToBytes(core),signature, getUserKey(sender, 0)):
 
         # Then perform the transaction, return true if the transaction can be performed
         if transitUTXO(sender, core[1], core[2], UTXO):
@@ -653,9 +654,6 @@ def displayLogs(last:int=0):
 
             time = log[0]
             user = c.BC_USERS[log[1]]
-
-            if len(user) <= 10:
-                user+='\t'
 
             logID = log[2]
             params = log[3]

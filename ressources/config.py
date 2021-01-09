@@ -66,7 +66,7 @@ BC_HASH_SIZE = 256
 BC_KEY_SIZE = 128
 BC_MINER_REWARD = 20
 BC_TIME_START = 0
-BC_SIGNING_ALG = "ElGamal"
+BC_SIGNING_ALG = "elGamal"
 
 BC_USER_PARAMS = [
     # Default value, param name, param desc, param type, is param a size, choices

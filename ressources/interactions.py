@@ -1446,6 +1446,8 @@ def bcSimulationParam():
     
     elif selection <= len(c.BC_USER_PARAMS) + 1:
 
+        clear()
+
         param = c.BC_USER_PARAMS[selection-2]
 
         pName = param[1].replace('\t','')
