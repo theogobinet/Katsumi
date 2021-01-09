@@ -70,9 +70,6 @@ def bytes_needed(n:int):
         return 1
     return int(log(n, 256)) + 1
 
-def bits_extractor(byteA):
-    """Take ether bytes or bytearray and return an array of bits."""
-    return [int(b) for b in ''.join(['{:08b}'.format(x) for x in byteA])]
 
 file_name=""
 without_ext=""
@@ -242,14 +239,15 @@ def circularRotation(arr, dir=0,n=1):
 
 def hammingWeight(n:object):
     """
-    The number of symbols that are different from the zero-symbol of the alphabet used.
+    The number of symbols that are different from the zero-symbol in binary.
     """
 
-    try:
-        if not n.isdigit():
-            n = bits_extractor(mult_to_bytes(n))
-    except AttributeError:
-        n = bits_extractor(mult_to_bytes(n))
+    n = bytes_to_int(mult_to_bytes(n))
 
-    return len(n)-n.count('0')
+    weight=0
 
+    for i in range(n.bit_length()):
+        if ((n >> i) & 1):
+            weight += 1
+
+    return weight

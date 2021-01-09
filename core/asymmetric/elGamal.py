@@ -197,9 +197,9 @@ def encrypt(M:bytes,pKey,saving:bool=False):
         # You need to choose a different y for each block to prevent
         # from Eve's attacks.
 
-        size = it.getKeySize(pKey)
+        size = (it.getKeySize(pKey) // 8) - 1
 
-        e = [process(bm.bytes_to_int(elt)) for elt in bm.splitBytes(M,size//8)]
+        e = [process(bm.bytes_to_int(elt)) for elt in bm.splitBytes(M,size)]
 
     if saving:
         e = it.writeKeytoFile(e,"encrypted",config.DIRECTORY_PROCESSING,".kat")
@@ -239,7 +239,7 @@ def decrypt(ciphertext,sK:tuple,asTxt=False):
         return r
 
 #############################################################
-################ - signature scheme - #######################
+################ - Signature scheme - #######################
 #############################################################
 
 def signing(M:bytes,privateK:tuple=None,saving:bool=False,Verbose:bool=False):
@@ -255,7 +255,7 @@ def signing(M:bytes,privateK:tuple=None,saving:bool=False,Verbose:bool=False):
         
     p,g,x = privateK
      
-    size = getSize(privateK)
+    size = it.getSize(privateK)
 
     # M = bm.fileToBytes(M)
     # M = "Blablabla".encode()
@@ -312,7 +312,7 @@ def verifying(M:bytes,pK:tuple=None,sign:tuple=None):
         pK = it.extractKeyFromFile("public_key")
         
     p,g,h = pK
-    size = getSize(pK)
+    size = it.getSize(pK)
 
     hm = hashF.sponge(M,size)
     # #base64 to int

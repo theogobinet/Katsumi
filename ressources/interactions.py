@@ -536,7 +536,6 @@ def doSomethingElse(m=None):
             clear()
             return m()
     else:
-        clear()
         return katsumi.work_with_selection(-1)
 
 #########################################
@@ -1483,7 +1482,6 @@ def katsuBlockChain():
 
     else:
         import katsumi
-        clear()
         katsumi.menu()
 
     doSomethingElse(katsuBlockChain)

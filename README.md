@@ -67,7 +67,7 @@ The source code is ordered as follows:
 
 * To make it easier to handle the inverses in the Galois fields, we have [pre-recorded in memory the inverses](ressources/generated/inversion_Sbox.txt) of the Galois field degree 16 (itself written in raw).
 
-* The Inversion_Sbox.txt is checked at each start and if it's corrupted (not here or wrong), the program will generate one before starting.
+* The [Inversion_Sbox.txt](ressources/inversion_Sbox.txt) is checked at each start and if it's corrupted (not here or wrong), the program will generate one before starting.
 
 * Any generator for El-Gamal is designed to resist common attacks and it's found via the principle of [Schnorr's group](https://en.wikipedia.org/wiki/Schnorr_group). More information by reading the code about El-Gamal [here](core/asymmetric/elGamal.py).
 
@@ -75,42 +75,7 @@ The source code is ordered as follows:
 
 * The difficulty of the [proof of work](https://en.wikipedia.org/wiki/Proof_of_work) established is adjusted according to the size of the blocks using a power function approximated by induction (i.e. by experimentation).
 
-* For [RSA](core/asymmetric/RSA.py) or [ElGamal](core/asymmetric/elGamal.py) encryption/decryption, **if the message is longer than our current modulus, it causes problem to process** (i.e. Mathematically outside the modulus). To overcome this, we **use a reversible mapping function** : 
-
-```pyhton
-import ressources.bytesManager as bm
-import ressources.interactions as it
-
-def process(m):
-    # Used function to process the encryption or decrytion scheme
-    # Depending on the cipher chosen (RSA, ElGamal)
-
-###########################
-## Mapping piece of code ##
-###########################
-
-# M <- Message in bytes
-Mint = bm.bytes_to_int(M)
-if Mint < modulus:
-    # That's a short message
-    m = Mint
-    e = process(m)
-else:
-    # M is a longer message, so it's divided into blocks
-    size = it.getKeySize(pKey) # To get current bit size of given key.
-    e = [process(bm.bytes_to_int(elt)) for elt in bm.splitBytes(M,size//8)]
-
-#############################
-## Unmapping piece of code ##
-#############################
-
-# ciphertext <- ciphered message to decrypt
-if isinstance(ciphertext,list):
-    decrypted=[process(elt) for elt in ciphertext]
-    r = bm.packSplittedBytes(decrypted)
-else:
-    r = process(ciphertext)
-```
+* For [RSA](core/asymmetric/RSA.py) or [ElGamal](core/asymmetric/elGamal.py) encryption/decryption, **if the message is longer than our current modulus, it causes problem to process** (i.e. Mathematically outside the modulus). To overcome this, we **use a reversible mapping function** : *If the input message is larger (after conversion in integer) than the module of our encryption algorithm, we divide said message into several parts strictly smaller than the size of the module (i.e. With a 128-bit key, a 488-bit message is divided into 120-bit sub-messages)*.
 
 * Base64 is used instead of hexadecimal for storing and displaying encrypted keys and/or messages. **Base64 takes 4 characters for every 3 bytes, so it's more efficient than hex.**
 

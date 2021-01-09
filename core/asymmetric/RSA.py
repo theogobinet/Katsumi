@@ -29,11 +29,13 @@ def key_gen(size:int=2048,randomFunction=None,saving=False,Verbose=False):
     saving: True if you want to save the private key to a file.
     """
 
+    sizeB = size//2
+
     # 1- Choose two distinct prime numbers p and q
 
     if Verbose: print(f"Let's try to generate two distinct prime numbers p and q of {size} bits.")
 
-    p,q = prng.randomPrime(size//2,randomFunction,Verbose=Verbose),prng.randomPrime(size//2,randomFunction,Verbose=Verbose)
+    p,q = prng.randomPrime(sizeB,randomFunction,Verbose=Verbose),prng.randomPrime(sizeB,randomFunction,Verbose=Verbose)
 
     # 2- Compute n = pq.
     n = p*q # new modulus
@@ -45,9 +47,9 @@ def key_gen(size:int=2048,randomFunction=None,saving=False,Verbose=False):
     # 4- Choosing e, part of the public key
     e = rd.randrange(1,carmichaelTotient)
 
-    while not ut.coprime(e,carmichaelTotient):
+    while not ut.coprime(e,carmichaelTotient) or bm.hammingWeight(e) > (0.995*sizeB - 19):
         e = rd.randrange(1,carmichaelTotient)
-        print(bm.hammingWeight(e))
+
         #e having a short bit-length and small Hamming weight results in more efficient encryption 
         #https://en.wikipedia.org/wiki/Hamming_weight
 
@@ -57,7 +59,7 @@ def key_gen(size:int=2048,randomFunction=None,saving=False,Verbose=False):
     #  p, q, and λ(n) must also be kept secret because they can be used to calculate d. In fact, they can all be discarded after d has been computed.
     del p,q,carmichaelTotient
 
-    public_key,private_key = (n,e),d
+    public_key,private_key = (n,e),(n,d)
 
     if saving:
         public_key = it.writeKeytoFile(public_key,"public_key",config.DIRECTORY_PROCESSING,".kpk")
@@ -86,8 +88,8 @@ def encrypt(M:bytes,pKey,saving:bool=False) -> int:
 
     n,e = pKey
 
-    def process():
-        print("coucou")
+    def process(m):
+        return ut.square_and_multiply(m,e,n)
 
     # First, turn M into 
     Mint = bm.bytes_to_int(M)
@@ -99,7 +101,9 @@ def encrypt(M:bytes,pKey,saving:bool=False) -> int:
 
     else:
         # M is a longer message, so it's divided into blocks
-        print("cpoiu")
+        size = (it.getKeySize(pKey) // 8) - 1
+
+        e = [process(bm.bytes_to_int(elt)) for elt in bm.splitBytes(M,size)]
 
     if saving:
         e = it.writeKeytoFile(e,"encrypted",config.DIRECTORY_PROCESSING,".kat")
@@ -109,4 +113,29 @@ def encrypt(M:bytes,pKey,saving:bool=False) -> int:
 #############################################
 ############# - Decryption - ################
 #############################################
+
+def decrypt(c,sK:tuple,asTxt=False):
+
+    n,d = sK
+
+    def process(cipherT):
+        return bm.mult_to_bytes(ut.square_and_multiply(cipherT,d,n))
+    
+    if isinstance(c,list):
+        
+        decrypted=[process(elt) for elt in c]
+
+        r = bm.packSplittedBytes(decrypted)
+
+    else:
+        r = process(c)
+
+    if asTxt:
+        return r.decode()
+    else:
+        return r
+
+#############################################################
+################ - Signature scheme - #######################
+#############################################################
 

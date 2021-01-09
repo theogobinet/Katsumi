@@ -36,10 +36,10 @@ def work_with_selection(pSelection):
  
     elif pSelection == 6:
         return it.primeNumbersFountain()
-    elif pSelection == 7 or pSelection == -1:
+    elif pSelection in [7,-1]:
         it.clear()
         print("\t --- Goodbye M'Lord. --- \n")
-        sys.exit
+        sys.exit()
     else:
         it.clear()
         menu()
@@ -50,6 +50,8 @@ def work_with_selection(pSelection):
 #################################################
 
 def menu():
+
+    it.clear()
 
     choices=["Symmetric","Asymmetric","Hash","Get X509 Certificate","BlockChain","Prime Numbers Fountain's","Exit"]
 
