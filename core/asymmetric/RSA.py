@@ -16,7 +16,7 @@ import random as rd
 ########### - Key Generation - ##############
 #############################################
 
-def key_gen(size:int=2048,randomFunction=None,saving=False,Verbose=False):
+def key_gen(size:int=2048, randomFunction=None, saving=False, Verbose=False):
     """
     RSA key generation.
 
@@ -47,9 +47,8 @@ def key_gen(size:int=2048,randomFunction=None,saving=False,Verbose=False):
     # 4- Choosing e, part of the public key
     e = rd.randrange(1,carmichaelTotient)
 
-    while not ut.coprime(e,carmichaelTotient) or bm.hammingWeight(e) > (0.995*sizeB - 19):
+    while not ut.coprime(e,carmichaelTotient) or bm.hammingWeight(e) > (0.995*sizeB):
         e = rd.randrange(1,carmichaelTotient)
-
         #e having a short bit-length and small Hamming weight results in more efficient encryption 
         #https://en.wikipedia.org/wiki/Hamming_weight
 
@@ -79,19 +78,19 @@ def key_gen(size:int=2048,randomFunction=None,saving=False,Verbose=False):
 ############# - Encryption - ################
 #############################################
 
-def encrypt(M:bytes,pKey,saving:bool=False) -> int:
+def encrypt(M:bytes, publicKey, saving:bool=False):
     """
     Encrypt a message M to make him sendable.
     """
 
     assert isinstance(M,bytes)
 
-    n,e = pKey
+    n,e = publicKey
 
     def process(m):
         return ut.square_and_multiply(m,e,n)
 
-    # First, turn M into 
+    # First, turn M into int
     Mint = bm.bytes_to_int(M)
 
     if Mint < n:
@@ -101,7 +100,7 @@ def encrypt(M:bytes,pKey,saving:bool=False) -> int:
 
     else:
         # M is a longer message, so it's divided into blocks
-        size = (it.getKeySize(pKey) // 8) - 1
+        size = (it.getKeySize(publicKey) // 8) - 1
 
         e = [process(bm.bytes_to_int(elt)) for elt in bm.splitBytes(M,size)]
 
@@ -114,12 +113,17 @@ def encrypt(M:bytes,pKey,saving:bool=False) -> int:
 ############# - Decryption - ################
 #############################################
 
-def decrypt(c,sK:tuple,asTxt=False):
+def decrypt(c, privateKey:tuple, asTxt=False):
+    """
+    Decryption of given ciphertext 'c' with secret key 'privateKey'. 
+    Return bytes/bytearray or txt if asTxt set to 'True'.
+    """
 
-    n,d = sK
+    n,d = privateKey
 
     def process(cipherT):
-        return bm.mult_to_bytes(ut.square_and_multiply(cipherT,d,n))
+        un  = ut.square_and_multiply(cipherT,d,n)
+        return bm.mult_to_bytes(un)
     
     if isinstance(c,list):
         
@@ -138,4 +142,75 @@ def decrypt(c,sK:tuple,asTxt=False):
 #############################################################
 ################ - Signature scheme - #######################
 #############################################################
+
+def signing(M:bytes, privateK:tuple=None, saving:bool=False, Verbose:bool=False):
+    """
+    Signing the message (M).
+    You need to attach this signature to the message. 
+    """
+
+    assert isinstance(M, bytes)
+
+    from ..hashbased import hashFunctions as hashF
+
+    if not privateK:
+        privateK = it.extractKeyFromFile("private_key")
+    
+    size = it.getKeySize(privateK) # Get key size
+    
+    if Verbose: print("Hashing in progress...")
+
+    hm = hashF.sponge(M,size)
+    #base64 to int
+    hm = bm.bytes_to_int(bm.mult_to_bytes(hm))
+
+    if Verbose:
+        print(f"hm = {hm}")
+        print("Hashing done.\n")
+
+    # raises it to the power of d (modulo n)
+    # same thing as decrypting
+    n,d = privateK
+    sign = ut.square_and_multiply(hm,d,n)
+
+    if saving:
+        sign = it.writeKeytoFile(sign,"RSA_signature")
+
+    return sign
+
+
+def verifying(M:bytes,sign:int,pK:tuple=None):
+    """
+    Verify given signature of message M with corresponding public key's.
+    """
+
+    assert isinstance(M,bytes) or isinstance(M,bytearray)
+
+    from ..hashbased import hashFunctions as hashF
+
+    if not pK:
+        pK = it.extractKeyFromFile("public_key")
+
+    size = it.getKeySize(pK)
+
+    hm = hashF.sponge(M,size)
+    # base64 to int
+    hm = bm.bytes_to_int(bm.mult_to_bytes(hm))
+        
+    # If the signature is in base64
+    if not isinstance(sign,int):
+        sign = it.getIntKey(sign)
+
+    n,e = pK
+    # raises the signature to the power of e (modulo n)
+    # (as when encrypting a message)
+    if sign > n:
+        print("Signature > modulus")
+
+    test = ut.square_and_multiply(sign,e,n)
+
+    if test == (hm % n):
+        return True
+    else:
+        return False
 

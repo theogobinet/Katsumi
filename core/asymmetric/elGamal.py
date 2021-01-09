@@ -17,7 +17,7 @@ import random as rd
 # the message itself is encrypted using a symmetric cryptosystem and ElGamal is then used to encrypt only the symmetric key.
 ############
 
-def generator(p:int,q:int,r:int=2) -> int:
+def generator(p:int,q:int,r:int=2):
     """
     Find a generator g such as g order is q (Sophie Germain prime) with p = 2q + 1.
     That's a generator for Gq. Not Zp* and any other subgroup. Very important point.
@@ -62,7 +62,7 @@ def generator(p:int,q:int,r:int=2) -> int:
         return g
 
 
-def isEasyGeneratorPossible(s:tuple) -> int:
+def isEasyGeneratorPossible(s:tuple):
     """
     Return True is it's possible to generate easly a generator.
     """
@@ -142,7 +142,7 @@ def key_gen(n:int=2048,primeFount=True,easyGenerator:bool=False,randomFunction=N
     private_key = (p,gen,x)
     
     if saving:
-        it.writeKeytoFile(private_key,"private_key",config.DIRECTORY_PROCESSING,".kpk")
+        it.writeKeytoFile(private_key,"private_key",config.DIRECTORY_PROCESSING,".kpublicKey")
 
     if Verbose:
         print(f"\nYour private key has been generated Alice, keep it safe !")
@@ -154,7 +154,7 @@ def key_gen(n:int=2048,primeFount=True,easyGenerator:bool=False,randomFunction=N
     public_key = (p,gen,h)
     
     if saving:
-        public_key = it.writeKeytoFile(public_key,"public_key",config.DIRECTORY_PROCESSING,".kpk")
+        public_key = it.writeKeytoFile(public_key,"public_key",config.DIRECTORY_PROCESSING,".kpublicKey")
 
     if Verbose:
         print(f"\nThe public key has been generated too : ",end="")
@@ -168,11 +168,11 @@ def key_gen(n:int=2048,primeFount=True,easyGenerator:bool=False,randomFunction=N
 ########### -   Encryption   - ##############
 #############################################
 
-def encrypt(M:bytes,pKey,saving:bool=False):
+def encrypt(M:bytes,publicKey,saving:bool=False):
 
-    assert isinstance(M,bytes)
+    assert isinstance(M,bytes) or isinstance(M,bytearray)
 
-    p,g,h = pKey
+    p,g,h = publicKey
 
     def process(m):
         y = rd.randrange(1,p-1)
@@ -197,7 +197,7 @@ def encrypt(M:bytes,pKey,saving:bool=False):
         # You need to choose a different y for each block to prevent
         # from Eve's attacks.
 
-        size = (it.getKeySize(pKey) // 8) - 1
+        size = (it.getKeySize(publicKey) // 8) - 1
 
         e = [process(bm.bytes_to_int(elt)) for elt in bm.splitBytes(M,size)]
 
@@ -210,9 +210,13 @@ def encrypt(M:bytes,pKey,saving:bool=False):
 ########### -   Decryption   - ##############
 #############################################
 
-def decrypt(ciphertext,sK:tuple,asTxt=False):
+def decrypt(c,privateKey:tuple,asTxt=False):
+    """
+    Decryption of given ciphertext 'c' with secret key 'privateKey'. 
+    Return bytes/bytearray or txt if asTxt set to 'True'.
+    """
 
-    p,_,x = sK
+    p,_,x = privateKey
 
     def process(cipherT):
         c1,c2 = cipherT
@@ -224,14 +228,14 @@ def decrypt(ciphertext,sK:tuple,asTxt=False):
 
         return bm.mult_to_bytes(m)
     
-    if isinstance(ciphertext,list):
+    if isinstance(c,list):
         
-        decrypted=[process(elt) for elt in ciphertext]
+        decrypted=[process(elt) for elt in c]
 
         r = bm.packSplittedBytes(decrypted)
 
     else:
-        r = process(ciphertext)
+        r = process(c)
 
     if asTxt:
         return r.decode()
@@ -244,7 +248,7 @@ def decrypt(ciphertext,sK:tuple,asTxt=False):
 
 def signing(M:bytes,privateK:tuple=None,saving:bool=False,Verbose:bool=False):
     """
-    Signing a message M (bytes)
+    Signing a message M (bytes).
     """
 
     from ..hashbased import hashFunctions as hashF
@@ -255,13 +259,12 @@ def signing(M:bytes,privateK:tuple=None,saving:bool=False,Verbose:bool=False):
         
     p,g,x = privateK
      
-    size = it.getSize(privateK)
+    size = it.getKeySize(privateK)
 
     # M = bm.fileToBytes(M)
     # M = "Blablabla".encode()
 
     if Verbose: print("Hashing in progress...")
-
 
     hm = hashF.sponge(M,size)
     # #base64 to int
@@ -273,10 +276,10 @@ def signing(M:bytes,privateK:tuple=None,saving:bool=False,Verbose:bool=False):
 
     p1 = p-1
 
-    k= rd.randrange(2,p-2)
+    k = rd.randrange(2,p-2)
 
     while not ut.coprime(k,p1):
-        k = rd.randrange(1,p-2)
+        k = rd.randrange(2,p-2)
 
 
     if Verbose: print(f"Your secret integer is: {k}")
@@ -285,7 +288,7 @@ def signing(M:bytes,privateK:tuple=None,saving:bool=False,Verbose:bool=False):
 
     from ressources.multGroup import inv
 
-    s2 = (inv(k,p1) * (hm - x*s1)) % p1
+    s2 = (multGroup.inv(k,p1) * (hm - x*s1)) % p1
 
     # In the unlikely event that s2 = 0 start again with a different random k.
 
@@ -301,21 +304,23 @@ def signing(M:bytes,privateK:tuple=None,saving:bool=False,Verbose:bool=False):
         return sign
 
 
-def verifying(M:bytes,pK:tuple=None,sign:tuple=None):
+def verifying(M:bytes,sign:tuple,publicKey:tuple=None):
     """
-    Verifyin given signature of message M with corresponding public key's.
+    Verify given signature of message M with corresponding public key's.
     """
+    assert isinstance(M,bytes) or isinstance(M,bytearray)
 
     from ..hashbased import hashFunctions as hashF
 
-    if not pK:
-        pK = it.extractKeyFromFile("public_key")
+    if not publicKey:
+        publicKey = it.extractKeyFromFile("public_key")
         
-    p,g,h = pK
-    size = it.getSize(pK)
+    p,g,h = publicKey
+    size = it.getKeySize(publicKey)
 
     hm = hashF.sponge(M,size)
-    # #base64 to int
+
+
     hm = bm.bytes_to_int(bm.mult_to_bytes(hm))
 
 
