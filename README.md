@@ -59,7 +59,16 @@ The source code is ordered as follows:
 
 #### Asymmetric
 
+<p align="center">
+  <img src="images/df.gif" alt="animated" />
+</p>
+
 #### BlockChain
+
+<p align="center">
+  <img src="images/bc.gif" alt="animated" />
+</p>
+
 
 ### Implementation choices
 
@@ -104,6 +113,8 @@ With this method, the user can have safe prime numbers loaded in his free time a
 * An obvious improvement would be to integrate the [elliptic curves](https://en.wikipedia.org/wiki/Elliptic-curve_cryptography). This is a notion that came up at the end of the semester and which, respecting the deadline, could not be implemented (and was not required).
 
 * Using [Schnorr signatures](https://medium.com/digitalassetresearch/schnorr-signatures-the-inevitability-of-privacy-in-bitcoin-b2f45a1f7287) for our BlockChain.
+
+* Group RSA and ElGamal into a parent class to benefit from function heritage (i.e. use object-oriented programming).
 ## Authors
 * **Azaël MARTIN** - [n3rada](https://github.com/n3rada)
 * **Théo GOBINET** - [Elec](https://github.com/theogobinet)
