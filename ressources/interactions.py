@@ -100,12 +100,12 @@ def correctSizeHook():
         return True
 
 
-def readFromUser(msg="Enter the message:"):
+def readFromUser(msg="Enter the message :"):
     from sys import stdin
 
     phrase=""
 
-    print(msg)
+    print(msg+"\n")
     
     for line in stdin:
         if line == '\n': # If empty string is read then stop the loop
@@ -1447,7 +1447,7 @@ def bcSimulationParam():
 
         pName = param[1].replace('\t','')
 
-        print (f'{pName} : {param[2]}')
+        print (f'{pName} : {param[2]} \n')
         
         if param[3] == int:
             param[0] = getInt(param[0], "value", param[4])
