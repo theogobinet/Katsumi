@@ -315,20 +315,14 @@ def extractVarFromFile(fileName:str,directory=config.DIRECTORY_GEN,ext:str=".kat
 ######## Key gestion #########
 ##############################
 
-def getIntKey(b64, keyNumber:int=1):
+def getIntKey(data:bytes, keyNumber:int=1):
     """
     Convert base64 key's into tuples of keyNumber integers.
     """
-    import base64, binascii
+    assert isinstance(data, bytes) or isinstance(data, bytearray)
 
     if isinstance(keyNumber,str):
         keyNumber = int(keyNumber)
-
-    try:
-        data = base64.b64decode(b64)
-    except binascii.Error:
-        # then it's already into b64 logically
-        data = b64
 
     if keyNumber != 1:
         keys = ()
@@ -347,6 +341,9 @@ def getIntKey(b64, keyNumber:int=1):
 
 
 def getB64Keys(key):
+    """
+    Received in input key in tuple,bytes,list etc. and return key in base64.
+    """
     import base64
     
     if isinstance(key,tuple):
@@ -420,14 +417,15 @@ def extractKeyFromFile(fileName:str,directory=config.DIRECTORY_PROCESSING,ext:st
         b64data = f.read()
         f.close()
 
+        from base64 import b64decode
+
         if b64data[0] == "L":
             #It's a list !
-            from base64 import b64decode
-
-            return [getIntKey(el,b64data[1]) for el in b64decode(b64data[2:]).decode().split("|") ]
+            #Case when message is longer than modulus -> separation into list of keys
+            return [getIntKey(b64decode(el),b64data[1]) for el in b64decode(b64data[2:]).decode().split("|") ]
 
         else:
-            return getIntKey(b64data[1:], b64data[0])
+            return getIntKey(b64decode(b64data[1:]), b64data[0])
         
     else:
         raise FileNotFoundError(f"File {fileName} not found")
@@ -439,7 +437,7 @@ def askForKey():
     clear()
     asc.asciiCat()
 
-    answer=query_yn("You have not yet defined a key, you want to enter one?","no")
+    answer = query_yn("You have not yet defined a key, you want to enter one?","no")
 
     key = bytearray()
 
@@ -620,7 +618,7 @@ def stockSafePrimes(n:int=1024,x:int=15,randomFunction=prng.xorshiftperso):
     
     print(f"Computing in progress. Please wait ...")
 
-    prng.genSafePrimes(x,fount,n,randomFunction)
+    fount = prng.genSafePrimes(x,fount,n,randomFunction)
 
     print(f"Generation completed.\n")
 
@@ -960,17 +958,14 @@ def dHgestion():
 
     selection = getInt(2,"choices")
 
-    def doSomethingDH(i:int):
+    def doSomethingDH(i:int,processWithAgreement:bool=False):
         
         if i == 1:
-            clear()
             asc.asciiKeys()
 
             print("On what size n (bits) did you agree with your penpal?")
 
             size = getInt(2048,"bits size",True)
-
-            clear()
             asc.asciiKeys()
 
             print(f"Checking existence of fountain of {size} bits...")
@@ -989,17 +984,24 @@ def dHgestion():
             print("According to the size of the private key, your agreement is : ",end="")
             prGreen(accord)
 
-            doSomethingElse(dHgestion)
+            if query_yn("Do you want to process with given agreement now ?") :
+                doSomethingDH(2,True)
+            else:
+                doSomethingElse(dHgestion)
 
         elif i == 2:
-            clear()
             asc.asciiKeys()
 
-            if query_yn("Do you want to use the dH_agreement.kat file's ? (default: Yes)"):
-                accord = extractKeyFromFile("dH_agreement")
+            if not processWithAgreement:
+                if query_yn("Do you want to use the dH_agreement.kat file's ? (default: Yes)"):
+                    accord = extractKeyFromFile("dH_agreement")
+                else:
+                    accord = getIntKey(getb64("agreement"),2)
+
             else:
-                accord = getIntKey(getb64("agreement"),2)
-                clear()
+                accord = extractKeyFromFile("dH_agreement")
+            
+            #asc.asciiKeys()
 
             print(f"\nNow, choose a secret value into [0,{accord[0]}]")
             
@@ -1007,30 +1009,23 @@ def dHgestion():
             
             secret = getInt(rd.randrange(2,accord[0]),"your secret integer",False,accord[0])
 
-            clear()
             asc.asciiKeys()
 
             secret = dH.chooseAndSend(accord,secret,saving=True,Verbose=True)
 
-            clear()
-            asc.asciiKeys()
-
             sended = getIntKey(getb64("his secret"),1)
+
             dH_shared = dH.compute(accord,[secret,sended],saving=True)
             
-            clear()
             asc.asciiKeys()
 
-            print("Shared key created.")
+            print("Shared key created.\n")
             prGreen(f"\t > {dH_shared}\n")
 
             doSomethingElse(dHgestion)
 
-            
-
         elif i == 3:
-            import katsumi
-            katsumi.menu()
+            katsuAsymm()
         else:
             dHgestion()
 
@@ -1098,7 +1093,7 @@ def katsuSymm():
             print("Here is your ciphered message, copy it and send it !\n")
             prGreen(ciphers.run(data, inFile, True, cipher, aad, key))
             end=datetime.now() - begin_time
-            input(f"Encryption finished in {end} seconds !\n")
+            input(f"\nEncryption finished in {end} seconds !")
 
             clear()
             asc.asciiCat()
@@ -1127,7 +1122,7 @@ def katsuSymm():
 
             begin_time = datetime.now()
 
-            print(ciphers.run(data, inFile, False, cipher, "", key))
+            prYellow(ciphers.run(data, inFile, False, cipher, "", key))
             
             end = datetime.now() - begin_time
             input(f"\nDecryption finished in {end} seconds !")
@@ -1222,34 +1217,32 @@ def katsuAsymm():
 
             #####
             while not isFileHere("public_key.kpk",config.DIRECTORY_PROCESSING):
-                clear()
                 asc.asciiCat()
 
                 input("Please put your 'private_key.kpk' file into the 'processing' folder.")
             
-            clear()
-            asc.asciiCat()
             print("Gotcha !\n")
             
             while not isFileHere("encrypted.kat",config.DIRECTORY_PROCESSING):
-                clear()
                 asc.asciiCat()
 
                 input("Please put your 'encrypted.kat' file into the 'processing' folder.")
             
-            clear()
-            asc.asciiCat()
             print("Gotcha !\n")
             #####
 
-            e = extractKeyFromFile("encrypted",config.DIRECTORY_PROCESSING,".kat")
+            asc.asciiCat()
+            
+            if query_yn("Do you want to use the encrypted.kat file's ? (default: Yes)"):
+                e = extractKeyFromFile("encrypted",config.DIRECTORY_PROCESSING,".kat")
+            else:
+                e = getIntKey(getb64("key"),2)
 
             d = elG.decrypt(e,extractKeyFromFile("private_key",config.DIRECTORY_PROCESSING),asTxt=True)
 
-            d = d.split("\n")
+            asc.asciiCat()
 
-            for phrase in d:
-                print(f"\t -'{phrase}'")
+            prYellow(d)
 
             doSomethingElse(katsuAsymm)
 
@@ -1374,7 +1367,7 @@ def certificate():
         clear()
         asc.asciiBark()
 
-        k=getb64("public key")
+        k = getb64("public key")
 
         if not k:
             certificate()

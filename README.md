@@ -1,20 +1,6 @@
-                        _                        
-                        \`*-.                 _  __     _                       _    
-                         )  _`-.             | |/ /    | |                     (_)    
-                        .  : `. .            | ' / __ _| |_ ___ _   _ _ __ ___  _     
-                        : _   '  \           |  < / _` | __/ __| | | | '_ ` _ \| |    
-                        ; *` _.   `*-._      | . \ (_| | |_\__ \ |_| | | | | | | |    
-                        `-.-'          `-.   |_|\_\__,_|\__|___/\__,_|_| |_| |_|_|    
-                            ;       `       `.     
-                            :.       .        \               Remember: 
-                            . \  .   :   .-'   .     Encryption provides secrecy,
-                            '  `+.;  ;  '      :    not authentication or integrety.
-                            :  '  |    ;       ;-. 
-                            ; '   : :`-:     _.`* ;  Martin Azaël && Gobinet Théo 
-                        .*' /  .*' ; .*`- +'  `*' 
-                        `*-*   `*-*  `*-*'           
-
-
+<p align="left">
+  <img src="images/katsumi.png" alt="katsumi_logo" />
+</p>
 `Katsumi` is an interactive cryptographical tool.
 
 **Designed** on Arch Linux and Windows 10 **for Linux and Windows operating systems**.
@@ -48,7 +34,7 @@ For more information about this subject, click [here](pdfs/Projet.pdf) (it's in 
 This project was initially devoted to the development of a modified version of [Kasumi's symmetric encryption](https://en.wikipedia.org/wiki/KASUMI) algorithm, then to the generation of a public/private key pair to finally gather all the acquired knowledge and simulate a [blockchain](pdfs/blockChain_article.pdf).
 ### Structure
 The source code is ordered as follows:
-* The "core" folder contains the core of the program. Everything related to symmetric, asymmetric and hash-based encryption methods (i.e. [the BlockChain](core/hashbased/blockchain.py)).
+* The ["core" folder](core/) contains the core of the program. Everything related to symmetric, asymmetric and hash-based encryption methods (i.e. [the BlockChain](core/hashbased/blockchain.py)).
 * The ["processing" folder](processing/) which contains all outputs of the program destined for the user (i.e. public/private keys, digital signatures and encrypted things).
 * The ["resources" folder](ressources/) contains all the largest code files. This is where most of the primary functions reside.
 
@@ -76,7 +62,7 @@ The source code is ordered as follows:
 
 * To make it easier to handle the inverses in the Galois fields, we have [pre-recorded in memory the inverses](ressources/generated/inversion_Sbox.txt) of the Galois field degree 16 (itself written in raw).
 
-* The [Inversion_Sbox.txt](ressources/inversion_Sbox.txt) is checked at each start and if it's corrupted (not here or wrong), the program will generate one before starting.
+* The [Inversion_Sbox.txt](ressources/generated/inversion_Sbox.txt) is checked at each start and if it's corrupted (not here or wrong), the program will generate one before starting.
 
 * Any generator for El-Gamal is designed to resist common attacks and it's found via the principle of [Schnorr's group](https://en.wikipedia.org/wiki/Schnorr_group). More information by reading the code about El-Gamal [here](core/asymmetric/elGamal.py).
 

@@ -38,8 +38,7 @@ def work_with_selection(pSelection):
         return it.primeNumbersFountain()
 
     elif pSelection in [7,-1]:
-        it.clear()
-        print("\t --- Goodbye M'Lord. --- \n")
+        asc.asciiGoodBye()
         sys.exit()
 
     else:

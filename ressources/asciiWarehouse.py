@@ -3,6 +3,18 @@
 
 from ressources import interactions as it
 
+def asciiGoodBye():
+    it.clear()
+    return print(
+        """
+     __                                                  
+    /__  _   _   _| |_      _    ._ _       |   _  ._ _| 
+    \_| (_) (_) (_| |_) \/ (/_   | | | \/   |_ (_) | (_| 
+                        /              /                 
+        """
+    )
+
+
 def asciiArt():
     it.clear()
     return print( """

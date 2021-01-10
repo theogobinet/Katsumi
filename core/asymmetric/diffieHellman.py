@@ -21,11 +21,10 @@ def agreement(n:int=2048,fountain=True):
 
     if fountain:
         p,_ = it.extractSafePrimes(n,False,Verbose=True)
+        return (p,multGroup.primitiveRoot(p))
     else:
         it.stockSafePrimes(n,1)
         return agreement(n,True)
-
-    return (p,multGroup.primitiveRoot(p))
 
 # 2) and 3)
 def chooseAndSend(accord:tuple,secret=None,n:int=2048,saving=False,Verbose=False):
@@ -50,9 +49,8 @@ def chooseAndSend(accord:tuple,secret=None,n:int=2048,saving=False,Verbose=False
         toSend = it.writeKeytoFile(toSend,"dH_sendable")
 
     if Verbose:
-        print(f"Here's what to send to the other one: {toSend}")
-
-        input("Is everything good ? (Press enter for next)")
+        print(f"Here's what to send to the other one : ", end="")
+        it.prGreen(toSend)
 
     return secret_integer
 

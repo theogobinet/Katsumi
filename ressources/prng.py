@@ -236,3 +236,5 @@ def genSafePrimes(n:int, L:list, nBits:int, randomFunction=None):
         s = safePrime(nBits,randomFunction,bool(rd.getrandbits(1)))
         if s not in L:
             L.append(s)
+    
+    return L
