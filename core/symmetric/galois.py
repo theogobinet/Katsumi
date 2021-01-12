@@ -15,7 +15,10 @@ def polydiv_mod(A,B,nZ=2):
     """Polynomial division in nZ"""
     buffer=np.polydiv(A,B)
 
-    return (np.poly1d([elt%nZ for elt in buffer[0]]) , np.poly1d([elt%nZ for elt in buffer[1] ]) )
+    if nZ:
+        return (np.poly1d([elt%nZ for elt in buffer[0]]) , np.poly1d([elt%nZ for elt in buffer[1] ]) )
+    else:
+        return buffer
 
 
 def poly_add(A,B,nZ=2):
@@ -192,7 +195,7 @@ def invertGalois(A,output=1):
 
 def GF(degree,p=2,Zn=2):
     """Initialize the Galois Field GF(p^degree) in Zn."""
-    config.DEGREE=degree
+    config.DEGREE = degree
     config.NBR_ELEMENTS = p ** degree 
     config.GENERATOR = gen_GL(config.IRRED_POLYNOMIAL,degree,p,Zn)
     return None

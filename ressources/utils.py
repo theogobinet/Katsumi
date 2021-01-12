@@ -148,7 +148,7 @@ def pairwise_coprime(listing:list):
     return True
 
 
-def square_and_multiply(x, k, p=None):
+def square_and_multiply(x, k, p=None,Verbose=False):
     """
     Square and Multiply Algorithm
 
@@ -161,11 +161,14 @@ def square_and_multiply(x, k, p=None):
     b = bin(k).lstrip('0b')
     r = 1
     for i in b:
+        rBuffer = r
         r = r**2
         if i == '1':
             r = r * x
         if p:
             r %= p
+        if Verbose:
+            print(f"{rBuffer}^2 = {r} mod {p}")
     return r
 
 

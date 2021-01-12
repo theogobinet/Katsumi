@@ -384,7 +384,7 @@ def isGenerator(e:int ,n:int, lagrangeWay:bool=True, printOther:bool=False, Verb
 
         if Verbose:
             print(f"If phi({n}) is equal to mutliplicative order of {e} modulo {n} then it's a generator of {n}.")
-            print(f"phi(n) = {totient} and order(e,n) = {order}.")
+            print(f"phi(n) = {totient} and order(e,n) = {order}.\n")
 
         if totient == order :
 
@@ -392,7 +392,7 @@ def isGenerator(e:int ,n:int, lagrangeWay:bool=True, printOther:bool=False, Verb
 
                 if Verbose:
                     print(f"There are {phi(phi(n))} generators in Z{n}.")
-                    print(f"{e} is the a generator of Z{n}.\n")
+                    print(f"{e} is the a generator of Z{n}.")
 
                 return True, findOtherGenerators(e,n,Verbose)
 
@@ -411,7 +411,7 @@ def isGenerator(e:int ,n:int, lagrangeWay:bool=True, printOther:bool=False, Verb
                     continue
                 else:
                     if Verbose:
-                        print(f"{e}^{i} = {t} mod {n}")
+                        print(f"\n{e}^{i} = {t} mod {n}")
 
                     #if cycling occurs
                     if t == 1 and t in elements:
@@ -447,7 +447,7 @@ def isGenerator(e:int ,n:int, lagrangeWay:bool=True, printOther:bool=False, Verb
             for k in L:
                 t = ut.square_and_multiply(e,k,n)
                 if Verbose:
-                    print(f"{e}^{k} = {t} mod {n}")
+                    print(f"\n{e}^{k} = {t} mod {n}")
                 if t == 1:
                     return False
             
