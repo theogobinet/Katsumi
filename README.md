@@ -108,7 +108,7 @@ With this method, the user can have safe prime numbers loaded in his free time a
 ### Performances
 **Each measurement is based on a i7-10510U with 2.5GHz**.
 
-* The generation of the inverses in a binary Galois field (Z2) of degree 16 takes about **85 secondes** (average over 5 trials).
+* The generation of the inverses in a binary Galois field (Z2) of degree 16 takes about **117 secondes** (average over 5 trials).
 * Generating a **safe prime of 512 bits** take at average **12.4 secondes** for 10 tests.
 * Generating a **safe prime of 2048 bits** take at average **71 minutes** for 4 tests.
 

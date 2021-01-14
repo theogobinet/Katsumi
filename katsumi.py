@@ -81,6 +81,7 @@ def main():
 
     #Galois field's initialization
     GF2(16)
+    
     menu()
 
 if __name__ == '__main__':

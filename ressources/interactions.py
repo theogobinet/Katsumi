@@ -490,36 +490,40 @@ def handleInvBox(doIt:bool=False):
     doIt: argument for debugging, run directly the thing.
     """
 
-    if not isFileHere("inversion_Sbox.txt"):
+    if doIt:
+        import threading
+        import time
+        import core.symmetric.galois_Z2 as gz2
 
-        print("A necessary file for the substitution has been deleted / corrupted from the system.\n")
+        th=threading.Thread(target = gz2.genInverses2)
+        
+        # This thread dies when main thread (only non-daemon thread) exits.
+        th.daemon = True
 
-        if query_yn("- Do you want to generate the inverse substitution box (No if you want to compute each time needed) ? "):
-   
-            import threading
-            import time
+        th.start()
+        time.sleep(2)
 
-            import core.symmetric.galois_Z2 as gz2
-
-            th=threading.Thread(target = gz2.genInverses2)
-            
-            # This thread dies when main thread (only non-daemon thread) exits.
-            th.daemon = True
-
-            th.start()
-            time.sleep(2)
-
-        else:
-            config.GALOIS_WATCH = True
-    
     else:
 
-        config.INVERSIONS_BOX=extractVarFromFile("inversion_Sbox",ext=".txt")
+        if not isFileHere("inversion_Sbox.txt"):
 
-        if len(config.INVERSIONS_BOX) != config.NBR_ELEMENTS:
-            rmFile("inversion_Sbox.txt")
-            clear()
-            handleInvBox()
+            print("A necessary file for the substitution has been deleted / corrupted from the system.\n")
+
+            if query_yn("- Do you want to generate the inverse substitution box (No if you want to compute each time needed) ? "):
+
+                handleInvBox(True)
+
+            else:
+                config.GALOIS_WATCH = True
+        
+        else:
+
+            config.INVERSIONS_BOX=extractVarFromFile("inversion_Sbox",ext=".txt")
+
+            if len(config.INVERSIONS_BOX) != config.NBR_ELEMENTS:
+                rmFile("inversion_Sbox.txt")
+                clear()
+                handleInvBox()
 
 
 def doSomethingElse(m=None):
