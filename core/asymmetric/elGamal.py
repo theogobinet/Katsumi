@@ -142,7 +142,7 @@ def key_gen(n:int=2048,primeFount=True,easyGenerator:bool=False,randomFunction=N
     private_key = (p,gen,x)
     
     if saving:
-        it.writeKeytoFile(private_key,"private_key",config.DIRECTORY_PROCESSING,".kpublicKey")
+        it.writeKeytoFile(private_key,"private_key",config.DIRECTORY_PROCESSING,".kpk")
 
     if Verbose:
         print(f"\nYour private key has been generated Alice, keep it safe !")
@@ -154,7 +154,7 @@ def key_gen(n:int=2048,primeFount=True,easyGenerator:bool=False,randomFunction=N
     public_key = (p,gen,h)
     
     if saving:
-        public_key = it.writeKeytoFile(public_key,"public_key",config.DIRECTORY_PROCESSING,".kpublicKey")
+        public_key = it.writeKeytoFile(public_key,"public_key",config.DIRECTORY_PROCESSING,".kpk")
 
     if Verbose:
         print(f"\nThe public key has been generated too : ",end="")
