@@ -69,10 +69,6 @@ def mine(user:int):
         user: user id of the miner
     '''
 
-    import time
-
-    # Waits a bit before trying to validate the block
-
     cBIndex = len(c.BC_CHAIN) - 1
 
     index = -1
@@ -80,7 +76,7 @@ def mine(user:int):
     cUTXO = []
 
     while cBIndex == (len(c.BC_CHAIN) - 1):
-
+        
         res = validBlock(cBIndex, user, (index, cBlock, cUTXO))
         if isinstance(res, tuple) :
             index, cBlock, cUTXO = res
@@ -504,7 +500,7 @@ def getUserUTXO(user:int, UTXO:list=c.BC_UTXO):
     return amounts
 
 
-def transitUTXO(sender:int, receiver:int, amount:int, UTXO:list=c.BC_UTXO):
+def transitUTXO(sender:int, receiver:int, amount:int, UTXO:list=None):
     '''
         Manage the transaction with UTXO
 
@@ -514,8 +510,10 @@ def transitUTXO(sender:int, receiver:int, amount:int, UTXO:list=c.BC_UTXO):
         UTXO: array of UTXO to use instead of default one: c.BC_UTXO
     '''
 
-    # If the sender is the network, add the amount in one UTXO without check
+    if UTXO == None:
+        UTXO = c.BC_UTXO
 
+    # If the sender is the network, add the amount in one UTXO without check
     if not sender:
         UTXO.append([receiver, amount])
         return True
