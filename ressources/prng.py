@@ -139,21 +139,30 @@ def safePrime(nBits:int=1024, randomFunction=xorshiftperso, easyGenerator:bool=F
     """
 
     from multiprocessing import Pool, cpu_count, Manager
+    import signal #https://docs.python.org/3/library/signal.html
 
     manager = Manager()
 
     c = int((85/100) * cpu_count())
 
+    original_sigint_handler = signal.signal(signal.SIGINT, signal.SIG_IGN)
     poule = Pool(c)
+    signal.signal(signal.SIGINT, original_sigint_handler)
 
     flag = manager.Value('i',0) # Can be shared between processes.
 
     return_list = manager.list([])
 
     data = [(nBits,randomFunction,easyGenerator,False,flag,return_list) for _ in range(c)]
-
-    poule.starmap(safePrime_worker,data)
-    poule.close()
+    
+    # Permit to quit safe prime generation with exit signal
+    try:
+        poule.starmap(safePrime_worker,data)
+    except KeyboardInterrupt:
+        poule.terminate()
+        return False
+    else:
+        poule.close()
 
     return list(return_list)[0]
 
@@ -234,7 +243,11 @@ def genSafePrimes(n:int, L:list, nBits:int, randomFunction=None):
     for _ in range(n):
         # bool(rd.getrandbits(1)) faster than rd.choice([True,False])
         s = safePrime(nBits,randomFunction,bool(rd.getrandbits(1)))
-        if s not in L:
-            L.append(s)
+        
+        if not s: # s is false due to interruption of research
+            return s
+        else:
+            if s not in L:
+                L.append(s)
     
     return L

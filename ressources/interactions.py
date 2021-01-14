@@ -483,11 +483,16 @@ def getKeySize(key:object="public_key") -> int:
 ######## Inversion Box #######
 ##############################
 
-def handleInvBox():
+def handleInvBox(doIt:bool=False):
+    """
+    Deal with inversion box of given degree.
+
+    doIt: argument for debugging, run directly the thing.
+    """
 
     if not isFileHere("inversion_Sbox.txt"):
 
-        print("A necessary file for the substitution has been deleted from the system.\n")
+        print("A necessary file for the substitution has been deleted / corrupted from the system.\n")
 
         if query_yn("- Do you want to generate the inverse substitution box (No if you want to compute each time needed) ? "):
    
@@ -513,7 +518,6 @@ def handleInvBox():
 
         if len(config.INVERSIONS_BOX) != config.NBR_ELEMENTS:
             rmFile("inversion_Sbox.txt")
-            print("WARNING - Wrong Inversion Substition box ! \n")
             clear()
             handleInvBox()
 
@@ -582,7 +586,10 @@ def extractSafePrimes(nBits:int=1024,allE:bool=True,easyGenerator:bool=False,dir
 
                             if question:
                                 s = prng.safePrime(nBits,easyGenerator=True)
-                                updatePrimesFount(s,nBits)
+                                if s:
+                                    updatePrimesFount(s,nBits)
+                                else:
+                                    return s # False
                             else:
                                 return elGamalKeysGeneration()
                         else:
@@ -620,9 +627,13 @@ def stockSafePrimes(n:int=1024,x:int=15,randomFunction=prng.xorshiftperso):
 
     fount = prng.genSafePrimes(x,fount,n,randomFunction)
 
-    print(f"Generation completed.\n")
-
-    writeVartoFile(fount,f"{str(n)}_bits",config.DIRECTORY_FOUNT)
+    if fount :
+        prYellow("Generation completed.\n")
+        writeVartoFile(fount,f"{str(n)}_bits",config.DIRECTORY_FOUNT)
+    else:
+        asc.asciiArt()
+        prRed("Generation stopped.\n")
+    
 
 def updatePrimesFount(p:tuple,nBits:int):
     """
@@ -681,7 +692,7 @@ def primeNumbersFountain():
 
             stockSafePrimes(wanted,numbers)
 
-            return doSomethingElse(primeNumbersFountain)
+            doSomethingElse(primeNumbersFountain)
 
         elif i == 2:
             print("Enter number of bits for updating corresponding one's :")
@@ -691,7 +702,8 @@ def primeNumbersFountain():
             numbers = getInt(1,"generations")
 
             stockSafePrimes(wanted,numbers)
-            return doSomethingElse(primeNumbersFountain)
+            
+            doSomethingElse(primeNumbersFountain)
         
         elif i == 3:
             clear()
@@ -703,7 +715,8 @@ def primeNumbersFountain():
             if query_yn("Are you sure ?"):
                 rmFile(name,config.DIRECTORY_FOUNT)
                 print(f"{name} removed successfully.\n")
-                return doSomethingElse(primeNumbersFountain)
+                
+                doSomethingElse(primeNumbersFountain)
             else:
                 primeNumbersFountain()
 
@@ -714,7 +727,7 @@ def primeNumbersFountain():
             clear()
             primeNumbersFountain()
         
-    return doSomethingFount(selection)
+    doSomethingFount(selection)
 
 
 #########################################

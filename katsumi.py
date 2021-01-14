@@ -66,10 +66,12 @@ def menu():
 
         it.enumerateMenu(choices)
 
-        selection = it.getInt(1,"choices")
+        try:
+            selection = it.getInt(1,"choices")
+            work_with_selection(selection)
+        except KeyboardInterrupt:
+            work_with_selection(-1)
 
-        work_with_selection(selection)
-        
     else:
         menu()
 
@@ -79,7 +81,6 @@ def main():
 
     #Galois field's initialization
     GF2(16)
-
     menu()
 
 if __name__ == '__main__':
