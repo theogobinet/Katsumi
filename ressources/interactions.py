@@ -921,22 +921,13 @@ def dlogAttack():
 
             el = elGamal.delog(extractKeyFromFile("public_key",config.DIRECTORY_PROCESSING),extractKeyFromFile("encrypted",config.DIRECTORY_PROCESSING,".kat"),True)
             
-            print(f"Decrypted message is:")
-
-            el = el.split("\n")
-            print(el)
-
-            for phrase in el:
-                print(f"\t -'{phrase}'")
+            print(f"Decrypted message is:\n")
+            prYellow(el)
 
             doSomethingElse(dlogAttack)
         
-        elif i == 3:
-            import katsumi
-            katsumi.menu()
         else:
-            
-            dlogAttack()
+            katsuAsymm() 
         
     doSomething(selection)
 

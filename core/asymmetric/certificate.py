@@ -13,9 +13,7 @@ import core.asymmetric.elGamal as elG
 def x509(subjectPublicKey,name:str="X509",out:bool=True):
 
     import ressources.bytesManager as bm
-
-    if not bm.isBase64(subjectPublicKey):
-        subjectPublicKey = it.getB64Keys(subjectPublicKey)
+    import base64
 
     # Get key size's
     n = it.getKeySize(it.getIntKey(subjectPublicKey,3))
@@ -33,7 +31,7 @@ def x509(subjectPublicKey,name:str="X509",out:bool=True):
     # The certificate is signed by the private key of the certification authority.
     # The one who manufactured and issued this certificate.
     
-    signature = it.getB64Keys(elG.signing(bm.mult_to_bytes(subjectPublicKey),CA_private_key))
+    signature = it.getB64Keys(elG.signing(subjectPublicKey,CA_private_key))
 
     CA = f"""
     Certificate:
@@ -53,7 +51,7 @@ def x509(subjectPublicKey,name:str="X509",out:bool=True):
             Public Key Algorithm: El-Gamal
                 Public-Key: ({str(n)} bit)
                 pub:
-                    {str(subjectPublicKey)}
+                    {base64.b64encode(subjectPublicKey).decode()}
     Signature Algorithm: El-Gamal
          {signature}
     Key Usages
