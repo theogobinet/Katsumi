@@ -209,7 +209,7 @@ def cipher_choice():
     asc.asciiCat()
 
     print("Choice cypher method : ")
-    print(" 1 - ECB \n 2 - CBC \n 3 - PCBC (Recommended) \n 4 - CTR (Stream) \n 5 - CGM (Authentification)")
+    print(" 1 - ECB \n 2 - CBC \n 3 - PCBC (Recommended) \n 4 - CTR (Stream) \n 5 - GCM (Authentification)")
 
     pCipher=getInt(3,"choices")
 

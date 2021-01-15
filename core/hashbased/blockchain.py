@@ -445,7 +445,7 @@ def getUserKey(user:int, key:int):
     return c.BC_USERS[user][2 + key]
 
 
-def validTransaction(user:int, transaction:list, UTXO:list=c.BC_UTXO):
+def validTransaction(user:int, transaction:list, UTXO:list=None):
     '''
         Verify the given transaction
 
@@ -453,6 +453,9 @@ def validTransaction(user:int, transaction:list, UTXO:list=c.BC_UTXO):
         transaction: array containing transaction information of the format {sender ID -> receiver ID :: amount} -> signed by sender
         UTXO: array of UTXO to use instead of default one: c.BC_UTXO
     '''
+
+    if UTXO == None:
+        UTXO = c.BC_UTXO
 
     core = transaction[:-1]
     signature = transaction[-1]
@@ -474,23 +477,29 @@ def validTransaction(user:int, transaction:list, UTXO:list=c.BC_UTXO):
         return False
 
 
-def getUserBalance(user:int, UTXO:list=c.BC_UTXO):
+def getUserBalance(user:int, UTXO:list=None):
     '''
         Get the balance of an user by counting all of his UTXO
 
         user: user ID of the user whose balance you want to get
         UTXO: array of UTXO to use instead of default one: c.BC_UTXO
     '''
+    if UTXO == None:
+        UTXO = c.BC_UTXO
+
     return sum([x[1] for x in getUserUTXO(user, UTXO)])
 
 
-def getUserUTXO(user:int, UTXO:list=c.BC_UTXO):
+def getUserUTXO(user:int, UTXO:list=None):
     '''
         Get a list containing the amount of each UTXO for a given user
 
         user: user ID of the user whose UTXO you want to get
         UTXO: array of UTXO to use instead of default one: c.BC_UTXO
     '''
+
+    if UTXO == None:
+        UTXO = c.BC_UTXO
 
     amounts = []
     for i, u in enumerate(UTXO):
@@ -613,13 +622,16 @@ class bcolors:
     BOLD = '\033[1m'
 
 
-def transactionToString(transaction:list, UTXO:list=c.BC_UTXO):
+def transactionToString(transaction:list, UTXO:list=None):
     '''
         Return a string from a transaction
 
         tansaction: array of the transaction
         UTXO: array of UTXO to use instead of default one: c.BC_UTXO, use to get balance of the users
     '''
+
+    if UTXO == None:
+        UTXO = c.BC_UTXO
 
     from ressources.interactions import getB64Keys
 
