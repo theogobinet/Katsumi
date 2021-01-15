@@ -18,14 +18,14 @@ from ressources import config as c
     Because all the calculation time will be spent verifying the transactions for each miner rather than calculating the proof of work.
 '''
 
-def network(limit:int, rangeBS:tuple=(1,2), rangeTB:tuple=(3,5), rangeAm:tuple=(1,10)):
+def network(limit:int, rangeBS:tuple=(1, 2), rangeTB:tuple=(3, 5), rangeAm:tuple=(1, 10)):
     '''
         Loop that creates random users and transactions, stops when block limit is reached
 
         limit: stops when the number of block in the block-chain have reach limit
-        rangeBS: range between each cycles of transactions (e.g. new cycle between every (1,2) seconds)
-        rangeTB: range of transactions per cycles (e.g. between (3,5) transactions are generated per cycle)
-        rangeAm: range between which amount of the transaction is choosen (e.g. transaction amount is between (1,10)) 
+        rangeBS: range between each cycles of transactions (e.g. new cycle between every (1, 2) seconds)
+        rangeTB: range of transactions per cycles (e.g. between (3, 5) transactions are generated per cycle)
+        rangeAm: range between which amount of the transaction is choosen (e.g. transaction amount is between (1, 10)) 
 
         Transaction frequency calculation: avg(rangeTB) / avg(rangeBS) = average number of transactions per second
     '''
@@ -82,15 +82,15 @@ def mine(user:int):
             index, cBlock, cUTXO = res
 
 
-def startLive(limit:int, maxMiner:int, rangeTB:tuple=(10,15), rangeBS:tuple=(2,3), rangeAm:tuple=(1,10)):
+def startLive(limit:int, maxMiner:int, rangeTB:tuple=(10, 15), rangeBS:tuple=(2, 3), rangeAm:tuple=(1, 10)):
     '''
         Main function to start the live execution of the block-chain
 
         limit: stops when the number of block in the block-chain have reach limit
         maxMiner: maximal number of simultaneous miner
-        rangeBS: range between each cycles of transactions (e.g. new cycle between every (1,2) seconds)
-        rangeTB: range of transactions per cycles (e.g. between (3,5) transactions are generated per cycle)
-        rangeAm: range between which amount of the transaction is choosen (e.g. transaction amount is between (1,10)) 
+        rangeBS: range between each cycles of transactions (e.g. new cycle between every (1, 2) seconds)
+        rangeTB: range of transactions per cycles (e.g. between (3, 5) transactions are generated per cycle)
+        rangeAm: range between which amount of the transaction is choosen (e.g. transaction amount is between (1, 10)) 
     '''
 
     import threading
@@ -117,7 +117,7 @@ def startLive(limit:int, maxMiner:int, rangeTB:tuple=(10,15), rangeBS:tuple=(2,3
             time.sleep(0.1)
 
         for miner in selectedMiner:
-            tM = threading.Thread(target=mine, args=(miner,))
+            tM = threading.Thread(target=mine, args=(miner, ))
             tM.daemon = True
             tM.start()
 
@@ -399,8 +399,8 @@ def addUser(username:str, autoGenerateKeys:bool=True, keys:list=[]):
         publicKey, privateKey = algModule.key_gen(c.BC_KEY_SIZE)
     else:
         # decode base64 tuple of key
-        publicKey = getIntKey(keys[0], [2,3][c.BC_SIGNING_ALG == "elGamal"])
-        privateKey = getIntKey(keys[1], [2,3][c.BC_SIGNING_ALG == "elGamal"])
+        publicKey = getIntKey(keys[0], [2, 3][c.BC_SIGNING_ALG == "elGamal"])
+        privateKey = getIntKey(keys[1], [2, 3][c.BC_SIGNING_ALG == "elGamal"])
 
     userID = len(c.BC_USERS)
     
@@ -464,7 +464,7 @@ def validTransaction(user:int, transaction:list, UTXO:list=None):
         
     # First verify the transaction signature
     algModule = __import__("core.asymmetric." + c.BC_SIGNING_ALG, fromlist=[''])
-    if algModule.verifying(arrayToBytes(core),signature, getUserKey(sender, 0)):
+    if algModule.verifying(arrayToBytes(core), signature, getUserKey(sender, 0)):
 
         # Then perform the transaction, return true if the transaction can be performed
         if transitUTXO(sender, core[1], core[2], UTXO):

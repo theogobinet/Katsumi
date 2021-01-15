@@ -37,7 +37,7 @@ def work_with_selection(pSelection):
     elif pSelection == 6:
         return it.primeNumbersFountain()
 
-    elif pSelection in [7,-1]:
+    elif pSelection in [7, -1]:
         asc.asciiGoodBye()
         sys.exit()
 
@@ -54,7 +54,7 @@ def menu():
 
     it.clear()
 
-    choices=["Symmetric","Asymmetric","Hash","Get X509 Certificate","BlockChain","Prime Numbers Fountain's","Exit"]
+    choices=["Symmetric", "Asymmetric", "Hash", "Get X509 Certificate", "BlockChain", "Prime Numbers Fountain's", "Exit"]
 
     if it.correctSizeHook():
 
@@ -67,7 +67,7 @@ def menu():
         it.enumerateMenu(choices)
 
         try:
-            selection = it.getInt(1,"choices")
+            selection = it.getInt(1, "choices")
             work_with_selection(selection)
         except KeyboardInterrupt:
             work_with_selection(-1)

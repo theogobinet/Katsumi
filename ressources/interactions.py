@@ -33,7 +33,7 @@ def enumerateMenu(choices):
     """
     Menu enumeration
     """
-    for i,elt in enumerate(choices):
+    for i, elt in enumerate(choices):
         print(f"\t({i+1}) - {elt}")
 
     print()
@@ -79,7 +79,7 @@ def correctSizeHook():
     Return if size was correct
     """
 
-    c,_=os.get_terminal_size()
+    c, _=os.get_terminal_size()
 
 
     if os.name == 'nt':
@@ -92,7 +92,7 @@ def correctSizeHook():
         prRed(f"Width needs to be at least {cE}!")
 
         while c<cE:
-            c,_=os.get_terminal_size()
+            c, _=os.get_terminal_size()
 
         return False
 
@@ -171,13 +171,13 @@ def getFloat(default=0.5, expected="value", limit:int=inf):
             except ValueError:
                 print(f"'{f}' is not an float, leave blank or enter a valid {expected}:")
     
-def getRange(default=(1,1)):
+def getRange(default=(1, 1)):
     while True:
         t1 = getInt(default[0], "min")
         t2 = getInt(default[1], "max") 
 
         if t1 <= t2:
-            return (t1,t2)
+            return (t1, t2)
         
         else :
             print (f'Error: ({t1}, {t2}) is not a valid range, leave blank or enter a valid range')
@@ -211,7 +211,7 @@ def cipher_choice():
     print("Choice cypher method : ")
     print(" 1 - ECB \n 2 - CBC \n 3 - PCBC (Recommended) \n 4 - CTR (Stream) \n 5 - GCM (Authentification)")
 
-    pCipher=getInt(3,"choices")
+    pCipher=getInt(3, "choices")
 
     # Cipher verification
     if pCipher > 5 :
@@ -241,7 +241,7 @@ def cipher_choice():
 ###############- File Manager - ################
 ################################################
 
-def findFile(ext="",directory=config.DIRECTORY_PROCESSING):
+def findFile(ext="", directory=config.DIRECTORY_PROCESSING):
     """
     To find a file given extension and return is name.
     """
@@ -260,16 +260,16 @@ def findFile(ext="",directory=config.DIRECTORY_PROCESSING):
 
     return name
 
-def isFileHere(name:str,directory=config.DIRECTORY_GEN):
+def isFileHere(name:str, directory=config.DIRECTORY_GEN):
     """Return if given name file's is here or is not."""
     return os.path.isfile(directory+name)
 
-def handleDirectory(dirName:str,directory=config.DIRECTORY_GEN):
+def handleDirectory(dirName:str, directory=config.DIRECTORY_GEN):
     """ If given directory doesn't exist, then create it. """
     if not os.path.exists(directory+dirName):
         os.makedirs(directory+dirName)
 
-def rmFile(name:str,directory=config.DIRECTORY_GEN):
+def rmFile(name:str, directory=config.DIRECTORY_GEN):
     """Remove named file."""
     try:
         os.remove(directory+name)
@@ -277,10 +277,10 @@ def rmFile(name:str,directory=config.DIRECTORY_GEN):
         pass
 
 
-def mvFile(name:str,src=config.DIRECTORY_PROCESSING,dst=config.DIRECTORY_GEN):
+def mvFile(name:str, src=config.DIRECTORY_PROCESSING, dst=config.DIRECTORY_GEN):
     """ Move named file """
     import shutil
-    return shutil.move(src+name,dst)
+    return shutil.move(src+name, dst)
 
 
 def whatInThere(directory=config.DIRECTORY_FOUNT):
@@ -289,20 +289,20 @@ def whatInThere(directory=config.DIRECTORY_FOUNT):
     """
     return [os.path.splitext(f)[0] for f in os.listdir(directory)]
 
-def writeVartoFile(var:object,name:str,directory=config.DIRECTORY_GEN,ext:str=".txt"):
+def writeVartoFile(var:object, name:str, directory=config.DIRECTORY_GEN, ext:str=".txt"):
     """Write given variable into a file with variable name"""
     # r+ for reading and writing
     name=directory+name
-    with open(name+ext,"w+") as f:
+    with open(name+ext, "w+") as f:
         f.truncate(0)
         f.write(f"{var}")
 
     return True
 
-def extractVarFromFile(fileName:str,directory=config.DIRECTORY_GEN,ext:str=".kat"):
+def extractVarFromFile(fileName:str, directory=config.DIRECTORY_GEN, ext:str=".kat"):
     """Extract variable contenant's from txt file."""
     import ast
-    with open(directory+fileName+ext,"r+") as f:
+    with open(directory+fileName+ext, "r+") as f:
         contents=f.read()
         try:
             extracted = ast.literal_eval(contents)
@@ -321,18 +321,18 @@ def getIntKey(data:bytes, keyNumber:int=1):
     """
     assert isinstance(data, bytes) or isinstance(data, bytearray)
 
-    if isinstance(keyNumber,str):
+    if isinstance(keyNumber, str):
         keyNumber = int(keyNumber)
 
     if keyNumber != 1:
         keys = ()
         kL = []
         for i in range(keyNumber):
-            kL.append(int.from_bytes(data[i*2:i*2+2],"big"))
+            kL.append(int.from_bytes(data[i*2:i*2+2], "big"))
 
         padding = keyNumber * 2
         for i, s in enumerate(kL):
-            keys += (int.from_bytes(data[padding: padding + s], "big"),)
+            keys += (int.from_bytes(data[padding: padding + s], "big"), )
             padding = padding + s
     else:
         keys = bm.bytes_to_int(data)
@@ -342,11 +342,11 @@ def getIntKey(data:bytes, keyNumber:int=1):
 
 def getB64Keys(key):
     """
-    Received in input key in tuple,bytes,list etc. and return key in base64.
+    Received in input key in tuple, bytes, list etc. and return key in base64.
     """
     import base64
     
-    if isinstance(key,tuple):
+    if isinstance(key, tuple):
         
         tw = bytearray()
         sizes = []
@@ -355,12 +355,12 @@ def getB64Keys(key):
             s = bm.bytes_needed(k)
             sizes.append(s)
             # Put the size into the coded b64
-            tw += s.to_bytes(2,"big")
+            tw += s.to_bytes(2, "big")
 
         for i, k in enumerate(key):
             tw += k.to_bytes(sizes[i], "big")
     
-    elif isinstance(key,list):
+    elif isinstance(key, list):
         # E.g, ElGamal with M >= p (longer message)
         
         e = [getB64Keys(el) for el in key]
@@ -370,7 +370,7 @@ def getB64Keys(key):
             tw += f"{el}|"
 
         tw = tw[:-1].encode()
-    elif isinstance(key,bytes):
+    elif isinstance(key, bytes):
         #Already into bytes
         tw = key
     else:
@@ -380,15 +380,15 @@ def getB64Keys(key):
     return base64.b64encode(tw).decode()
 
 
-def writeKeytoFile(key,fileName:str,directory=config.DIRECTORY_PROCESSING,ext:str=".kpk") -> str:
+def writeKeytoFile(key, fileName:str, directory=config.DIRECTORY_PROCESSING, ext:str=".kpk") -> str:
     """
     Write key in b64 format to file .kpk with key length's as header.
     """
 
-    if isinstance(key,tuple):
+    if isinstance(key, tuple):
         size = str(len(key))
 
-    elif isinstance(key,list):
+    elif isinstance(key, list):
         # size of each element
         size = len(key[0])
         size = f"L{size}"
@@ -401,19 +401,19 @@ def writeKeytoFile(key,fileName:str,directory=config.DIRECTORY_PROCESSING,ext:st
 
     b64Key = size + b64K
 
-    writeVartoFile(b64Key,fileName,directory,ext)
+    writeVartoFile(b64Key, fileName, directory, ext)
 
     return b64K
 
 
-def extractKeyFromFile(fileName:str,directory=config.DIRECTORY_PROCESSING,ext:str=".kpk"):
+def extractKeyFromFile(fileName:str, directory=config.DIRECTORY_PROCESSING, ext:str=".kpk"):
     """
     Extract key's from b64 format to tuples from katsumi public/private keys file's.
     """
 
     fileName += ext
     if isFileHere(fileName, directory):
-        f = open(os.path.join(directory, fileName),"r+")
+        f = open(os.path.join(directory, fileName), "r+")
         b64data = f.read()
         f.close()
 
@@ -422,7 +422,7 @@ def extractKeyFromFile(fileName:str,directory=config.DIRECTORY_PROCESSING,ext:st
         if b64data[0] == "L":
             #It's a list !
             #Case when message is longer than modulus -> separation into list of keys
-            return [getIntKey(b64decode(el),b64data[1]) for el in b64decode(b64data[2:]).decode().split("|") ]
+            return [getIntKey(b64decode(el), b64data[1]) for el in b64decode(b64data[2:]).decode().split("|") ]
 
         else:
             return getIntKey(b64decode(b64data[1:]), b64data[0])
@@ -437,7 +437,7 @@ def askForKey():
     clear()
     asc.asciiCat()
 
-    answer = query_yn("You have not yet defined a key, you want to enter one?","no")
+    answer = query_yn("You have not yet defined a key, you want to enter one?", "no")
 
     key = bytearray()
 
@@ -449,7 +449,7 @@ def askForKey():
 
     else:
         import secrets as sr
-        key = sr.randbits(128).to_bytes(16,"big")
+        key = sr.randbits(128).to_bytes(16, "big")
         print("Your key was randomly generated: ", end="")
         prGreen(base64.b64encode(key).decode())
     
@@ -467,8 +467,8 @@ def getKeySize(key:object="public_key") -> int:
 
     sizes = [int(elt.split("_")[0]) for elt in whatInThere()]
     
-    if isinstance(key,str):
-        pK = extractKeyFromFile(key,config.DIRECTORY_PROCESSING,".kpk")
+    if isinstance(key, str):
+        pK = extractKeyFromFile(key, config.DIRECTORY_PROCESSING, ".kpk")
     else:
         pK = key
 
@@ -476,7 +476,7 @@ def getKeySize(key:object="public_key") -> int:
 
     import ressources.utils as ut
 
-    return ut.closestValue(sizes,bits)
+    return ut.closestValue(sizes, bits)
 
 
 ##############################
@@ -518,7 +518,7 @@ def handleInvBox(doIt:bool=False):
         
         else:
 
-            config.INVERSIONS_BOX=extractVarFromFile("inversion_Sbox",ext=".txt")
+            config.INVERSIONS_BOX=extractVarFromFile("inversion_Sbox", ext=".txt")
 
             if len(config.INVERSIONS_BOX) != config.NBR_ELEMENTS:
                 rmFile("inversion_Sbox.txt")
@@ -548,9 +548,9 @@ def doSomethingElse(m=None):
 ##### Prime number's fount gestion ######
 #########################################
 
-def extractSafePrimes(nBits:int=1024,allE:bool=True,easyGenerator:bool=False,directory:str=config.DIRECTORY_FOUNT,Verbose=False):
+def extractSafePrimes(nBits:int=1024, allE:bool=True, easyGenerator:bool=False, directory:str=config.DIRECTORY_FOUNT, Verbose=False):
     """
-    Return list of tuples (Safe_Prime,Sophie_Germain_Prime) for given n bits.
+    Return list of tuples (Safe_Prime, Sophie_Germain_Prime) for given n bits.
     If list doesn't exist, create one with 1 tuple.
 
     all :
@@ -559,12 +559,12 @@ def extractSafePrimes(nBits:int=1024,allE:bool=True,easyGenerator:bool=False,dir
     """
     name = f"{str(nBits)}_bits"
 
-    if not isFileHere(name+".txt",directory):
+    if not isFileHere(name+".txt", directory):
         print("File doesn't exist. Creating it with one element.")
-        stockSafePrimes(nBits,1)
-        extractSafePrimes(nBits,allE,easyGenerator,directory)
+        stockSafePrimes(nBits, 1)
+        extractSafePrimes(nBits, allE, easyGenerator, directory)
     else:
-        v = extractVarFromFile(name,directory,".txt")
+        v = extractVarFromFile(name, directory, ".txt")
 
         if allE:
             return v
@@ -589,22 +589,22 @@ def extractSafePrimes(nBits:int=1024,allE:bool=True,easyGenerator:bool=False,dir
                             question = query_yn("Do you want to generate one compatible with this condition (It can be long) ? ")
 
                             if question:
-                                s = prng.safePrime(nBits,easyGenerator=True)
+                                s = prng.safePrime(nBits, easyGenerator=True)
                                 if s:
-                                    updatePrimesFount(s,nBits)
+                                    updatePrimesFount(s, nBits)
                                 else:
                                     return s # False
                             else:
                                 return elGamalKeysGeneration()
                         else:
                             #No choice.
-                            updatePrimesFount(s,nBits)
+                            updatePrimesFount(s, nBits)
                 else:
                     return s
             else:
                 return s
 
-def stockSafePrimes(n:int=1024,x:int=15,randomFunction=prng.xorshiftperso):
+def stockSafePrimes(n:int=1024, x:int=15, randomFunction=prng.xorshiftperso):
     """ 
     Stock x tuples of distincts (Safe prime, Sophie Germain prime) into a fount of given n bits length.
     """
@@ -614,7 +614,7 @@ def stockSafePrimes(n:int=1024,x:int=15,randomFunction=prng.xorshiftperso):
     handleDirectory("PrimeNumber's_Fount")
     
     # Safety check, if already exist, then you just update it !
-    if isFileHere(f"{str(n)}_bits.txt",config.DIRECTORY_FOUNT):
+    if isFileHere(f"{str(n)}_bits.txt", config.DIRECTORY_FOUNT):
         print("\nData concerning this number of bits already exists. Update in progress.")
         Update = True
     else:
@@ -622,41 +622,41 @@ def stockSafePrimes(n:int=1024,x:int=15,randomFunction=prng.xorshiftperso):
         Update = False
 
     if Update:
-        fount = extractSafePrimes(n,Verbose=True)
+        fount = extractSafePrimes(n, Verbose=True)
         
     else:
         fount = []
     
     print(f"Computing in progress. Please wait ...")
 
-    fount = prng.genSafePrimes(x,fount,n,randomFunction)
+    fount = prng.genSafePrimes(x, fount, n, randomFunction)
 
     if fount :
         prYellow("Generation completed.\n")
-        writeVartoFile(fount,f"{str(n)}_bits",config.DIRECTORY_FOUNT)
+        writeVartoFile(fount, f"{str(n)}_bits", config.DIRECTORY_FOUNT)
     else:
         asc.asciiArt()
         prRed("Generation stopped.\n")
     
 
-def updatePrimesFount(p:tuple,nBits:int):
+def updatePrimesFount(p:tuple, nBits:int):
     """
     Update prime number's fount (or create one with one element if not exist) and add given tuple if not present in stocked ones.
     """
     name = f"{str(nBits)}_bits"
 
-    if not isFileHere(name+".txt",config.DIRECTORY_FOUNT):
+    if not isFileHere(name+".txt", config.DIRECTORY_FOUNT):
         print("\nData not existing, creating file...")
-        stockSafePrimes(nBits,0)
-        updatePrimesFount(p,nBits)
+        stockSafePrimes(nBits, 0)
+        updatePrimesFount(p, nBits)
 
     else:
 
-        buffer = extractVarFromFile(name,config.DIRECTORY_FOUNT,".txt")
+        buffer = extractVarFromFile(name, config.DIRECTORY_FOUNT, ".txt")
 
         if p not in buffer:
             buffer.append(p)
-            writeVartoFile(buffer,name,config.DIRECTORY_FOUNT)
+            writeVartoFile(buffer, name, config.DIRECTORY_FOUNT)
             print(f"{p} successfully added to prime number's fount.\n")
         else:
             print(f"{p} already into prime number's fount. Not added.\n")
@@ -676,12 +676,12 @@ def primeNumbersFountain():
         numberOfTuples = len(extractSafePrimes(elt.split('_')[0]))
         print(f"\t > {elt} - {numberOfTuples} tuples")
     
-    choices = ["Generate and stock safe primes","Update a list","Delete a list","Back to menu"]
+    choices = ["Generate and stock safe primes", "Update a list", "Delete a list", "Back to menu"]
 
     print("\n")
     enumerateMenu(choices)
 
-    selection = getInt(2,"choices")
+    selection = getInt(2, "choices")
 
     def doSomethingFount(i:int):
         """ Handle choices for fountain. """
@@ -689,23 +689,23 @@ def primeNumbersFountain():
         asc.asciiArt()
         if i == 1:
             print("How many bits wanted for this generation ?")
-            wanted = getInt(2048,"bits size",True)
+            wanted = getInt(2048, "bits size", True)
 
             print("\nHow many generations ?")
-            numbers = getInt(1,"generations")
+            numbers = getInt(1, "generations")
 
-            stockSafePrimes(wanted,numbers)
+            stockSafePrimes(wanted, numbers)
 
             doSomethingElse(primeNumbersFountain)
 
         elif i == 2:
             print("Enter number of bits for updating corresponding one's :")
-            wanted = getInt(2048,"bits size",True)
+            wanted = getInt(2048, "bits size", True)
 
             print("\nHow many generations ?")
-            numbers = getInt(1,"generations")
+            numbers = getInt(1, "generations")
 
-            stockSafePrimes(wanted,numbers)
+            stockSafePrimes(wanted, numbers)
             
             doSomethingElse(primeNumbersFountain)
         
@@ -713,11 +713,11 @@ def primeNumbersFountain():
             clear()
             asc.asciiDeath()
             print("Enter the number of bits corresponding to the list you would like to be removed.")
-            lnumber = getInt(2048,"bits size",True)
+            lnumber = getInt(2048, "bits size", True)
             name = f"{str(lnumber)}_bits.txt"
 
             if query_yn("Are you sure ?"):
-                rmFile(name,config.DIRECTORY_FOUNT)
+                rmFile(name, config.DIRECTORY_FOUNT)
                 print(f"{name} removed successfully.\n")
                 
                 doSomethingElse(primeNumbersFountain)
@@ -748,17 +748,17 @@ def elGamalKeysGeneration():
     asc.asciiCat()
 
     # Because here default is no so not(yes)
-    if not query_yn("Do you want to use the fastest ElGamal key generation's (default: no) ?","no"):
+    if not query_yn("Do you want to use the fastest ElGamal key generation's (default: no) ?", "no"):
         
-        if query_yn("Do you want to choose the length of the key (default = 2048 bits) ?","no"):
-            n = getInt(2048,"key size",True)
+        if query_yn("Do you want to choose the length of the key (default = 2048 bits) ?", "no"):
+            n = getInt(2048, "key size", True)
         else:
             n = 2048
 
-        eGen = query_yn("Do you want to use easy Generator (fastest generation) (default: No) ?","no")
+        eGen = query_yn("Do you want to use easy Generator (fastest generation) (default: No) ?", "no")
 
         if query_yn("Do you want to use the Prime Number's Fountain to generate the keys (fastest) (default: yes) ?"):
-            primes = extractSafePrimes(n,False,eGen,Verbose=True)
+            primes = extractSafePrimes(n, False, eGen, Verbose=True)
         else:
             primes = False
 
@@ -767,17 +767,17 @@ def elGamalKeysGeneration():
 
         print("\t.... Key generation in progress ....\n")
         
-        elGamal.key_gen(n,primes,eGen,prng.xorshiftperso,True,True)
+        elGamal.key_gen(n, primes, eGen, prng.xorshiftperso, True, True)
     else:
         n = 1024
-        primes = extractSafePrimes(n,False,Verbose=True)
+        primes = extractSafePrimes(n, False, Verbose=True)
 
         clear()
         asc.asciiCat()
 
         print("\t.... Key generation in progress ....")
 
-        elGamal.key_gen(n,primes,saving=True,Verbose=True)
+        elGamal.key_gen(n, primes, saving=True, Verbose=True)
 
     doSomethingElse(katsuAsymm)
     
@@ -793,14 +793,14 @@ def keysVerif(verif:bool=True):
 
     print("\nChecking the presence of keys in the system....")
 
-    if isFileHere("public_key.kpk",config.DIRECTORY_PROCESSING):
+    if isFileHere("public_key.kpk", config.DIRECTORY_PROCESSING):
 
         from core.asymmetric import elGamal as elG
 
         publicS = getKeySize()
         print(f"\nPublic key's of {publicS} bits already here.\n")
 
-        if isFileHere("private_key.kpk",config.DIRECTORY_PROCESSING):
+        if isFileHere("private_key.kpk", config.DIRECTORY_PROCESSING):
             
             privateS = getKeySize("private_key")
             print(f"Private key's of {privateS} bits too.\n")
@@ -813,8 +813,8 @@ def keysVerif(verif:bool=True):
                 if query_yn("Do you want to delete them ?"):
                     
                     print("Keys are going to be deleted...")
-                    for f in ["public_key","private_key"]:
-                        rmFile(f+".kpk",config.DIRECTORY_PROCESSING)
+                    for f in ["public_key", "private_key"]:
+                        rmFile(f+".kpk", config.DIRECTORY_PROCESSING)
 
                     clear()
                     asc.asciiDeath()
@@ -824,10 +824,10 @@ def keysVerif(verif:bool=True):
                     asc.asciiCat()
 
             else:
-                if verif and not query_yn("Do you want to keep them ? (default: No)","no"):
-                    rmFile("public_key.kpk",config.DIRECTORY_PROCESSING)
-                    rmFile("private_key.kpk",config.DIRECTORY_PROCESSING)
-                    rmFile("encrypted.kat",config.DIRECTORY_PROCESSING)
+                if verif and not query_yn("Do you want to keep them ? (default: No)", "no"):
+                    rmFile("public_key.kpk", config.DIRECTORY_PROCESSING)
+                    rmFile("private_key.kpk", config.DIRECTORY_PROCESSING)
+                    rmFile("encrypted.kat", config.DIRECTORY_PROCESSING)
                     return True
                 else:
                     clear()
@@ -838,7 +838,7 @@ def keysVerif(verif:bool=True):
         
             if query_yn("Do you want to add them now ?\n"):
 
-                while not isFileHere("private_key.kpk",config.DIRECTORY_PROCESSING):
+                while not isFileHere("private_key.kpk", config.DIRECTORY_PROCESSING):
                     clear()
                     input("Please put your 'private_key.kpk' file into the 'processing' folder.")
                 
@@ -849,12 +849,12 @@ def keysVerif(verif:bool=True):
             else:
                 katsuAsymm()
 
-    elif isFileHere("private_key.kpk",config.DIRECTORY_PROCESSING):
+    elif isFileHere("private_key.kpk", config.DIRECTORY_PROCESSING):
         print("\nPrivate key's already here but not public one's.\n")
 
-        if query_yn("Do you want to add them now ? ( default: No)\n","no"):
+        if query_yn("Do you want to add them now ? ( default: No)\n", "no"):
 
-                while not isFileHere("public_key.kpk",config.DIRECTORY_PROCESSING):
+                while not isFileHere("public_key.kpk", config.DIRECTORY_PROCESSING):
                     clear()
                     input("Please put your 'public_key.kpk' file into the 'processing' folder.")
                 
@@ -876,11 +876,11 @@ def dlogAttack():
     clear()
     asc.asciiJongling()
 
-    choices = ["Retieve private key with publicKey","Decrypt encrypted message.","Back to menu"]
+    choices = ["Retieve private key with publicKey", "Decrypt encrypted message.", "Back to menu"]
 
     enumerateMenu(choices)
 
-    selection = getInt(1,"choices")
+    selection = getInt(1, "choices")
 
     def doSomething(i:int):
         """ Handle choices for dlog attack. """
@@ -890,7 +890,7 @@ def dlogAttack():
 
         if i == 1:
 
-            while not isFileHere("public_key.kpk",config.DIRECTORY_PROCESSING):
+            while not isFileHere("public_key.kpk", config.DIRECTORY_PROCESSING):
                 clear()
                 asc.asciiJongling()
 
@@ -903,9 +903,9 @@ def dlogAttack():
             print("Compute dlog attack with pollard's rho algorithm.")
             print("It can takes times ...\n")
 
-            el = elGamal.delog(extractKeyFromFile("public_key",config.DIRECTORY_PROCESSING,".kpk"),None,True)
+            el = elGamal.delog(extractKeyFromFile("public_key", config.DIRECTORY_PROCESSING, ".kpk"), None, True)
             
-            el = writeKeytoFile(el,"private_key",config.DIRECTORY_PROCESSING,".kpk")
+            el = writeKeytoFile(el, "private_key", config.DIRECTORY_PROCESSING, ".kpk")
             
             print(f"Saved private_key : {el} into appropriated file.\n")
 
@@ -913,7 +913,7 @@ def dlogAttack():
 
         elif i == 2:
 
-            while not isFileHere("public_key.kpk",config.DIRECTORY_PROCESSING):
+            while not isFileHere("public_key.kpk", config.DIRECTORY_PROCESSING):
                 clear()
                 asc.asciiJongling()
 
@@ -923,7 +923,7 @@ def dlogAttack():
             asc.asciiJongling()
             print("Gotcha !\n")
             
-            while not isFileHere("encrypted.kat",config.DIRECTORY_PROCESSING):
+            while not isFileHere("encrypted.kat", config.DIRECTORY_PROCESSING):
                 clear()
                 asc.asciiJongling()
 
@@ -936,7 +936,7 @@ def dlogAttack():
             print("Compute dlog attack with pollard's rho algorithm.")
             print("It can takes some times...\n")
 
-            el = elGamal.delog(extractKeyFromFile("public_key",config.DIRECTORY_PROCESSING),extractKeyFromFile("encrypted",config.DIRECTORY_PROCESSING,".kat"),True)
+            el = elGamal.delog(extractKeyFromFile("public_key", config.DIRECTORY_PROCESSING), extractKeyFromFile("encrypted", config.DIRECTORY_PROCESSING, ".kat"), True)
             
             print(f"Decrypted message is:\n")
             prYellow(el)
@@ -957,28 +957,28 @@ def dHgestion():
     """
     import core.asymmetric.diffieHellman as dH
 
-    choices = ["Choose agreement","Process with agreement","Back"]
+    choices = ["Choose agreement", "Process with agreement", "Back"]
 
     clear()
     asc.asciiKeys()
 
     enumerateMenu(choices)
 
-    selection = getInt(2,"choices")
+    selection = getInt(2, "choices")
 
-    def doSomethingDH(i:int,processWithAgreement:bool=False):
+    def doSomethingDH(i:int, processWithAgreement:bool=False):
         
         if i == 1:
             asc.asciiKeys()
 
             print("On what size n (bits) did you agree with your penpal?")
 
-            size = getInt(2048,"bits size",True)
+            size = getInt(2048, "bits size", True)
             asc.asciiKeys()
 
             print(f"Checking existence of fountain of {size} bits...")
 
-            if not isFileHere(f"{size}_bits.txt",config.DIRECTORY_FOUNT):
+            if not isFileHere(f"{size}_bits.txt", config.DIRECTORY_FOUNT):
                 print("\n\tFile unavailable !")
                 print("\n\fOne will be created.\n")
                 fountain = False
@@ -986,14 +986,14 @@ def dHgestion():
                 print("\n\tFile available !\n")
                 fountain = True
 
-            accord = dH.agreement(size,fountain)
+            accord = dH.agreement(size, fountain)
 
-            accord = writeKeytoFile(accord,"dH_agreement")
-            print("According to the size of the private key, your agreement is : ",end="")
+            accord = writeKeytoFile(accord, "dH_agreement")
+            print("According to the size of the private key, your agreement is : ", end="")
             prGreen(accord)
 
             if query_yn("Do you want to process with given agreement now ?") :
-                doSomethingDH(2,True)
+                doSomethingDH(2, True)
             else:
                 doSomethingElse(dHgestion)
 
@@ -1004,26 +1004,26 @@ def dHgestion():
                 if query_yn("Do you want to use the dH_agreement.kat file's ? (default: Yes)"):
                     accord = extractKeyFromFile("dH_agreement")
                 else:
-                    accord = getIntKey(getb64("agreement"),2)
+                    accord = getIntKey(getb64("agreement"), 2)
 
             else:
                 accord = extractKeyFromFile("dH_agreement")
             
             #asc.asciiKeys()
 
-            print(f"\nNow, choose a secret value into [0,{accord[0]}]")
+            print(f"\nNow, choose a secret value into [0, {accord[0]}]")
             
             import random as rd
             
-            secret = getInt(rd.randrange(2,accord[0]),"your secret integer",False,accord[0])
+            secret = getInt(rd.randrange(2, accord[0]), "your secret integer", False, accord[0])
 
             asc.asciiKeys()
 
-            secret = dH.chooseAndSend(accord,secret,saving=True,Verbose=True)
+            secret = dH.chooseAndSend(accord, secret, saving=True, Verbose=True)
 
-            sended = getIntKey(getb64("his secret"),1)
+            sended = getIntKey(getb64("his secret"), 1)
 
-            dH_shared = dH.compute(accord,[secret,sended],saving=True)
+            dH_shared = dH.compute(accord, [secret, sended], saving=True)
             
             asc.asciiKeys()
 
@@ -1052,11 +1052,11 @@ def katsuSymm():
     clear()
     asc.asciiCat()
 
-    symmetric_choices=["Encrypt a message.", "Decrypt a message.","Back"]
+    symmetric_choices=["Encrypt a message.", "Decrypt a message.", "Back"]
     
     enumerateMenu(symmetric_choices)
 
-    selection = getInt(1,"choices")
+    selection = getInt(1, "choices")
 
     def doSomethingSymm(i:int):
         """ Handle choices for symmetric things. """
@@ -1064,7 +1064,7 @@ def katsuSymm():
         clear()
         asc.asciiCat()
 
-        if i in [1,2]:
+        if i in [1, 2]:
 
             if not config.KEY:
                 key = askForKey()
@@ -1085,7 +1085,7 @@ def katsuSymm():
                     clear()
                     asc.asciiCat()
 
-            if query_yn("Do you want to encrypt a file ?","no"):
+            if query_yn("Do you want to encrypt a file ?", "no"):
                 inFile = getFile()
                 if inFile:
                     data = bm.fileToBytes(inFile)
@@ -1114,7 +1114,7 @@ def katsuSymm():
             cipher = cipher_choice()
             inFile = False
 
-            if query_yn("Do you want to decrypt a file ?","no"):
+            if query_yn("Do you want to decrypt a file ?", "no"):
                 inFile = getFile()
                 if inFile:
                     data = bm.fileToBytes(inFile)
@@ -1160,11 +1160,11 @@ def katsuAsymm():
     clear()
     asc.asciiCat()
 
-    asymmetric_choices= ["Using ElGamal to generate public/private key pairs.","Show keys","Encrypt a message with ElGamal","Decrypt a message encrypted by ElGamal.","Share private key with Diffie-Hellman.","Discrete Logarithmic attack on ElGamal.","Keys deletion","Back"]
+    asymmetric_choices= ["Using ElGamal to generate public/private key pairs.", "Show keys", "Encrypt a message with ElGamal", "Decrypt a message encrypted by ElGamal.", "Share private key with Diffie-Hellman.", "Discrete Logarithmic attack on ElGamal.", "Keys deletion", "Back"]
 
     enumerateMenu(asymmetric_choices)
 
-    selection = getInt(2,"choices")
+    selection = getInt(2, "choices")
 
     def doSomethingAssym(i:int):
         """ Handle choices for symmetric things. """
@@ -1180,7 +1180,7 @@ def katsuAsymm():
                 clear()
                 asc.asciiCat()
 
-                print("Your current public key is: ",end="")
+                print("Your current public key is: ", end="")
                 prGreen(getB64Keys(extractKeyFromFile("public_key")))
 
                 doSomethingElse(katsuAsymm)
@@ -1191,10 +1191,10 @@ def katsuAsymm():
                 publicK = getB64Keys(extractKeyFromFile("public_key"))
                 privateK = getB64Keys(extractKeyFromFile("private_key"))
 
-                print("Public Key : ",end="")
+                print("Public Key : ", end="")
                 prGreen(publicK)
                 print()
-                print("Private Key : ",end="")
+                print("Private Key : ", end="")
                 prGreen(privateK)
 
             except FileNotFoundError:
@@ -1205,16 +1205,16 @@ def katsuAsymm():
 
         elif i == 3:
             
-            if not isFileHere("public_key.kpk",config.DIRECTORY_PROCESSING):
+            if not isFileHere("public_key.kpk", config.DIRECTORY_PROCESSING):
                 print("No public key found into the system...")
                 time.sleep(1)
                 doSomethingAssym(1)
             else:
                 keysVerif(verif=False)
                 answer = readFromUser().encode()
-                e = elG.encrypt(answer,extractKeyFromFile("public_key",config.DIRECTORY_PROCESSING),saving=True)
+                e = elG.encrypt(answer, extractKeyFromFile("public_key", config.DIRECTORY_PROCESSING), saving=True)
 
-                print(f"Saved encrypted message into appropriated file : ",end="")
+                print(f"Saved encrypted message into appropriated file : ", end="")
                 prGreen(e)
 
                 doSomethingElse(katsuAsymm)
@@ -1224,14 +1224,14 @@ def katsuAsymm():
             print("Let's check if everything is there.")
 
             #####
-            while not isFileHere("public_key.kpk",config.DIRECTORY_PROCESSING):
+            while not isFileHere("public_key.kpk", config.DIRECTORY_PROCESSING):
                 asc.asciiCat()
 
                 input("Please put your 'private_key.kpk' file into the 'processing' folder.")
             
             print("Gotcha !\n")
             
-            while not isFileHere("encrypted.kat",config.DIRECTORY_PROCESSING):
+            while not isFileHere("encrypted.kat", config.DIRECTORY_PROCESSING):
                 asc.asciiCat()
 
                 input("Please put your 'encrypted.kat' file into the 'processing' folder.")
@@ -1242,11 +1242,11 @@ def katsuAsymm():
             asc.asciiCat()
             
             if query_yn("Do you want to use the encrypted.kat file's ? (default: Yes)"):
-                e = extractKeyFromFile("encrypted",config.DIRECTORY_PROCESSING,".kat")
+                e = extractKeyFromFile("encrypted", config.DIRECTORY_PROCESSING, ".kat")
             else:
-                e = getIntKey(getb64("key"),2)
+                e = getIntKey(getb64("key"), 2)
 
-            d = elG.decrypt(e,extractKeyFromFile("private_key",config.DIRECTORY_PROCESSING),asTxt=True)
+            d = elG.decrypt(e, extractKeyFromFile("private_key", config.DIRECTORY_PROCESSING), asTxt=True)
 
             asc.asciiCat()
 
@@ -1266,8 +1266,8 @@ def katsuAsymm():
 
             if query_yn("Are you sure ?"):
 
-                for f in ["public_key","private_key","dH_shared_key","dH_agreement","dH_sendable"]:
-                    rmFile(f+".kpk",config.DIRECTORY_PROCESSING)
+                for f in ["public_key", "private_key", "dH_shared_key", "dH_agreement", "dH_sendable"]:
+                    rmFile(f+".kpk", config.DIRECTORY_PROCESSING)
 
                 clear()
                 asc.asciiDeath()
@@ -1297,17 +1297,17 @@ def katsuHash():
     clear()
     asc.asciiCat()
 
-    choices = ["Generate a hash","Check a hash","Back to menu"]
+    choices = ["Generate a hash", "Check a hash", "Back to menu"]
 
     enumerateMenu(choices)
 
-    selection = getInt(1,"choices")
+    selection = getInt(1, "choices")
 
     if selection == 1:
 
         size = getInt(256, "hash", True)
 
-        if query_yn("Do you want to hash a file ?","no"):
+        if query_yn("Do you want to hash a file ?", "no"):
 
             f = getFile()
             clear()
@@ -1365,11 +1365,11 @@ def certificate():
     clear()
     asc.asciiBark()
 
-    choices = ["Get a public key certificate","Show current digital certificate","Back to menu"]
+    choices = ["Get a public key certificate", "Show current digital certificate", "Back to menu"]
 
     enumerateMenu(choices)
 
-    selection = getInt(1,"choices")
+    selection = getInt(1, "choices")
 
     if selection == 1:
         clear()
@@ -1383,7 +1383,7 @@ def certificate():
         clear()
         asc.asciiBark()
 
-        ca.x509(k,out=False)
+        ca.x509(k, out=False)
         print("Certifcate generated !")
 
         doSomethingElse(certificate)
@@ -1393,7 +1393,7 @@ def certificate():
         clear()
         asc.asciiBark()
         
-        if not isFileHere("X509.ca",config.DIRECTORY_PROCESSING):
+        if not isFileHere("X509.ca", config.DIRECTORY_PROCESSING):
             print("Certificate not present into the system.")
             print("Getting back ..")
             time.sleep(1)
@@ -1428,7 +1428,7 @@ def bcSimulationParam():
     params = [f"{bc.bcolors.BOLD}START THE SIMULATION{bc.bcolors.ENDC}"] + [f'{x[1]} \t\t | {x[0]}'  for x in c.BC_USER_PARAMS] + ["Back to menu"]
 
     enumerateMenu(params)
-    selection = getInt(1,"choices")
+    selection = getInt(1, "choices")
 
     if selection == 1:
         values = [x[0] for x in c.BC_USER_PARAMS]
@@ -1453,7 +1453,7 @@ def bcSimulationParam():
 
         param = c.BC_USER_PARAMS[selection-2]
 
-        pName = param[1].replace('\t','')
+        pName = param[1].replace('\t', '')
 
         print (f'{pName} : {param[2]} \n')
         
@@ -1476,10 +1476,10 @@ def bcSimulationParam():
 def katsuBlockChain():
 
     asc.asciiBlockC()
-    choices = ["Block-chain live simulation", "Quick block-chain test","Back to menu"]
+    choices = ["Block-chain live simulation", "Quick block-chain test", "Back to menu"]
     enumerateMenu(choices)
 
-    selection = getInt(1,"choices")
+    selection = getInt(1, "choices")
 
     if selection == 1:
         bcSimulationParam()

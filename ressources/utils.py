@@ -72,14 +72,14 @@ def euclid(a:int, b:int, Verbose=False):
     """Return the Greatest Common Divisor (GCD) of number a and b."""
     
     # The GCD of two relative integers is equal to the GCD of their absolute values.
-    a,b=abs(a),abs(b) 
+    a, b=abs(a), abs(b) 
 
     # The largest of the two numbers is replaced by the remainder of the Euclidean division of the larger 
     # number by the smaller one. 
     if (b==0) :
         return a
     elif (b>a) :
-        return euclid(b,a,Verbose)
+        return euclid(b, a, Verbose)
     else:
         r=a%b
 
@@ -87,7 +87,7 @@ def euclid(a:int, b:int, Verbose=False):
             q=a//b
             print(f"{a} = {b}*{q} + {r}")
     
-        return euclid(b,r,Verbose)
+        return euclid(b, r, Verbose)
 
 def lcm(a:int, b:int):
     """Return the Least Common Multiple (LCM) of number a and b."""
@@ -105,7 +105,7 @@ def euclid_ext(a:int, b:int, Verbose=False):
     """
 
     x0, x1, y0, y1 = 0, 1, 1, 0
-    a_buffer,b_buffer=a,b
+    a_buffer, b_buffer=a, b
     n=1 # iterations
     
     while a != 0:
@@ -116,7 +116,7 @@ def euclid_ext(a:int, b:int, Verbose=False):
             print(f"\n{a} = {a_buffer}×{x1} + {b_buffer}×{y1}")
         n+=1
     
-    s=f"gcd({a_buffer},{b_buffer})= {a_buffer}×{x0} + {b_buffer}×{y0} = {b}"
+    s=f"gcd({a_buffer}, {b_buffer})= {a_buffer}×{x0} + {b_buffer}×{y0} = {b}"
     
     return b, x0, y0, s, n
 
@@ -129,7 +129,7 @@ def coprime(a:int, b:int):
     This is equivalent to their greatest common divisor (gcd) being 1.
     """
     
-    if euclid(a,b) == 1:
+    if euclid(a, b) == 1:
         return True
     else:
         return False
@@ -137,18 +137,18 @@ def coprime(a:int, b:int):
 def pairwise_coprime(listing:list):
     """ Check if elements of a list are pairwise coprime."""
 
-    assert isinstance(listing,list)
+    assert isinstance(listing, list)
     
     size=len(listing)
     
-    for i in range(0,size-1):
-        for j in range(i+1,size):
-            if not coprime(listing[i],listing[j]) : return False
+    for i in range(0, size-1):
+        for j in range(i+1, size):
+            if not coprime(listing[i], listing[j]) : return False
     
     return True
 
 
-def square_and_multiply(x, k, p=None,Verbose=False):
+def square_and_multiply(x, k, p=None, Verbose=False):
     """
     Square and Multiply Algorithm
 
@@ -255,7 +255,7 @@ def findPrimeFactors(n:int, exponent:bool = False) :
 
     if exponent:
         # using set to get unique list
-        return dict(zip(uniqSorted,[s.count(e) for e in uniqSorted]))
+        return dict(zip(uniqSorted, [s.count(e) for e in uniqSorted]))
     else:
         return uniqSorted
 
@@ -269,8 +269,8 @@ def ChineseRemainder(integers:list, modulis:list, Verbose=False):
     """
     Return result of Chinese Remainder.
 
-        integers: [a1,..,ak]
-        modulis: [n1,..,nk] 
+        integers: [a1, .., ak]
+        modulis: [n1, .., nk] 
         Verbose: wether print or not the function steps
     """
 
@@ -286,13 +286,13 @@ def ChineseRemainder(integers:list, modulis:list, Verbose=False):
 
     if len(integers)==2 and len(modulis)==2:
          # Simplified chinese remainder theorem to deciphering
-         a,b=integers[0],integers[1]
-         m,n=modulis[0],modulis[1]
+         a, b=integers[0], integers[1]
+         m, n=modulis[0], modulis[1]
          if Verbose:
              print(f"x = [ {b} * {m}^(-1) * {m}  +  {a} * {n}^(-1) * {n} ] mod ({m*n}) ")
-             m1,n1 = inv(m,n,Verbose)[0] , inv(n,m,Verbose)[0]
+             m1, n1 = inv(m, n, Verbose)[0] , inv(n, m, Verbose)[0]
          else:
-             m1,n1 = inv(m,n,Verbose) , inv(n,m,Verbose)
+             m1, n1 = inv(m, n, Verbose) , inv(n, m, Verbose)
 
          solution = b*m1*m + a*n1*n
 
@@ -304,9 +304,9 @@ def ChineseRemainder(integers:list, modulis:list, Verbose=False):
         solution=0
 
         if Verbose:
-            print(integers,modulis)
+            print(integers, modulis)
         
-        for a,n in zip(integers,modulis):
+        for a, n in zip(integers, modulis):
             
             if not ((a>=0) and (a<n)) : raise ValueError("Error: '0 <= ai < ni' is not respected.")
             
@@ -317,9 +317,9 @@ def ChineseRemainder(integers:list, modulis:list, Verbose=False):
             Mk=int(product/n)
 
             if Verbose:
-                yk=inv(Mk,n,Verbose)[0]
+                yk=inv(Mk, n, Verbose)[0]
             else:
-                yk=inv(Mk,n,Verbose)
+                yk=inv(Mk, n, Verbose)
             
             if Verbose:
                 print(f" - y congruent to {yk} modulo {n}\n")
@@ -327,7 +327,7 @@ def ChineseRemainder(integers:list, modulis:list, Verbose=False):
             solution += a*yk*Mk
 
     if Verbose:
-        return (solution%product,product,f" x congruent to {solution%product} mod {product}")
+        return (solution%product, product, f" x congruent to {solution%product} mod {product}")
     else:
         return solution%product
 
@@ -352,9 +352,9 @@ def mapperCRT(elt, p:int, q:int, action:bool=True, Verbose:bool=False):
             print(f"Converting {elt} in Zpq to a in Zp and b in Zq.")
             print(f"With a = {a} mod {p} and b = {b} mod {q}")
         
-        return (a,b)
+        return (a, b)
     else:
-        x = ChineseRemainder(elt,[p,q],Verbose)
+        x = ChineseRemainder(elt, [p, q], Verbose)
         return x
 
 
@@ -381,8 +381,8 @@ def bsgs(g:int, res:int, modulo:int):
   
     hashTable = {square_and_multiply(g, j, modulo): j for j in range(m)} # Baby-Step
     
-    gm = square_and_multiply(g,m,modulo)
-    invGm = inv(gm,modulo)
+    gm = square_and_multiply(g, m, modulo)
+    invGm = inv(gm, modulo)
 
     #Initialization
     y = res
@@ -413,7 +413,7 @@ def pollard_rho(g:int, h:int, n:int , order:int = None):
     import ressources.multGroup as multGroup
 
     if order == None:
-        order = multGroup.multiplicativeOrder(g,n)
+        order = multGroup.multiplicativeOrder(g, n)
 
     # from a, b and c, partitioning the field
     def step_xab(x, a, b, g, h, order, n):
@@ -475,36 +475,36 @@ def pohlig_hellman(g:int, h:int, n:int):
     Based on https://en.wikipedia.org/wiki/Pohlig%E2%80%93Hellman_algorithm
     """
 
-    def group_of_prime_power_order(g,h,n=tuple):
-        # n = (p,e) prime factor exponent times he appears
-        p,e = n
-        n = square_and_multiply(p,e)
+    def group_of_prime_power_order(g, h, n=tuple):
+        # n = (p, e) prime factor exponent times he appears
+        p, e = n
+        n = square_and_multiply(p, e)
 
         x = 0
         # By Lagrange's theorem, this element has order p.
-        y = square_and_multiply(g,square_and_multiply(p,e-1,n),n)
+        y = square_and_multiply(g, square_and_multiply(p, e-1, n), n)
 
         for k in range(e):
-            hk = square_and_multiply(square_and_multiply(g,-x,n)*h,square_and_multiply(p,e-1-k,n),n)
-            dk = pollard_rho(y,hk,n)
-            x += dk * square_and_multiply(p,k,n)
+            hk = square_and_multiply(square_and_multiply(g, -x, n)*h, square_and_multiply(p, e-1-k, n), n)
+            dk = pollard_rho(y, hk, n)
+            x += dk * square_and_multiply(p, k, n)
 
         return x
 
-    pFactors = findPrimeFactors(n,True)
-    integers, modulis = [],[]
+    pFactors = findPrimeFactors(n, True)
+    integers, modulis = [], []
 
-    for p,e in pFactors.items():
-        ni = square_and_multiply(p,e)
-        gi = square_and_multiply(g,(n//ni),n)
-        hi = square_and_multiply(h,(n//ni),n)
+    for p, e in pFactors.items():
+        ni = square_and_multiply(p, e)
+        gi = square_and_multiply(g, (n//ni), n)
+        hi = square_and_multiply(h, (n//ni), n)
 
-        xi = group_of_prime_power_order(gi,hi,(p,e))
+        xi = group_of_prime_power_order(gi, hi, (p, e))
 
         integers.append(xi)
         modulis.append(ni)
 
-    return ChineseRemainder(integers,modulis)
+    return ChineseRemainder(integers, modulis)
 
 
 # Function to calculate k for given a, b, m  
@@ -512,7 +512,7 @@ def discreteLog(g:int, h:int, p:int, method:int=1):
     """
     Given a cyclic group of order 'p' a generator 'g' and a group element h, 
     the problem is to find an integer 'k' such that g^k = h (mod p) by using
-    baby-step,giant-step algorithm or Pohlig-Hellman algorithm.
+    baby-step, giant-step algorithm or Pohlig-Hellman algorithm.
 
     method:
         0 - baby-step giant-step
@@ -521,11 +521,11 @@ def discreteLog(g:int, h:int, p:int, method:int=1):
     """
 
     if method == 0:
-        return bsgs(g,h,p)
+        return bsgs(g, h, p)
     elif method == 1:
-        return pollard_rho(g,h,p)
+        return pollard_rho(g, h, p)
     elif method == 2:
-        return pohlig_hellman(g,h,p)
+        return pohlig_hellman(g, h, p)
     else:
         return -1
     

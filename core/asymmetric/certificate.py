@@ -10,14 +10,14 @@ import ressources.interactions as it
 import core.asymmetric.elGamal as elG
 
 
-def x509(subjectPublicKey,name:str="X509",out:bool=True):
+def x509(subjectPublicKey, name:str="X509", out:bool=True):
 
     import ressources.bytesManager as bm
     import base64
 
     # Get key size's
-    n = it.getKeySize(it.getIntKey(subjectPublicKey,3))
-    CA_public_key,CA_private_key = elG.key_gen(n,primeFount=True)
+    n = it.getKeySize(it.getIntKey(subjectPublicKey, 3))
+    CA_public_key, CA_private_key = elG.key_gen(n, primeFount=True)
 
     import os
     #An X. 509 Serial Number is an integer whose value can be represented in 20 bytes 
@@ -31,7 +31,7 @@ def x509(subjectPublicKey,name:str="X509",out:bool=True):
     # The certificate is signed by the private key of the certification authority.
     # The one who manufactured and issued this certificate.
     
-    signature = it.getB64Keys(elG.signing(subjectPublicKey,CA_private_key))
+    signature = it.getB64Keys(elG.signing(subjectPublicKey, CA_private_key))
 
     CA = f"""
     Certificate:
@@ -64,7 +64,7 @@ def x509(subjectPublicKey,name:str="X509",out:bool=True):
     else:
         from ressources import config
         #Write into file
-        it.writeVartoFile(CA,name,config.DIRECTORY_PROCESSING,".ca")
+        it.writeVartoFile(CA, name, config.DIRECTORY_PROCESSING, ".ca")
 
 
     return it.getB64Keys(CA_public_key)
