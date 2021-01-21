@@ -222,7 +222,7 @@ def cipher_choice():
         menu()
 
     elif pCipher == 1:
-        answer=query_yn("ECB is not recommended for use in cryptographic protocols. Are you sure ?")
+        answer=query_yn("ECB is not recommended for use in cryptographic protocols. Are you sure?")
         if answer:
             clear()
             return pCipher
@@ -453,7 +453,7 @@ def askForKey():
         print("Your key was randomly generated: ", end="")
         prGreen(base64.b64encode(key).decode())
     
-    answer=query_yn("Do you want to keep your key in cache ?")
+    answer=query_yn("Do you want to keep your key in cache?")
     
     if answer:
         config.KEY = key
@@ -509,7 +509,7 @@ def handleInvBox(doIt:bool=False):
 
             print("A necessary file for the substitution has been deleted / corrupted from the system.\n")
 
-            if query_yn("- Do you want to generate the inverse substitution box (No if you want to compute each time needed) ? "):
+            if query_yn("- Do you want to generate the inverse substitution box (No if you want to compute each time needed)? "):
 
                 handleInvBox(True)
 
@@ -530,7 +530,7 @@ def doSomethingElse(m=None):
     """
     Ask user if he want to do something and if yes, get back to main menu.
     """
-    answer = query_yn("\nDo you want to do something else ?")
+    answer = query_yn("\nDo you want to do something else?")
     import katsumi
 
     if m == None:
@@ -586,7 +586,7 @@ def extractSafePrimes(nBits:int=1024, allE:bool=True, easyGenerator:bool=False, 
                         if Verbose:
                             print("No safe prime available for easy generator creation into current {nBits} bits fountain's.")
 
-                            question = query_yn("Do you want to generate one compatible with this condition (It can be long) ? ")
+                            question = query_yn("Do you want to generate one compatible with this condition (It can be long)? ")
 
                             if question:
                                 s = prng.safePrime(nBits, easyGenerator=True)
@@ -688,10 +688,10 @@ def primeNumbersFountain():
         clear()
         asc.asciiArt()
         if i == 1:
-            print("How many bits wanted for this generation ?")
+            print("How many bits wanted for this generation?")
             wanted = getInt(2048, "bits size", True)
 
-            print("\nHow many generations ?")
+            print("\nHow many generations?")
             numbers = getInt(1, "generations")
 
             stockSafePrimes(wanted, numbers)
@@ -702,7 +702,7 @@ def primeNumbersFountain():
             print("Enter number of bits for updating corresponding one's :")
             wanted = getInt(2048, "bits size", True)
 
-            print("\nHow many generations ?")
+            print("\nHow many generations?")
             numbers = getInt(1, "generations")
 
             stockSafePrimes(wanted, numbers)
@@ -716,7 +716,7 @@ def primeNumbersFountain():
             lnumber = getInt(2048, "bits size", True)
             name = f"{str(lnumber)}_bits.txt"
 
-            if query_yn("Are you sure ?"):
+            if query_yn("Are you sure?"):
                 rmFile(name, config.DIRECTORY_FOUNT)
                 print(f"{name} removed successfully.\n")
                 
@@ -748,16 +748,16 @@ def elGamalKeysGeneration():
     asc.asciiCat()
 
     # Because here default is no so not(yes)
-    if not query_yn("Do you want to use the fastest ElGamal key generation's (default: no) ?", "no"):
+    if not query_yn("Do you want to use the fastest ElGamal key generation's (default: no)?", "no"):
         
-        if query_yn("Do you want to choose the length of the key (default = 2048 bits) ?", "no"):
+        if query_yn("Do you want to choose the length of the key (default = 2048 bits)?", "no"):
             n = getInt(2048, "key size", True)
         else:
             n = 2048
 
-        eGen = query_yn("Do you want to use easy Generator (fastest generation) (default: No) ?", "no")
+        eGen = query_yn("Do you want to use easy Generator (fastest generation) (default: No)?", "no")
 
-        if query_yn("Do you want to use the Prime Number's Fountain to generate the keys (fastest) (default: yes) ?"):
+        if query_yn("Do you want to use the Prime Number's Fountain to generate the keys (fastest) (default: yes)?"):
             primes = extractSafePrimes(n, False, eGen, Verbose=True)
         else:
             primes = False
@@ -810,7 +810,7 @@ def keysVerif(verif:bool=True):
                 asc.asciiDeath()
                 print(f"Key sizes do not match ({privateS} != {publicS}). Suspected corruption.")
                 
-                if query_yn("Do you want to delete them ?"):
+                if query_yn("Do you want to delete them?"):
                     
                     print("Keys are going to be deleted...")
                     for f in ["public_key", "private_key"]:
@@ -824,7 +824,7 @@ def keysVerif(verif:bool=True):
                     asc.asciiCat()
 
             else:
-                if verif and not query_yn("Do you want to keep them ? (default: No)", "no"):
+                if verif and not query_yn("Do you want to keep them? (default: No)", "no"):
                     rmFile("public_key.kpk", config.DIRECTORY_PROCESSING)
                     rmFile("private_key.kpk", config.DIRECTORY_PROCESSING)
                     rmFile("encrypted.kat", config.DIRECTORY_PROCESSING)
@@ -836,7 +836,7 @@ def keysVerif(verif:bool=True):
         else:
             prRed("Private key's missing.\n")
         
-            if query_yn("Do you want to add them now ?\n"):
+            if query_yn("Do you want to add them now?\n"):
 
                 while not isFileHere("private_key.kpk", config.DIRECTORY_PROCESSING):
                     clear()
@@ -852,7 +852,7 @@ def keysVerif(verif:bool=True):
     elif isFileHere("private_key.kpk", config.DIRECTORY_PROCESSING):
         print("\nPrivate key's already here but not public one's.\n")
 
-        if query_yn("Do you want to add them now ? ( default: No)\n", "no"):
+        if query_yn("Do you want to add them now? ( default: No)\n", "no"):
 
                 while not isFileHere("public_key.kpk", config.DIRECTORY_PROCESSING):
                     clear()
@@ -992,7 +992,7 @@ def dHgestion():
             print("According to the size of the private key, your agreement is : ", end="")
             prGreen(accord)
 
-            if query_yn("Do you want to process with given agreement now ?") :
+            if query_yn("Do you want to process with given agreement now?") :
                 doSomethingDH(2, True)
             else:
                 doSomethingElse(dHgestion)
@@ -1001,7 +1001,7 @@ def dHgestion():
             asc.asciiKeys()
 
             if not processWithAgreement:
-                if query_yn("Do you want to use the dH_agreement.kat file's ? (default: Yes)"):
+                if query_yn("Do you want to use the dH_agreement.kat file's? (default: Yes)"):
                     accord = extractKeyFromFile("dH_agreement")
                 else:
                     accord = getIntKey(getb64("agreement"), 2)
@@ -1079,13 +1079,13 @@ def katsuSymm():
             inFile = ""
 
             if cipher == 5:
-                if query_yn("GCM allows to store authentified additional data (not encrypted), do you want to store some AAD ?"):
+                if query_yn("GCM allows to store authentified additional data (not encrypted), do you want to store some AAD?"):
                     aad = readFromUser()
                 else: 
                     clear()
                     asc.asciiCat()
 
-            if query_yn("Do you want to encrypt a file ?", "no"):
+            if query_yn("Do you want to encrypt a file?", "no"):
                 inFile = getFile()
                 if inFile:
                     data = bm.fileToBytes(inFile)
@@ -1114,7 +1114,7 @@ def katsuSymm():
             cipher = cipher_choice()
             inFile = False
 
-            if query_yn("Do you want to decrypt a file ?", "no"):
+            if query_yn("Do you want to decrypt a file?", "no"):
                 inFile = getFile()
                 if inFile:
                     data = bm.fileToBytes(inFile)
@@ -1241,7 +1241,7 @@ def katsuAsymm():
 
             asc.asciiCat()
             
-            if query_yn("Do you want to use the encrypted.kat file's ? (default: Yes)"):
+            if query_yn("Do you want to use the encrypted.kat file's? (default: Yes)"):
                 e = extractKeyFromFile("encrypted", config.DIRECTORY_PROCESSING, ".kat")
             else:
                 e = getIntKey(getb64("key"), 2)
@@ -1264,7 +1264,7 @@ def katsuAsymm():
             asc.asciiDeath()
             print("You're going to erase all key's from the system.\n")
 
-            if query_yn("Are you sure ?"):
+            if query_yn("Are you sure?"):
 
                 for f in ["public_key", "private_key", "dH_shared_key", "dH_agreement", "dH_sendable"]:
                     rmFile(f+".kpk", config.DIRECTORY_PROCESSING)
@@ -1307,7 +1307,7 @@ def katsuHash():
 
         size = getInt(256, "hash", True)
 
-        if query_yn("Do you want to hash a file ?", "no"):
+        if query_yn("Do you want to hash a file?", "no"):
 
             f = getFile()
             clear()
@@ -1336,7 +1336,7 @@ def katsuHash():
         h = getb64("hash")
 
         if  h:
-            if query_yn("Do you want to compare this hash to a file's one ?", "no"):
+            if query_yn("Do you want to compare this hash to a file's one?", "no"):
                 f = getFile()
                 if f:
                     verifyHash(h, bm.fileToBytes(f))

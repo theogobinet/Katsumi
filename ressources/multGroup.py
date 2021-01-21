@@ -12,8 +12,8 @@ def inv(a:int, m:int, Verbose:bool=False):
 
     if ut.euclid(a, m) != 1 :
         if Verbose:
-            print(f"gcd({a}, {m}) = {ut.euclid(a, m)} != 1 thus you cannot get an invert of a.")
-        raise ValueError(f"gcd({a}, {m}) != 1 thus you cannot get an invert of a.")
+            print(f"gcd({a}, {m}) = {ut.euclid(a, m)} != 1 thus you cannot get an invert of {a}.")
+        raise ValueError(f"gcd({a}, {m}) != 1 thus you cannot get an invert of {a}.")
         # a modular multiplicative inverse can be found directly
     
     elif a == 0:
@@ -25,13 +25,13 @@ def inv(a:int, m:int, Verbose:bool=False):
         # A simple consequence of Fermat's little theorem is that if p is prime and does not divide a
         # then a^−1 ≡ a^(p − 2) (mod p) is the multiplicative 
         if Verbose: 
-            print(f"From Fermat's little theorem, because {m} is prime and does not divide {a} so: a^-1 = a^{m}-2 mod {m}")
+            print(f"From Fermat's little theorem, because {m} is prime and does not divide {a} so: {a}^-1 = {a}^({m}-2) mod {m}")
         u = ut.square_and_multiply(a, m-2, m)
 
     elif ut.coprime(a, m) and m < (1 << 20):
         #From Euler's theorem, if a and n are coprime, then a^−1 ≡ a^(φ(n) − 1) (mod n).
         if Verbose:
-            print(f"From Euler's theorem, because {a} and {m} are coprime -> a^-1 = a^phi({m})-1 mod {m}")
+            print(f"From Euler's theorem, because {a} and {m} are coprime -> {a}^-1 = {a}^(phi({m})-1) mod {m}")
         
         u = ut.square_and_multiply(a, phi(m, 1, 1, Verbose)-1, m)
 
@@ -144,6 +144,8 @@ def multiplicativeOrder(n:int , p:int, iterativeWay:bool=False, Verbose:bool=Fal
 
     Set iterative way to true if you want to use iterations.
     """
+    if ut.euclid(n,p) != 1 :
+        raise ValueError(f"gcd({n},{p}) != 1")
 
     if not iterativeWay:
         if Verbose:
@@ -158,7 +160,7 @@ def multiplicativeOrder(n:int , p:int, iterativeWay:bool=False, Verbose:bool=Fal
 
             p, e = t
             m = ut.square_and_multiply(p, e)
-            totient = phi(p, 1, e, Verbose=Verbose) # phi(p^e)
+            totient = phi(p, 1, e) # phi(p^e)
             qs = [1]
 
             for elt, exp in ut.findPrimeFactors(totient, True).items():
@@ -173,10 +175,12 @@ def multiplicativeOrder(n:int , p:int, iterativeWay:bool=False, Verbose:bool=Fal
             return q
 
         pf = ut.findPrimeFactors(p, True)
-        if Verbose:
-                print(f"\nPrime factors of {p} has been generated : {pf}.")
 
-        mofs = (multOrder1(n, (elt, exp)) for elt, exp in pf.items())
+        mofs = [multOrder1(n, (elt, exp)) for elt, exp in pf.items()]
+
+        if Verbose:
+            print(f"\nPrime factors of {p} has been generated : {pf}.")
+            print(f"Now, we need to find least common multiple of {mofs}")
 
         # used to apply a particular function passed in its argument to all of the list elements mentioned in the sequence passed along.
         return reduce(ut.lcm, mofs, 1)
@@ -224,17 +228,20 @@ def primitiveRoot(n:int, totient=None, Verbose:bool=False):
         totient=phi(n, 1, 1, Verbose)
 
     if Verbose:
-        print(f"phi({n}) = {totient} ")
+        print(f"Phi({n}) = {totient}\n")
 
     if n > 3 and  ut.millerRabin(n):
 
         q = (n-1)//2
 
+        if Verbose:
+            print(f"\n{n} is a prime number.")
+
         # To deal with safe prime
         if ut.millerRabin(q):
 
             if Verbose:
-                print(f"{n} Safe Prime.")
+                print(f"{n} is a Safe Prime! Because {q} prime too.")
                 print("Choose random number between g [2, p-1]")
             
             import random as rd
@@ -287,13 +294,13 @@ def primitiveRoot(n:int, totient=None, Verbose:bool=False):
             return -1
     else:
         if Verbose:
-            print(f"According to Euler's theorem, a is a primitive root mod {n} if and only if the multiplicative order of a is ϕ(n) = {totient}.")
+            print(f"\nAccording to Euler's theorem, a is a primitive root mod {n} if and only if the multiplicative order of a is ϕ(n) = {totient}.")
 
         for e in range(1, n):
             o = multiplicativeOrder(e, n, Verbose)
 
             if Verbose:
-                print(f"multiplicative order({e}, {n}) = {o} \n")
+                print(f"\nMultiplicative order({e}, {n}) = {o} \n")
 
             if o == totient:
                 if Verbose:
@@ -383,7 +390,7 @@ def isGenerator(e:int , n:int, lagrangeWay:bool=True, printOther:bool=False, Ver
         order = multiplicativeOrder(e, n, False, Verbose)
 
         if Verbose:
-            print(f"If phi({n}) is equal to mutliplicative order of {e} modulo {n} then it's a generator of {n}.")
+            print(f"\nIf phi({n}) is equal to mutliplicative order of {e} modulo {n} then it's a generator of {n}.")
             print(f"phi(n) = {totient} and order(e, n) = {order}.\n")
 
         if totient == order :
@@ -392,7 +399,7 @@ def isGenerator(e:int , n:int, lagrangeWay:bool=True, printOther:bool=False, Ver
 
                 if Verbose:
                     print(f"There are {phi(phi(n))} generators in Z{n}.")
-                    print(f"{e} is the a generator of Z{n}.")
+                    print(f"{e} is the a generator of Z{n}.\n")
 
                 return True, findOtherGenerators(e, n, Verbose)
 

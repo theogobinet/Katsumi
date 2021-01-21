@@ -176,9 +176,13 @@ def millerRabin(p, s=40):
     """
     Probalistic compositeness test.
     Return whether a given number is likely to be prime (not composite).
+
+    First, it test in common primes list up to 10 000.
     """
 
-    if p == 2: # 2 is the only prime that is even
+    from ressources import config as conf
+
+    if p in conf.COMMON_PRIMES:
         return True
     if not (p & 1): # n is a even number and can't be prime
         return False
