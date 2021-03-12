@@ -32,13 +32,13 @@ Réalisé sous le respect de [PEP8](https://www.python.org/dev/peps/pep-0008/)
 
 - [A propos](#A_propos)
 - [Installation](#Installation)
-- [Vue d'ensemble](#Vue_d_ensemble)
+- [Vue d'ensemble](#Vue-d"ensemble)
     - [Structure](#Structure)
         - [Symétrique](#Symétrique)
         - [Asymétriqie](#Asymétrique)
         - [BlockChain](#BlockChain)
-    - [Choix d'implémentation](#Choix_d_implémentation)
-        - [Fontaine à nombres premiers](#Fontaine_nombres_premiers)
+    - [Choix d'implémentation](#Choix-d'implémentation)
+        - [Fontaine à nombres premiers](#Fontaine-à-nombres-premiers)
     - [Performances](#Performances)
     - [Améliorations](#Améliorations)
 - [Auteurs](#Auteurs)
@@ -82,9 +82,9 @@ Le code source est ordonné ainsi:
 
 ### Choix d'implémentation
 
-* The primitive polynomial of the binary extension field GF(2) of degree 16 was found [online](https://www.partow.net/programming/polynomials/index.html) and hard-coded into a [config file](ressources/config.py)
+* Le polynôme primitif du champ d'extension binaire GF(2) de degré 16 a été trouvé [en ligne](https://www.partow.net/programming/polynomials/index.html) et codé en dur dans un [fichier de configuration] (ressources/config.py).
 
-* To make it easier to handle the inverses in the Galois fields, we have [pre-recorded in memory the inverses](ressources/generated/inversion_Sbox.txt) of the Galois field degree 16 (itself written in raw).
+* Pour faciliter la manipulation des inverses dans les champs de Galois, nous avons [pré-enregistré en mémoire les inverses](ressources/generated/inversion_Sbox.txt) du champ de Galois degré 16 (lui-même écrit en brut).
 
 * Le fichier [Inversion_Sbox.txt](ressources/generated/inversion_Sbox.txt) est vérifié à chaque démarrage et s'il est corrompu (pas ici ou faux), le programme en génère un avant de démarrer.
 
