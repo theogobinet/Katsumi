@@ -56,7 +56,7 @@ def chooseAndSend(accord: tuple,
         toSend = it.writeKeytoFile(toSend, "dH_sendable")
 
     if Verbose:
-        print(f"Here's what to send to the other one: ", end="")
+        print("Here's what to send to the other one: ", end="")
         it.prGreen(toSend)
 
     return secret_integer

@@ -64,6 +64,7 @@ def isEasyGeneratorPossible(s: tuple):
     """
     Return True is it's possible to generate easly a generator.
     """
+
     # Control if easy generator is possible
     def p_filter(to_be_filtered: int):
         return (p % 3 == 2 and (p % 12 == 1 or p % 12 == 11))
@@ -352,7 +353,8 @@ def verifying(M: bytes, sign: tuple, publicKey: tuple = None):
 
     if ((0 < s1 < p) and (0 < s2 < p - 1)):
 
-        test1 = (ut.square_and_multiply(h, s1, p) * ut.square_and_multiply(s1, s2, p)) % p
+        test1 = (ut.square_and_multiply(h, s1, p) *
+                 ut.square_and_multiply(s1, s2, p)) % p
         test2 = ut.square_and_multiply(g, hm, p)
 
         if test1 == test2:

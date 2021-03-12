@@ -145,7 +145,7 @@ def safePrime(nBits: int = 1024,
     """
 
     from multiprocessing import Pool, cpu_count, Manager
-    import signal  #https://docs.python.org/3/library/signal.html
+    import signal  # https://docs.python.org/3/library/signal.html
 
     manager = Manager()
 
@@ -193,10 +193,13 @@ def safePrime_worker(nBits: int = 1024,
     if easyGenerator:
         if Verbose:
             print("Easy generator choosen.")
+
         p_filter = lambda p: p % 3 == 2 and (
             p % 12 == 1 or p % 12 == 11
         )  # p = 1 mod 12 make 11 as primitive root
+
     else:
+
         p_filter = lambda p: p % 3 == 2
 
     while not bool(flag.value):
@@ -204,7 +207,7 @@ def safePrime_worker(nBits: int = 1024,
         # Calculate 2q +1 and (q-1)//2
         # Return Sophie Germain's prime according to what is prime.
 
-        if randomFunction == None:
+        if randomFunction is None:
             randomFunction = randomInt
 
         q = randomPrime(nBits, randomFunction, p_filter, 1)
@@ -244,7 +247,7 @@ def safePrime_worker(nBits: int = 1024,
         else:
             if Verbose:
                 print(
-                    f"But 2 * him + 1 and (him - 1) / 2 doesn't seem to be primes...\n"
+                    "But 2 * him + 1 and (him - 1) / 2 doesn't seem to be primes...\n"
                 )
 
 

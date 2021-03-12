@@ -25,22 +25,22 @@ def cipher(arr, method=3, encrypt=True, aad=""):
     if len(last) < 8:
         arr[-1] = bm.zfill_b(last, 8)
 
-    if method == 1:  #ECB
+    if method == 1:  # ECB
         config.WATCH_CIPHER_TYPE = "ECB"
         return ECB(arr, encrypt)
 
-    elif method == 2:  #CBC
+    elif method == 2:  # CBC
         config.WATCH_CIPHER_TYPE = "CBC"
         return CBC(arr, encrypt)
 
-    elif method == 3:  #PCBC
+    elif method == 3:  # PCBC
         config.WATCH_CIPHER_TYPE = "PCBC"
         return PCBC(arr, encrypt)
 
-    elif method == 4:  #CTR
+    elif method == 4:  # CTR
         config.WATCH_CIPHER_TYPE = "CTR"
         return CTR(arr, encrypt)
-    elif method == 5:  #CTR
+    elif method == 5:  # CTR
         config.WATCH_CIPHER_TYPE = "GCM"
         return GCM(arr, encrypt, aad)
 
@@ -387,10 +387,10 @@ def GCM(arr, encrypt=True, aad=""):
 def IV_action(arr, iv=None, action="extract"):
     """Extract or store IV at the end of the arr."""
 
-    if action == "store" and iv != None:
+    if action == "store" and iv is not None:
         arr.append(iv)
 
-    elif action == "extract" and iv == None:
+    elif action == "extract" and iv is None:
         iv = arr.pop()
         return iv
     else:

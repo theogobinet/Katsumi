@@ -79,11 +79,10 @@ def key_gen(size: int = 2048,
 
     if Verbose:
         print(
-            f"\nYour private key has been generated Bob, keep it safe and never distibute them !"
+            "\nYour private key has been generated Bob, keep it safe and never distibute them !"
         )
-        print(
-            f"\nThe public key has been generated, send this to your Alice: ",
-            end="")
+        print("\nThe public key has been generated, send this to your Alice: ",
+              end="")
 
         it.prGreen(public_key)
 
@@ -184,7 +183,8 @@ def signing(M: bytes,
 
     size = it.getKeySize(privateK)  # Get key size
 
-    if Verbose: print("Hashing in progress...")
+    if Verbose:
+        print("Hashing in progress...")
 
     hm = hashF.sponge(M, size)
     #base64 to int

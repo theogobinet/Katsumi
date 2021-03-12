@@ -80,6 +80,7 @@ def watch():
 
         it.clear()
         # To avoid error of Division by 0
-        if config.WATCH_PERCENTAGE == 0: config.WATCH_PERCENTAGE = 0.01
+        if config.WATCH_PERCENTAGE == 0:
+            config.WATCH_PERCENTAGE = 0.01
         display()
         time.sleep(0.5)

@@ -60,8 +60,8 @@ def kasumi(arr, encrypt=True):
         exTime = time.time()
 
         arr = bm.splitBytes(arr, 4)
-        l = arr[0]
-        r = arr[1]
+        left = arr[0]
+        right = arr[1]
 
         for i in range(0, 8):
 
@@ -71,19 +71,19 @@ def kasumi(arr, encrypt=True):
             KO = [config.KO1[i], config.KO2[i], config.KO3[i]]
             KI = [config.KI1[i], config.KI2[i], config.KI3[i]]
             KL = [config.KL1[i], config.KL2[i]]
-            lp = l
+            lp = left
 
             if (i % 2 == 0):
-                l = FL(KL, FO(KO, KI, l))
+                left = FL(KL, FO(KO, KI, left))
             else:
-                l = FO(KO, KI, FL(KL, l))
+                left = FO(KO, KI, FL(KL, left))
 
-            l = bm.b_op(l, r, "XOR")
-            r = lp
+            left = bm.b_op(left, right, "XOR")
+            right = lp
 
         config.WATCH_GLOBAL_KASUMI += time.time() - exTime
 
-        return r + l
+        return right + left
 
 
 #######
@@ -95,13 +95,13 @@ def FL(pKL, arr):
         raise ValueError("FL takes 32 bits as 4 bytes array in input")
     else:
         arr = bm.splitBytes(arr, 2)
-        l = arr[0]
-        r = arr[1]
+        left = arr[0]
+        right = arr[1]
 
-        rp = bm.b_op(bm.circularRotation(bm.b_op(l, pKL[0], "AND"), 0, 1), r,
-                     "XOR")
-        lp = bm.b_op(bm.circularRotation(bm.b_op(rp, pKL[1], "OR"), 0, 1), l,
-                     "XOR")
+        rp = bm.b_op(bm.circularRotation(bm.b_op(left, pKL[0], "AND"), 0, 1),
+                     right, "XOR")
+        lp = bm.b_op(bm.circularRotation(bm.b_op(rp, pKL[1], "OR"), 0, 1),
+                     left, "XOR")
 
         # Inverted in Galois Field
         lp = invertGalois2(lp)
@@ -119,14 +119,15 @@ def FO(pKO, pKI, arr):
         raise ValueError("FO takes 32 bits as 4 bytes array in input")
     else:
         arr = bm.splitBytes(arr, 2)
-        l = arr[0]
-        r = arr[1]
+        left = arr[0]
+        right = arr[1]
 
         for i in range(0, 3):
-            l = r
-            r = bm.b_op(r, FI(bm.b_op(l, pKO[i], "XOR"), pKI[i]), "XOR")
+            left = right
+            right = bm.b_op(right, FI(bm.b_op(left, pKO[i], "XOR"), pKI[i]),
+                            "XOR")
 
-        return l + r
+        return left + right
 
 
 #######
@@ -161,11 +162,11 @@ def initRC4(masterKey):
 
     global S1, S2
 
-    l = len(masterKey)
-    mid = int(l / 2)
+    lenght = len(masterKey)
+    mid = int(lenght / 2)
     K1, K2 = masterKey[mid:], masterKey[:mid]
 
-    if l < 8 or l > 24:
+    if lenght < 8 or lenght > 24:
         return False
 
     S1, S2 = [i for i in range(0, 256)], [i for i in range(0, 256)]

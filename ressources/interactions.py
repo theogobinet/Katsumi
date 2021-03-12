@@ -477,8 +477,8 @@ def extractKeyFromFile(fileName: str,
         from base64 import b64decode
 
         if b64data[0] == "L":
-            #It's a list !
-            #Case when message is longer than modulus -> separation into list of keys
+            # It's a list !
+            # Case when message is longer than modulus -> separation into list of keys
             return [
                 getIntKey(b64decode(el), b64data[1])
                 for el in b64decode(b64data[2:]).decode().split("|")
@@ -601,7 +601,7 @@ def doSomethingElse(m=None):
     answer = query_yn("\nDo you want to do something else?")
     import katsumi
 
-    if m == None:
+    if m is None:
         m = katsumi.menu
 
     print()
@@ -710,7 +710,7 @@ def stockSafePrimes(n: int = 1024,
     else:
         fount = []
 
-    print(f"Computing in progress. Please wait ...")
+    print("Computing in progress. Please wait ...")
 
     fount = prng.genSafePrimes(x, fount, n, randomFunction)
 
@@ -1061,7 +1061,7 @@ def dlogAttack():
                 extractKeyFromFile("encrypted", config.DIRECTORY_PROCESSING,
                                    ".kat"), True)
 
-            print(f"Decrypted message is:\n")
+            print("Decrypted message is:\n")
             prYellow(el)
 
             doSomethingElse(dlogAttack)
@@ -1359,7 +1359,7 @@ def katsuAsymm():
                                     "public_key", config.DIRECTORY_PROCESSING),
                                 saving=True)
 
-                print(f"Saved encrypted message into appropriated file: ",
+                print("Saved encrypted message into appropriated file: ",
                       end="")
                 prGreen(e)
 
@@ -1574,8 +1574,8 @@ def certificate():
             certificate()
         else:
             f = open(config.DIRECTORY_PROCESSING + "X509.ca")
-            for l in f.readlines():
-                print(l)
+            for line in f.readlines():
+                print(line)
 
         doSomethingElse(certificate)
 

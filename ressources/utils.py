@@ -432,7 +432,7 @@ def pollard_rho(g: int, h: int, n: int, order: int = None):
 
     import ressources.multGroup as multGroup
 
-    if order == None:
+    if order is None:
         order = multGroup.multiplicativeOrder(g, n)
 
     # from a, b and c, partitioning the field
@@ -483,8 +483,10 @@ def pollard_rho(g: int, h: int, n: int, order: int = None):
 
             r = (b_i - b_2i) % order
 
-            if r == 0: return False
-            else: return multGroup.inv(r, order) * (a_2i - a_i) % order
+            if r == 0:
+                return False
+            else:
+                return multGroup.inv(r, order) * (a_2i - a_i) % order
 
 
 ###

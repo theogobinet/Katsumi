@@ -23,7 +23,7 @@ def inv(a: int, m: int, Verbose: bool = False):
     elif a == 0:
         if Verbose:
             print(
-                f"a = 0 and 0 cannot have multiplicative inverse ( 0 * nothing = 1 ) ."
+                "a = 0 and 0 cannot have multiplicative inverse ( 0 * nothing = 1 ) ."
             )
         raise ValueError("0 cannot have multiplicative inverse.")
 
@@ -48,14 +48,15 @@ def inv(a: int, m: int, Verbose: bool = False):
     else:
         if Verbose:
             print(
-                f"Modular inverse u solves the given equation: a.u+m.v=1.\n Let's use the euclid extended algorithm tho."
+                "Modular inverse u solves the given equation: a.u+m.v=1.\n Let's use the euclid extended algorithm tho."
             )
 
         # Modular inverse u solves the given equation: a.u+m.v=1
         # n number of iterations
         _, u, _, _, _ = ut.euclid_ext(a, m, Verbose)
 
-        if u < 0: u += m
+        if u < 0:
+            u += m
 
     if Verbose:
         return u, f"u = {u} + {m}k, k in Z"
@@ -140,9 +141,11 @@ def phi(n: int, m: int = 1, k: int = 1, Verbose: bool = False):
                 print(f"\nLet's calculate phi({n}) with prime factors way.\n")
 
             tot = n
-            if Verbose: print("Generating primes factors ...\n")
+            if Verbose:
+                print("Generating primes factors ...\n")
             for factor in ut.findPrimeFactors(n):
-                if Verbose: print(f"Factor: {factor}")
+                if Verbose:
+                    print(f"Factor: {factor}")
                 tot -= tot // factor
 
             return tot
@@ -156,7 +159,7 @@ def multiplicativeOrder(n: int,
     Returns the multiplicative order of n mod p.
 
     The minimum period of the sequence of powers of a is called the order of a.
-    So a is a primitive root mod n if and only if the order of a is ϕ(n). 
+    So a is a primitive root mod n if and only if the order of a is ϕ(n).
     Order of n in p is the smallest number M or n^M = 1 mod p.
 
     Set iterative way to true if you want to use iterations.
@@ -170,7 +173,7 @@ def multiplicativeOrder(n: int,
                 f"\nBy the Chinese Remainder Theorem, it's enough to calculate the multiplicative order for each prime exponent p^k of {p}, "
             )
             print(
-                f"and combine the results with the least common multiple operation."
+                "and combine the results with the least common multiple operation."
             )
 
         from functools import reduce
@@ -245,7 +248,7 @@ def primitiveRoot(n: int, totient=None, Verbose: bool = False):
     https://en.wikipedia.org/wiki/Fermat%27s_little_theorem
     """
 
-    if totient == None:
+    if totient is None:
         totient = phi(n, 1, 1, Verbose)
 
     if Verbose:
@@ -285,7 +288,8 @@ def primitiveRoot(n: int, totient=None, Verbose: bool = False):
                 return g
 
         else:
-            if Verbose: print(f"Let's find all prime factors of {totient}:")
+            if Verbose:
+                print(f"Let's find all prime factors of {totient}:")
             s = ut.findPrimeFactors(totient)
 
             if Verbose:
@@ -295,7 +299,7 @@ def primitiveRoot(n: int, totient=None, Verbose: bool = False):
                     f"Computing all g^(phi({n})/p_i) mod {n} with p_i prime factors."
                 )
                 print(
-                    f"If all the calculated values are different from 1, then g is a primitive root."
+                    "If all the calculated values are different from 1, then g is a primitive root."
                 )
                 print("-----------------------------")
 
@@ -368,7 +372,7 @@ def reducedResidueSystem(n: int, g: int = None, Verbose: bool = False):
     """
 
     totient = phi(n, Verbose)
-    if g == None:
+    if g is None:
         if Verbose:
             print("No generator given in input. Computing one now ..")
         g = primitiveRoot(n, totient, Verbose)
@@ -556,7 +560,7 @@ def legendreSymbol(a: int, p: int, quadraticList=None):
     """
     assert ut.millerRabin(p)
 
-    if quadraticList == None:
+    if quadraticList is None:
         quadraticList = quadraticsResidues(p)
 
     if a % p == 0:

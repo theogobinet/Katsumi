@@ -94,7 +94,8 @@ def fileToBytes(file,
     file_name = os.path.join(directory, file)
     without_ext = os.path.splitext(file)[0]
 
-    if Verbose: print(f"Opening the {file} file.")
+    if Verbose:
+        print(f"Opening the {file} file.")
 
     readTime = time.time()
     with open(file_name, 'rb') as f:
@@ -133,7 +134,7 @@ def codeOut(thing, coded=True, inFile=""):
         wTime = time.time()
 
         if coded:
-            #Let's write byte per byte into a .kat file
+            # Let's write byte per byte into a .kat file
             katFile = open(inFile + ".kat", "wb")
             katFile.write(bytes(packed))
         else:
@@ -167,7 +168,6 @@ def zfill_b(byteA, n: int):
     Fill byte till length n.
 
     Output: bytes
-    
     """
 
     if not isinstance(byteA, bytearray):
@@ -182,7 +182,6 @@ def zfill_b(byteA, n: int):
 def b_op(b1, b2, ope="XOR"):
     """
     Bitwise operation between two bytes (XOR, AND, OR available)
-    
     Output: bytes
     """
 
@@ -230,7 +229,6 @@ def packSplittedBytes(pSplitted):
 def circularRotation(arr, dir=0, n=1):
     '''
     Circular shift to dir (left=0, right=1) of n (=1 by default) bits
-    
     Output: bytes
     '''
 

@@ -244,8 +244,8 @@ def validChain(user: int):
     # Don't check last block as it has not been validated
     for i in range(0, len(c.BC_CHAIN) - 1):
         vB = isValidBlock(i, user, False, UTXO)
-        if vB != True:
-            if vB != False:
+        if vB is not True:
+            if vB is not False:
                 print("Unvalid block: ", i, " - Transaction: ", vB)
             else:
                 print("Unvalid block previous hash or salt: ", i)
@@ -481,7 +481,7 @@ def validTransaction(user: int, transaction: list, UTXO: list = None):
         UTXO: array of UTXO to use instead of default one: c.BC_UTXO
     '''
 
-    if UTXO == None:
+    if UTXO is None:
         UTXO = c.BC_UTXO
 
     core = transaction[:-1]
@@ -513,7 +513,7 @@ def getUserBalance(user: int, UTXO: list = None):
         user: user ID of the user whose balance you want to get
         UTXO: array of UTXO to use instead of default one: c.BC_UTXO
     '''
-    if UTXO == None:
+    if UTXO is None:
         UTXO = c.BC_UTXO
 
     return sum([x[1] for x in getUserUTXO(user, UTXO)])
@@ -527,7 +527,7 @@ def getUserUTXO(user: int, UTXO: list = None):
         UTXO: array of UTXO to use instead of default one: c.BC_UTXO
     '''
 
-    if UTXO == None:
+    if UTXO is None:
         UTXO = c.BC_UTXO
 
     amounts = []
@@ -548,7 +548,7 @@ def transitUTXO(sender: int, receiver: int, amount: int, UTXO: list = None):
         UTXO: array of UTXO to use instead of default one: c.BC_UTXO
     '''
 
-    if UTXO == None:
+    if UTXO is None:
         UTXO = c.BC_UTXO
 
     # If the sender is the network, add the amount in one UTXO without check
@@ -662,7 +662,7 @@ def transactionToString(transaction: list, UTXO: list = None):
         UTXO: array of UTXO to use instead of default one: c.BC_UTXO, use to get balance of the users
     '''
 
-    if UTXO == None:
+    if UTXO is None:
         UTXO = c.BC_UTXO
 
     from ressources.interactions import getB64Keys
