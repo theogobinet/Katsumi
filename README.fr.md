@@ -28,7 +28,7 @@ Réalisé sous le respect de [PEP8](https://www.python.org/dev/peps/pep-0008/)
 
 **Lire ceci dans un autre language**: [English](README.md)
 
-## Table of content
+## Sommaire
 
 - [A propos](#A_propos)
 - [Installation](#Installation)
