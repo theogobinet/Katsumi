@@ -18,11 +18,20 @@
 
 **Designed** on Arch Linux and Windows 10 **for Linux and Windows operating systems**.
 
+[Yapf](https://github.com/google/yapf) was used to check the formatting of our code:
+
+```
+sudo yapf -ri Katsumi/
+```
+
+Carried out in accordance with [PEP8](https://www.python.org/dev/peps/pep-0008/)
+
+**Read this in other languages**: [French](README.fr.md)
 ## Table of content
 
 - [About](#About)
 - [Installation](#Installation)
-- [Overview](#Performance)
+- [Overview](#Overview)
     - [Structure](#Structure)
         - [Symmetric](#Symmetric)
         - [Asymmetric](#Asymmetric)
