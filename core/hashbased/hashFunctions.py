@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-
 ##################
-# Hash functions # 
+# Hash functions #
 ##################
 
 import ressources.bytesManager as bm
 
-def sponge(N:bytearray, d:int):
+
+def sponge(N: bytearray, d: int):
     """
     Sponge construction for hash functions.
 
@@ -17,7 +17,6 @@ def sponge(N:bytearray, d:int):
 
     return bytearray
     """
-
     def pad(N, r):
         iN = bm.bytes_to_int(N)
         lN = int.bit_length(iN)
@@ -27,13 +26,13 @@ def sponge(N:bytearray, d:int):
 
         # Padding using the SHA-3 pattern 10*1: a 1 bit, followed by zero or more 0 bits (maximum r − 1) and a final 1 bit.
         op = ((iN | (1 << b + lN + 1)) << 1) ^ 1
-        
+
         return bm.mult_to_bytes(op)
 
     r = 8
-    d = int(d/8)
+    d = int(d / 8)
 
-    blocks = bm.splitBytes(pad(N, r*8), r)
+    blocks = bm.splitBytes(pad(N, r * 8), r)
 
     S = bytearray(16)
 
@@ -52,6 +51,7 @@ def sponge(N:bytearray, d:int):
     # Truncating with the desired length
     return O[:d]
 
+
 def md5(block):
     '''
         Return md5 hash
@@ -65,28 +65,30 @@ def md5(block):
 
     def iToB(i):
         return int.to_bytes(i, 4, "little")
-    
+
     def p32(a, b):
         return (a + b) % (1 << 32)
 
     s = [
-        7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22,
-        5, 9, 14, 20, 5, 9, 14, 20, 5, 9, 14, 20, 5, 9, 14, 20,
-        4, 11, 16, 23, 4, 11, 16, 23, 4, 11, 16, 23, 4, 11, 16, 23,
-        6, 10, 15, 21, 6, 10, 15, 21, 6, 10, 15, 21, 6, 10, 15, 21
+        7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22, 5, 9, 14,
+        20, 5, 9, 14, 20, 5, 9, 14, 20, 5, 9, 14, 20, 4, 11, 16, 23, 4, 11, 16,
+        23, 4, 11, 16, 23, 4, 11, 16, 23, 6, 10, 15, 21, 6, 10, 15, 21, 6, 10,
+        15, 21, 6, 10, 15, 21
     ]
 
     K = []
-    for i in range (64):
+    for i in range(64):
         K.append((math.floor(2**32 * abs(math.sin(i + 1)))) % (1 << 32))
 
     iN = bm.bytes_to_int(block)
-    lN = len(block)*8
+    lN = len(block) * 8
 
-    # Number of 0 to add 
+    # Number of 0 to add
     b = 512 - ((lN + 1) % 512)
 
-    lN = int.from_bytes(lN.to_bytes(8, byteorder='little'), byteorder='big', signed=False)
+    lN = int.from_bytes(lN.to_bytes(8, byteorder='little'),
+                        byteorder='big',
+                        signed=False)
 
     iN = (((iN << 1) | 1) << b) ^ lN
 
@@ -114,29 +116,29 @@ def md5(block):
                 g = i
             elif i <= 31:
                 F = (D & B) | (~D & C)
-                g = (5*i + 1) % 16
+                g = (5 * i + 1) % 16
             elif i <= 47:
                 F = B ^ C ^ D
-                g = (3*i + 5) % 16
+                g = (3 * i + 5) % 16
             else:
                 # C xor (B or (not D))
                 F = C ^ (B | ~D) % (1 << 32)
-                g = (7*i) % 16
-                
+                g = (7 * i) % 16
 
-            # F + A + K[i] + M[g] 
+            # F + A + K[i] + M[g]
             try:
-                F = p32(p32(p32(F, A), K[i]), int.from_bytes(blocks[g],"little"))
+                F = p32(p32(p32(F, A), K[i]),
+                        int.from_bytes(blocks[g], "little"))
             except IndexError:
                 print(i, K, blocks[g])
-                raise Exception('Error') 
+                raise Exception('Error')
 
             A = D
             D = C
             C = B
             # B + leftrotate(F, s[i])
             B = p32(B, ((F << s[i]) | (F >> (32 - s[i]))))
-        
+
         h1 = p32(A, h1)
         h2 = p32(B, h2)
         h3 = p32(C, h3)
@@ -154,7 +156,7 @@ def nullBits(H, nbZ):
     '''
     H = bm.bytes_to_int(H)
 
-    for i in range (0, nbZ):
+    for i in range(0, nbZ):
         if ((H >> i) & 1) == 1:
             return False
 
@@ -175,9 +177,10 @@ def PoW(block, zBits=1, interruptOnChange=('', 0)):
     from ressources import config as c
 
     if interruptOnChange[0]:
-        originalData = getattr(locals()['c'], interruptOnChange[0])[interruptOnChange[1]].copy()
+        originalData = getattr(
+            locals()['c'], interruptOnChange[0])[interruptOnChange[1]].copy()
 
-    if(zBits >= 255):
+    if (zBits >= 255):
         raise ValueError('The number of zero bits must be lower than 2^8')
 
     salt = 1
@@ -186,7 +189,8 @@ def PoW(block, zBits=1, interruptOnChange=('', 0)):
     while not nullBits(H, zBits):
 
         if interruptOnChange[0]:
-            if originalData != getattr(locals()['c'], interruptOnChange[0])[interruptOnChange[1]]:
+            if originalData != getattr(
+                    locals()['c'], interruptOnChange[0])[interruptOnChange[1]]:
                 return False
 
         salt = random.randint(0, 1 << 32)

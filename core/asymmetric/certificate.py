@@ -10,7 +10,7 @@ import ressources.interactions as it
 import core.asymmetric.elGamal as elG
 
 
-def x509(subjectPublicKey, name:str="X509", out:bool=True):
+def x509(subjectPublicKey, name: str = "X509", out: bool = True):
 
     import ressources.bytesManager as bm
     import base64
@@ -20,17 +20,16 @@ def x509(subjectPublicKey, name:str="X509", out:bool=True):
     CA_public_key, CA_private_key = elG.key_gen(n, primeFount=True)
 
     import os
-    #An X. 509 Serial Number is an integer whose value can be represented in 20 bytes 
-    serialN=it.getB64Keys(os.urandom(20))
+    #An X. 509 Serial Number is an integer whose value can be represented in 20 bytes
+    serialN = it.getB64Keys(os.urandom(20))
 
     from datetime import date
     today = date.today()
-    nextY = today.replace(year = today.year + 1)
-
+    nextY = today.replace(year=today.year + 1)
 
     # The certificate is signed by the private key of the certification authority.
     # The one who manufactured and issued this certificate.
-    
+
     signature = it.getB64Keys(elG.signing(subjectPublicKey, CA_private_key))
 
     CA = f"""
@@ -45,7 +44,7 @@ def x509(subjectPublicKey, name:str="X509", out:bool=True):
             Common Name = BARK CA 101
         Validity
             Not Before: {today.strftime("%b-%d-%Y")}
-            Not After : {nextY.strftime("%b-%d-%Y")}
+            Not After: {nextY.strftime("%b-%d-%Y")}
         Subject: CN = Katsumi User
         Subject Public Key Info:
             Public Key Algorithm: El-Gamal
@@ -58,13 +57,11 @@ def x509(subjectPublicKey, name:str="X509", out:bool=True):
         Purposes: Digital Signature
     """
 
-
     if out:
         print(CA)
     else:
         from ressources import config
         #Write into file
         it.writeVartoFile(CA, name, config.DIRECTORY_PROCESSING, ".ca")
-
 
     return it.getB64Keys(CA_public_key)

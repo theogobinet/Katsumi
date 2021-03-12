@@ -6,11 +6,11 @@ from core.symmetric.galois_Z2 import GF2
 import ressources.asciiWarehouse as asc
 
 import sys
-import time
 
 #################################################
 ################## Selection  ###################
 #################################################
+
 
 def work_with_selection(pSelection):
     """Interact with others py functions depending on user choice."""
@@ -18,22 +18,22 @@ def work_with_selection(pSelection):
     it.clear()
     asc.asciiCat()
 
-    # Selection orientation 
-    if pSelection == 1 :
+    # Selection orientation
+    if pSelection == 1:
         it.katsuSymm()
 
-    elif pSelection == 2 :
+    elif pSelection == 2:
         it.katsuAsymm()
-        
-    elif pSelection == 3 :
+
+    elif pSelection == 3:
         it.katsuHash()
 
-    elif pSelection == 4 :
+    elif pSelection == 4:
         it.certificate()
-    
+
     elif pSelection == 5:
         it.katsuBlockChain()
- 
+
     elif pSelection == 6:
         return it.primeNumbersFountain()
 
@@ -44,23 +44,29 @@ def work_with_selection(pSelection):
     else:
         it.clear()
         menu()
-    
+
 
 #################################################
 ################## MENU  ########################
 #################################################
 
+
 def menu():
 
     it.clear()
 
-    choices=["Symmetric", "Asymmetric", "Hash", "Get X509 Certificate", "BlockChain", "Prime Numbers Fountain's", "Exit"]
+    choices = [
+        "Symmetric", "Asymmetric", "Hash", "Get X509 Certificate",
+        "BlockChain", "Prime Numbers Fountain's", "Exit"
+    ]
 
     if it.correctSizeHook():
 
-        print("------------------------------------------------------------------")
+        print(
+            "------------------------------------------------------------------"
+        )
         asc.asciiCat()
-        print("- Created by : Gobinet Théo && Martin Azaël ")
+        print("- Created by: Gobinet Théo && Martin Azaël ")
         print("- Free to use")
         print("- MIT License\n")
 
@@ -81,8 +87,9 @@ def main():
 
     #Galois field's initialization
     GF2(16)
-    
+
     menu()
+
 
 if __name__ == '__main__':
     main()

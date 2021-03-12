@@ -17,7 +17,8 @@ import random as rd
 # the message itself is encrypted using a symmetric cryptosystem and ElGamal is then used to encrypt only the symmetric key.
 ############
 
-def generator(p:int, q:int, r:int=2):
+
+def generator(p: int, q: int, r: int = 2):
     """
     Find a generator g such as g order is q (Sophie Germain prime) with p = 2q + 1.
     That's a generator for Gq. Not Zp* and any other subgroup. Very important point.
@@ -27,50 +28,48 @@ def generator(p:int, q:int, r:int=2):
 
     Avoid commons attacks.
     """
-    assert p == r*q +1
+    assert p == r * q + 1
 
     while 1:
 
         # Choose a random quadratic residues, thus is multiplicative order will be q.
         # Without 0 and 1 to keep only legender symbol = 1 results
-        
+
         e = rd.randrange(2, p)
         g = ut.square_and_multiply(e, r, p)
 
-
-
         # We must avoid g=2 because of Bleichenbacher's attack described
-        # in "Generating ElGamal signatures without knowning the secret key", 
+        # in "Generating ElGamal signatures without knowning the secret key",
         # 1996
 
         if g in (1, 2):
             continue
 
-        #Discard g if it divides p-1
-        elif (p-1) % g == 0:
+        # Discard g if it divides p-1
+        elif (p - 1) % g == 0:
             continue
-
 
         # g^{-1} must not divide p-1 because of Khadir's attack
         # described in "Conditions of the generator for forging ElGamal
         # signature", 2011
 
-        elif (p-1) % multGroup.inv(g, p) == 0:
+        elif (p - 1) % multGroup.inv(g, p) == 0:
             continue
 
         # Found a good candidate
         return g
 
 
-def isEasyGeneratorPossible(s:tuple):
+def isEasyGeneratorPossible(s: tuple):
     """
     Return True is it's possible to generate easly a generator.
     """
-    # Control if easy generator is possible 
-    p_filter = lambda p : p % 3 == 2 and (p % 12 == 1 or p % 12 == 11)
+    # Control if easy generator is possible
+    def p_filter(to_be_filtered: int):
+        return (p % 3 == 2 and (p % 12 == 1 or p % 12 == 11))
 
     p, _ = s
-    
+
     if p_filter(p):
         easyGenerator = True
     else:
@@ -78,12 +77,18 @@ def isEasyGeneratorPossible(s:tuple):
 
     return easyGenerator
 
+
 #############################################
 ########### - Key Generation - ##############
 #############################################
 
 
-def key_gen(n:int=2048, primeFount=True, easyGenerator:bool=False, randomFunction=None, saving=False, Verbose=False) -> tuple :
+def key_gen(n: int = 2048,
+            primeFount=True,
+            easyGenerator: bool = False,
+            randomFunction=None,
+            saving=False,
+            Verbose=False) -> tuple:
     """
     ElGamal key generation.
 
@@ -98,93 +103,99 @@ def key_gen(n:int=2048, primeFount=True, easyGenerator:bool=False, randomFunctio
     saving: True if you want to save the private key to a file.
     """
 
-
     if not primeFount:
 
-        if Verbose: print(f"Let's try to generate a safe prime number of {n} bits.")
+        if Verbose:
+            print(f"Let's try to generate a safe prime number of {n} bits.")
 
         s = prng.safePrime(n, randomFunction, easyGenerator)
-    
+
     else:
         primeFount = it.extractSafePrimes(n, False, Verbose)
         s = primeFount
-        
-    p, q = s # safe_prime and Sophie Germain prime
 
+    p, q = s  # safe_prime and Sophie Germain prime
 
-    if Verbose: print(f"Let's find the generator for p: {p} , safe prime number.\n")
+    if Verbose:
+        print(f"Let's find the generator for p: {p} , safe prime number.\n")
 
     # Generate an efficient description of a cyclic group G, of order q with generator g.
     if easyGenerator:
         # https://en.wikipedia.org/wiki/Quadratic_residue#Table_of_quadratic_residues
-        if Verbose: print(f"Easy generator => gen = 12 (condition in prime generation) or (4, 9) (for every prime)")
+        if Verbose:
+            print(
+                "Easy generator => gen = 12 (condition in prime generation) or (4, 9) (for every prime)"
+            )
 
         gen = rd.choice([12, 4, 9])
 
     else:
         gen = generator(p, q)
-    
-    if Verbose: print(f"generator found : {gen}\n")
-    
+
+    if Verbose:
+        print(f"generator found: {gen}\n")
 
     # The description of the group is (g, q, p)
     # When p=2q+1, they are the exact same group as Gq.
     # The prime order subgroup has no subgroups being prime.
     # This means, by using Gq, you don't have to worry about an adversary testing if certain numbers are quadratic residues or not.
-    
+
     # The message space MUST be restrained to this prime order subgroup.
 
-    x = rd.randrange(1, p-1) # gcd(x, p) = 1
+    x = rd.randrange(1, p - 1)  # gcd(x, p) = 1
 
     h = ut.square_and_multiply(gen, x, p)
 
     # The private key consists of the values (G, x).
     private_key = (p, gen, x)
-    
+
     if saving:
-        it.writeKeytoFile(private_key, "private_key", config.DIRECTORY_PROCESSING, ".kpk")
+        it.writeKeytoFile(private_key, "private_key",
+                          config.DIRECTORY_PROCESSING, ".kpk")
 
     if Verbose:
-        print(f"\nYour private key has been generated Alice, keep it safe !")
-
+        print("\nYour private key has been generated Alice, keep it safe !")
 
     # The public key consists of the values (G, q, g, h).
     # But we saved only (p, g, h) cause q = (p-1)//2
 
     public_key = (p, gen, h)
-    
+
     if saving:
-        public_key = it.writeKeytoFile(public_key, "public_key", config.DIRECTORY_PROCESSING, ".kpk")
+        public_key = it.writeKeytoFile(public_key, "public_key",
+                                       config.DIRECTORY_PROCESSING, ".kpk")
 
     if Verbose:
-        print(f"\nThe public key has been generated too : ", end="")
+        print("\nThe public key has been generated too: ", end="")
 
         it.prGreen(public_key)
-    
+
     if not saving:
         return (public_key, private_key)
+
 
 #############################################
 ########### -   Encryption   - ##############
 #############################################
 
-def encrypt(M:bytes, publicKey, saving:bool=False):
+
+def encrypt(M: bytes, publicKey, saving: bool = False):
 
     assert isinstance(M, bytes) or isinstance(M, bytearray)
 
     p, g, h = publicKey
 
     def process(m):
-        y = rd.randrange(1, p-1)
+        y = rd.randrange(1, p - 1)
 
         # shared secret -> g^xy
-        c1 = ut.square_and_multiply(g, y, p) 
+        c1 = ut.square_and_multiply(g, y, p)
 
-        s = ut.square_and_multiply(h, y, p) 
-        c2 = (m*s)%p
+        s = ut.square_and_multiply(h, y, p)
+        c2 = (m * s) % p
 
         return (c1, c2)
-    
+
     Mint = bm.bytes_to_int(M)
 
     if Mint < p:
@@ -202,17 +213,20 @@ def encrypt(M:bytes, publicKey, saving:bool=False):
         e = [process(bm.bytes_to_int(elt)) for elt in bm.splitBytes(M, size)]
 
     if saving:
-        e = it.writeKeytoFile(e, "encrypted", config.DIRECTORY_PROCESSING, ".kat")
+        e = it.writeKeytoFile(e, "encrypted", config.DIRECTORY_PROCESSING,
+                              ".kat")
 
     return e
+
 
 #############################################
 ########### -   Decryption   - ##############
 #############################################
 
-def decrypt(c, privateKey:tuple, asTxt=False):
+
+def decrypt(c, privateKey: tuple, asTxt=False):
     """
-    Decryption of given ciphertext 'c' with secret key 'privateKey'. 
+    Decryption of given ciphertext 'c' with secret key 'privateKey'.
     Return bytes/bytearray or txt if asTxt set to 'True'.
     """
 
@@ -221,16 +235,16 @@ def decrypt(c, privateKey:tuple, asTxt=False):
     def process(cipherT):
         c1, c2 = cipherT
 
-        s1 = ut.square_and_multiply(c1, p-1-x, p)
+        s1 = ut.square_and_multiply(c1, p - 1 - x, p)
 
         # This calculation produces the original message
         m = (c2 * s1) % p
 
         return bm.mult_to_bytes(m)
-    
+
     if isinstance(c, list):
-        
-        decrypted=[process(elt) for elt in c]
+
+        decrypted = [process(elt) for elt in c]
 
         r = bm.packSplittedBytes(decrypted)
 
@@ -242,11 +256,16 @@ def decrypt(c, privateKey:tuple, asTxt=False):
     else:
         return r
 
+
 #############################################################
 ################ - Signature scheme - #######################
 #############################################################
 
-def signing(M:bytes, privateK:tuple=None, saving:bool=False, Verbose:bool=False):
+
+def signing(M: bytes,
+            privateK: tuple = None,
+            saving: bool = False,
+            Verbose: bool = False):
     """
     Signing a message M (bytes).
     """
@@ -256,55 +275,58 @@ def signing(M:bytes, privateK:tuple=None, saving:bool=False, Verbose:bool=False)
     # y choosed randomly between 1 and p-2 with condition than y coprime to p-1
     if not privateK:
         privateK = it.extractKeyFromFile("private_key")
-        
+
     p, g, x = privateK
-     
+
     size = it.getKeySize(privateK)
 
     # M = bm.fileToBytes(M)
     # M = "Blablabla".encode()
 
-    if Verbose: print("Hashing in progress...")
+    if Verbose:
+        print("Hashing in progress...")
 
     hm = hashF.sponge(M, size)
     # #base64 to int
     hm = bm.bytes_to_int(bm.mult_to_bytes(hm))
 
-    if Verbose: print("Hashing done.\n")
+    if Verbose:
+        print("Hashing done.\n")
 
     import random as rd
 
-    p1 = p-1
+    p1 = p - 1
 
-    k = rd.randrange(2, p-2)
+    k = rd.randrange(2, p - 2)
 
     while not ut.coprime(k, p1):
-        k = rd.randrange(2, p-2)
+        k = rd.randrange(2, p - 2)
 
-
-    if Verbose: print(f"Your secret integer is: {k}")
+    if Verbose:
+        print(f"Your secret integer is: {k}")
 
     s1 = ut.square_and_multiply(g, k, p)
 
     from ressources.multGroup import inv
 
-    s2 = (multGroup.inv(k, p1) * (hm - x*s1)) % p1
+    s2 = (multGroup.inv(k, p1) * (hm - x * s1)) % p1
 
     # In the unlikely event that s2 = 0 start again with a different random k.
 
     if s2 == 0:
-        if Verbose: print(f"Unlikely, s2 is equal to 0. Restart signing...")
+        if Verbose:
+            print("Unlikely, s2 is equal to 0. Restart signing...")
         signing(M, privateK, saving, Verbose)
     else:
         sign = (s1, s2)
-        
+
         if saving:
             sign = it.writeKeytoFile(sign, "elG_signature")
 
         return sign
 
 
-def verifying(M:bytes, sign:tuple, publicKey:tuple=None):
+def verifying(M: bytes, sign: tuple, publicKey: tuple = None):
     """
     Verify given signature of message M with corresponding public key's.
     """
@@ -314,23 +336,21 @@ def verifying(M:bytes, sign:tuple, publicKey:tuple=None):
 
     if not publicKey:
         publicKey = it.extractKeyFromFile("public_key")
-        
+
     p, g, h = publicKey
     size = it.getKeySize(publicKey)
 
     hm = hashF.sponge(M, size)
 
-
     hm = bm.bytes_to_int(bm.mult_to_bytes(hm))
 
-
     if not isinstance(sign, tuple):
-            b64data = sign
-            sign = it.getIntKey(b64data[1:], b64data[0])
+        b64data = sign
+        sign = it.getIntKey(b64data[1:], b64data[0])
 
     s1, s2 = sign
 
-    if ((0 < s1 < p) and (0 < s2 < p-1)):
+    if ((0 < s1 < p) and (0 < s2 < p - 1)):
 
         test1 = (ut.square_and_multiply(h, s1, p) * ut.square_and_multiply(s1, s2, p)) % p
         test2 = ut.square_and_multiply(g, hm, p)
@@ -342,6 +362,7 @@ def verifying(M:bytes, sign:tuple, publicKey:tuple=None):
     else:
         raise ValueError
 
+
 #############################################################
 ################ - Logarithmic attack - #####################
 #############################################################
@@ -352,13 +373,12 @@ def delog(publicKey, encrypted=None, asTxt=False, method=1):
     Retrieve private key with publicKey.
     And if you get the encrypted message, thus you can decrypt them.
     """
-
     def dlog_get_x(publicKey):
         """
         Find private key using discrete logarithmic method.
         """
-        
-        # PublicKey format : (p, q, gen, h)
+
+        # PublicKey format: (p, q, gen, h)
         p, g, h = publicKey
 
         x = ut.discreteLog(g, h, p, method)
@@ -368,20 +388,8 @@ def delog(publicKey, encrypted=None, asTxt=False, method=1):
 
     private_Key = dlog_get_x(publicKey)
 
-    if encrypted == None:
+    if encrypted is None:
         return private_Key
 
     else:
         return decrypt(encrypted, private_Key, asTxt)
-        
-
-    
-
-
-
-
-
-
-    
-
-
