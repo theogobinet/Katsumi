@@ -12,7 +12,6 @@ import core.asymmetric.elGamal as elG
 
 def x509(subjectPublicKey, name: str = "X509", out: bool = True):
 
-    import ressources.bytesManager as bm
     import base64
 
     # Get key size's

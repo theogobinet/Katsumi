@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 
 from ressources import config as c
+import time
+import random
 
 ###########################
 #       LIVE CHAIN        #
@@ -31,9 +33,6 @@ def network(limit: int,
 
         Transaction frequency calculation: avg(rangeTB) / avg(rangeBS) = average number of transactions per second
     '''
-
-    import time
-    import random
 
     # List of most used french names
     names = [
@@ -107,8 +106,6 @@ def startLive(limit: int,
     '''
 
     import threading
-    import time
-    import random
 
     initChain()
 

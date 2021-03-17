@@ -32,8 +32,8 @@ def poly_mult_2(a: int, b: int):
 
     if a.bit_length() >= b.bit_length():
         return multbiggest(a, b)
-    else:
-        return multbiggest(b, a)
+
+    return multbiggest(b, a)
 
 
 def poly_mult_mod_2(a: int, b: int, mod: int):
@@ -75,23 +75,24 @@ def poly_mod_2(a: int, mod: int):
 
     if a.bit_length() < mod.bit_length():
         return a
-    else:
-        c = [0 for _ in range(mod.bit_length())]
 
-        # Initialization of X^i results in mod
-        m = [0 for _ in range(a.bit_length())]
+    c = [0 for _ in range(mod.bit_length())]
 
-        # degree of mod
-        degM = mod.bit_length() - 1
+    # Initialization of X^i results in mod
+    m = [0 for _ in range(a.bit_length())]
 
-        # int representing mod degree's - 1 full of "1" bits
-        fullBits = int("".join(["1" for i in range(degM - 1)]), 2)
+    # degree of mod
+    degM = mod.bit_length() - 1
 
-        rec(a, mod, c, m, degM, fullBits)
+    # int representing mod degree's - 1 full of "1" bits
+    fullBits = int("".join(["1" for i in range(degM - 1)]), 2)
 
-        for i in range(len(c)):
-            c[i] = c[i] % 2
-        return int("".join([str(x) for x in reversed(c)]), 2)
+    rec(a, mod, c, m, degM, fullBits)
+
+    for i in range(len(c)):
+        c[i] = c[i] % 2
+
+    return int("".join([str(x) for x in reversed(c)]), 2)
 
 
 #######

@@ -156,8 +156,8 @@ def decrypt(c, privateKey: tuple, asTxt=False):
 
     if asTxt:
         return r.decode()
-    else:
-        return r
+    
+    return r
 
 
 #############################################################
@@ -237,5 +237,5 @@ def verifying(M: bytes, sign: int, pK: tuple = None):
 
     if test == (hm % n):
         return True
-    else:
-        return False
+
+    return False

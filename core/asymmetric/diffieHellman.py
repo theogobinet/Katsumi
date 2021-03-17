@@ -23,9 +23,9 @@ def agreement(n: int = 2048, fountain=True):
     if fountain:
         p, _ = it.extractSafePrimes(n, False, Verbose=True)
         return (p, multGroup.primitiveRoot(p))
-    else:
-        it.stockSafePrimes(n, 1)
-        return agreement(n, True)
+
+    it.stockSafePrimes(n, 1)
+    return agreement(n, True)
 
 
 # 2) and 3)
@@ -74,8 +74,8 @@ def compute(accord: tuple, L: list, saving=False):
 
     if saving:
         return it.writeKeytoFile(shared_secret, "dH_shared_key")
-    else:
-        return shared_secret
+
+    return shared_secret
 
 
 # Only a and b are kept secret

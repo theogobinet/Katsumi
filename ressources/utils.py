@@ -36,13 +36,13 @@ def integer_sqrt(x: int):
         r = newr
 
 
-def swapPos(list: list, pos1: int, pos2: int):
+def swapPos(table: list, pos1: int, pos2: int):
     """
     Swap two elements in list. Return modified list
     """
 
-    list[pos1], list[pos2] = list[pos2], list[pos1]
-    return list
+    table[pos1], table[pos2] = table[pos2], table[pos1]
+    return table
 
 
 def closestValue(aList: list, givenV: int):
@@ -81,16 +81,17 @@ def euclid(a: int, b: int, Verbose=False):
 
     if (b == 0):
         return a
-    elif (b > a):
+
+    if (b > a):
         return euclid(b, a, Verbose)
-    else:
-        r = a % b
+    
+    r = a % b
 
-        if Verbose:
-            q = a // b
-            print(f"{a} = {b}*{q} + {r}")
+    if Verbose:
+        q = a // b
+        print(f"{a} = {b}*{q} + {r}")
 
-        return euclid(b, r, Verbose)
+    return euclid(b, r, Verbose)
 
 
 def lcm(a: int, b: int):
@@ -133,10 +134,7 @@ def coprime(a: int, b: int):
     This is equivalent to their greatest common divisor (gcd) being 1.
     """
 
-    if euclid(a, b) == 1:
-        return True
-    else:
-        return False
+    return euclid(a, b) == 1
 
 
 def pairwise_coprime(listing: list):
@@ -267,8 +265,8 @@ def findPrimeFactors(n: int, exponent: bool = False):
     if exponent:
         # using set to get unique list
         return dict(zip(uniqSorted, [s.count(e) for e in uniqSorted]))
-    else:
-        return uniqSorted
+    
+    return uniqSorted
 
 
 #########################################
@@ -344,8 +342,8 @@ def ChineseRemainder(integers: list, modulis: list, Verbose=False):
     if Verbose:
         return (solution % product, product,
                 f" x congruent to {solution%product} mod {product}")
-    else:
-        return solution % product
+
+    return solution % product
 
 
 def mapperCRT(elt, p: int, q: int, action: bool = True, Verbose: bool = False):
@@ -369,9 +367,9 @@ def mapperCRT(elt, p: int, q: int, action: bool = True, Verbose: bool = False):
             print(f"With a = {a} mod {p} and b = {b} mod {q}")
 
         return (a, b)
-    else:
-        x = ChineseRemainder(elt, [p, q], Verbose)
-        return x
+
+    x = ChineseRemainder(elt, [p, q], Verbose)
+    return x
 
 
 #########################################
@@ -485,8 +483,8 @@ def pollard_rho(g: int, h: int, n: int, order: int = None):
 
             if r == 0:
                 return False
-            else:
-                return multGroup.inv(r, order) * (a_2i - a_i) % order
+
+            return multGroup.inv(r, order) * (a_2i - a_i) % order
 
 
 ###
@@ -546,9 +544,11 @@ def discreteLog(g: int, h: int, p: int, method: int = 1):
 
     if method == 0:
         return bsgs(g, h, p)
-    elif method == 1:
+
+    if method == 1:
         return pollard_rho(g, h, p)
-    elif method == 2:
+
+    if method == 2:
         return pohlig_hellman(g, h, p)
-    else:
-        return -1
+
+    return -1

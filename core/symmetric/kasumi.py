@@ -3,7 +3,6 @@
 
 import ressources.config as config
 import ressources.bytesManager as bm
-import ressources.interactions as it
 from core.symmetric.galois_Z2 import invertGalois2
 
 import time
@@ -54,36 +53,36 @@ def set_key(km=config.KEY):
 #################################################
 def kasumi(arr, encrypt=True):
     if (len(arr) > 8):
-        return "Error: Kasumi takes 64 bits as 8 bytes array in input"
-    else:
-        config.WATCH_KASUMI_NUMBER += 1
-        exTime = time.time()
+        raise ValueError("Error: Kasumi takes 64 bits as 8 bytes array in input")
 
-        arr = bm.splitBytes(arr, 4)
-        left = arr[0]
-        right = arr[1]
+    config.WATCH_KASUMI_NUMBER += 1
+    exTime = time.time()
 
-        for i in range(0, 8):
+    arr = bm.splitBytes(arr, 4)
+    left = arr[0]
+    right = arr[1]
 
-            if not encrypt:
-                i = 7 - i
+    for i in range(0, 8):
 
-            KO = [config.KO1[i], config.KO2[i], config.KO3[i]]
-            KI = [config.KI1[i], config.KI2[i], config.KI3[i]]
-            KL = [config.KL1[i], config.KL2[i]]
-            lp = left
+        if not encrypt:
+            i = 7 - i
 
-            if (i % 2 == 0):
-                left = FL(KL, FO(KO, KI, left))
-            else:
-                left = FO(KO, KI, FL(KL, left))
+        KO = [config.KO1[i], config.KO2[i], config.KO3[i]]
+        KI = [config.KI1[i], config.KI2[i], config.KI3[i]]
+        KL = [config.KL1[i], config.KL2[i]]
+        lp = left
 
-            left = bm.b_op(left, right, "XOR")
-            right = lp
+        if (i % 2 == 0):
+            left = FL(KL, FO(KO, KI, left))
+        else:
+            left = FO(KO, KI, FL(KL, left))
 
-        config.WATCH_GLOBAL_KASUMI += time.time() - exTime
+        left = bm.b_op(left, right, "XOR")
+        right = lp
 
-        return right + left
+    config.WATCH_GLOBAL_KASUMI += time.time() - exTime
+
+    return right + left
 
 
 #######
@@ -93,21 +92,19 @@ def FL(pKL, arr):
 
     if (len(arr) != 4):
         raise ValueError("FL takes 32 bits as 4 bytes array in input")
-    else:
-        arr = bm.splitBytes(arr, 2)
-        left = arr[0]
-        right = arr[1]
 
-        rp = bm.b_op(bm.circularRotation(bm.b_op(left, pKL[0], "AND"), 0, 1),
-                     right, "XOR")
-        lp = bm.b_op(bm.circularRotation(bm.b_op(rp, pKL[1], "OR"), 0, 1),
-                     left, "XOR")
+    arr = bm.splitBytes(arr, 2)
+    left = arr[0]
+    right = arr[1]
 
-        # Inverted in Galois Field
-        lp = invertGalois2(lp)
-        rp = invertGalois2(rp)
+    rp = bm.b_op(bm.circularRotation(bm.b_op(left, pKL[0], "AND"), 0, 1), right, "XOR")
+    lp = bm.b_op(bm.circularRotation(bm.b_op(rp, pKL[1], "OR"), 0, 1), left, "XOR")
 
-        return lp + rp
+    # Inverted in Galois Field
+    lp = invertGalois2(lp)
+    rp = invertGalois2(rp)
+
+    return lp + rp
 
 
 #######
@@ -117,17 +114,17 @@ def FO(pKO, pKI, arr):
 
     if (len(arr) != 4):
         raise ValueError("FO takes 32 bits as 4 bytes array in input")
-    else:
-        arr = bm.splitBytes(arr, 2)
-        left = arr[0]
-        right = arr[1]
 
-        for i in range(0, 3):
-            left = right
-            right = bm.b_op(right, FI(bm.b_op(left, pKO[i], "XOR"), pKI[i]),
-                            "XOR")
+    arr = bm.splitBytes(arr, 2)
+    left = arr[0]
+    right = arr[1]
 
-        return left + right
+    for i in range(0, 3):
+        left = right
+        right = bm.b_op(right, FI(bm.b_op(left, pKO[i], "XOR"), pKI[i]),
+                        "XOR")
+
+    return left + right
 
 
 #######

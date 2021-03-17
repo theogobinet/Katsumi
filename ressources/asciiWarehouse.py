@@ -90,9 +90,9 @@ def asciiDeath():
 def asciiKeys():
     it.clear()
     return print("""
-        8 8          , o.                                        , o.          8 8
+        8 8          , o.                                       , o.          8 8
         d8o8azzzzzzzzd   b        Diffie Hellman Key           d   bzzzzzzzza8o8b
-                    `o'               Exchange                  `o'
+                      `o'               Exchange                `o'
 
             8 8 8 8                     , ooo.
             8a8 8a8                    oP   ?b

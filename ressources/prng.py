@@ -6,7 +6,7 @@
 # https://en.wikipedia.org/wiki/List_of_random_number_generators
 
 import os
-from .bytesManager import bytes_to_int, circularRotation, bytes_needed
+import ressources.bytesManager as bm
 from ressources.utils import millerRabin
 from secrets import randbits
 
@@ -29,10 +29,10 @@ def xorshiftperso(evenOrodd: int = 0, nBits: int = 512):
     # Unpredictable random seed
     state1, state2 = os.urandom(bytes), os.urandom(bytes)
 
-    a, b = bytes_to_int(state1), bytes_to_int(state2)
+    a, b = bm.bytes_to_int(state1), bm.bytes_to_int(state2)
 
-    a ^= bytes_to_int(circularRotation(state1, 0, 23))
-    b ^= bytes_to_int(circularRotation(state2, 1, 17))
+    a ^= bm.bytes_to_int(bm.circularRotation(state1, 0, 23))
+    b ^= bm.bytes_to_int(bm.circularRotation(state2, 1, 17))
 
     # Generate full bytes of 1 of the size of the array
     size = int("0x" + "".join(["FF" for _ in range(0, nBits)]), 16)
@@ -104,6 +104,7 @@ def randomPrime(nBits: int = 512,
 
         if Verbose:
             print("Found !")
+        
         return maybe
 
     maybe = find(Verbose)
@@ -121,8 +122,8 @@ def randomPrime(nBits: int = 512,
 
     if b:
         return primes[0]
-    else:
-        return primes
+
+    return primes
 
 
 def safePrime(nBits: int = 1024,
@@ -264,8 +265,8 @@ def genSafePrimes(n: int, L: list, nBits: int, randomFunction=None):
 
         if not s:  # s is false due to interruption of research
             return s
-        else:
-            if s not in L:
-                L.append(s)
+
+        if s not in L:
+            L.append(s)
 
     return L

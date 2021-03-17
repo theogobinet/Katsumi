@@ -46,14 +46,14 @@ def generator(p: int, q: int, r: int = 2):
             continue
 
         # Discard g if it divides p-1
-        elif (p - 1) % g == 0:
+        if (p - 1) % g == 0:
             continue
 
         # g^{-1} must not divide p-1 because of Khadir's attack
         # described in "Conditions of the generator for forging ElGamal
         # signature", 2011
 
-        elif (p - 1) % multGroup.inv(g, p) == 0:
+        if (p - 1) % multGroup.inv(g, p) == 0:
             continue
 
         # Found a good candidate
@@ -182,7 +182,7 @@ def key_gen(n: int = 2048,
 
 def encrypt(M: bytes, publicKey, saving: bool = False):
 
-    assert isinstance(M, bytes) or isinstance(M, bytearray)
+    assert isinstance(M, (bytes, bytearray))
 
     p, g, h = publicKey
 
@@ -254,8 +254,8 @@ def decrypt(c, privateKey: tuple, asTxt=False):
 
     if asTxt:
         return r.decode()
-    else:
-        return r
+    
+    return r
 
 
 #############################################################
@@ -308,8 +308,6 @@ def signing(M: bytes,
 
     s1 = ut.square_and_multiply(g, k, p)
 
-    from ressources.multGroup import inv
-
     s2 = (multGroup.inv(k, p1) * (hm - x * s1)) % p1
 
     # In the unlikely event that s2 = 0 start again with a different random k.
@@ -318,6 +316,7 @@ def signing(M: bytes,
         if Verbose:
             print("Unlikely, s2 is equal to 0. Restart signing...")
         signing(M, privateK, saving, Verbose)
+        
     else:
         sign = (s1, s2)
 
@@ -353,16 +352,14 @@ def verifying(M: bytes, sign: tuple, publicKey: tuple = None):
 
     if ((0 < s1 < p) and (0 < s2 < p - 1)):
 
-        test1 = (ut.square_and_multiply(h, s1, p) *
-                 ut.square_and_multiply(s1, s2, p)) % p
+        test1 = (ut.square_and_multiply(h, s1, p) * ut.square_and_multiply(s1, s2, p)) % p
         test2 = ut.square_and_multiply(g, hm, p)
 
         if test1 == test2:
             return True
-        else:
-            return False
-    else:
-        raise ValueError
+        return False
+
+    raise ValueError
 
 
 #############################################################
@@ -393,5 +390,4 @@ def delog(publicKey, encrypted=None, asTxt=False, method=1):
     if encrypted is None:
         return private_Key
 
-    else:
-        return decrypt(encrypted, private_Key, asTxt)
+    return decrypt(encrypted, private_Key, asTxt)

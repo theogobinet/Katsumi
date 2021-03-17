@@ -6,7 +6,6 @@ import core.symmetric.galois_Z2 as gz2
 
 import ressources.config as config
 import ressources.bytesManager as bm
-import ressources.interactions as it
 from core.symmetric.watch import watch
 
 import time
@@ -141,10 +140,8 @@ def CBC(arr, encrypt=True):
     if encrypt:
         # Adding the IV to the encrypted data
         IV_action(res, iv, "store")
-        return res
-    else:
-        return res
 
+    return res
 
 #################################################
 ###### Propagating cipher block chaining ########
@@ -394,7 +391,7 @@ def IV_action(arr, iv=None, action="extract"):
         iv = arr.pop()
         return iv
     else:
-        return "Error: No action assigned."
+        raise ValueError("Error: No action assigned.")
 
 
 def IV(arr, key="y/B?E(H+MbQeThVm".encode()):
