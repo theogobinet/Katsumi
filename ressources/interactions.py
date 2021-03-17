@@ -307,8 +307,12 @@ def isFileHere(name: str, directory=c.DIRECTORY_GEN):
     return os.path.isfile(directory + name)
 
 
-def handleDirectory(dirName: str, directory=c.DIRECTORY_GEN):
+def handleDirectory(dirName: str, directory=c.THIS_FOLDER):
     """ If given directory doesn't exist, then create it. """
+
+    if directory == c.THIS_FOLDER:
+        directory += "/"
+
     if not os.path.exists(directory + dirName):
         os.makedirs(directory + dirName)
 
@@ -554,6 +558,8 @@ def handleInvBox(doIt: bool = False):
     doIt: argument for debugging, run directly the thing.
     """
 
+    handleDirectory(dirName="generated", directory=c.DIRECTORY_RESSOURCES)
+
     if doIt:
         import threading
         import core.symmetric.galois_Z2 as gz2
@@ -691,7 +697,7 @@ def stockSafePrimes(n: int = 1024,
 
     assert x > 0
     # Create an appropriated directory.
-    handleDirectory("PrimeNumber's_Fount")
+    handleDirectory("PrimeNumber's_Fount", directory=c.DIRECTORY_GEN)
 
     # Safety check, if already exist, then you just update it !
     if isFileHere(f"{str(n)}_bits.txt", c.DIRECTORY_FOUNT):

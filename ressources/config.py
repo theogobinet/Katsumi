@@ -6,8 +6,11 @@ sys.setrecursionlimit(recursionL * 2)
 # To avoid maximum recursion depth with huge integer (e.g euclid).
 
 THIS_FOLDER = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-DIRECTORY_GEN = os.path.join(THIS_FOLDER, "ressources/generated/")
+
+DIRECTORY_RESSOURCES = os.path.join(THIS_FOLDER, "ressources/")
 DIRECTORY_PROCESSING = os.path.join(THIS_FOLDER, "processing/")
+
+DIRECTORY_GEN = os.path.join(DIRECTORY_RESSOURCES, "generated/")
 DIRECTORY_FOUNT = os.path.join(DIRECTORY_GEN, "PrimeNumber's_Fount/")
 
 # Keys

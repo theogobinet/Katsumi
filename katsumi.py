@@ -85,7 +85,10 @@ def menu():
 def main():
     it.clear()
 
-    #Galois field's initialization
+    # Directory initialisation
+    it.handleDirectory("processing")
+
+    # Galois field's initialization
     GF2(16)
 
     menu()
