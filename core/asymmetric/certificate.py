@@ -19,10 +19,12 @@ def x509(subjectPublicKey, name: str = "X509", out: bool = True):
     CA_public_key, CA_private_key = elG.key_gen(n, primeFount=True)
 
     import os
-    #An X. 509 Serial Number is an integer whose value can be represented in 20 bytes
+
+    # An X. 509 Serial Number is an integer whose value can be represented in 20 bytes
     serialN = it.getB64Keys(os.urandom(20))
 
     from datetime import date
+
     today = date.today()
     nextY = today.replace(year=today.year + 1)
 
@@ -60,7 +62,8 @@ def x509(subjectPublicKey, name: str = "X509", out: bool = True):
         print(CA)
     else:
         from ressources import config
-        #Write into file
+
+        # Write into file
         it.writeVartoFile(CA, name, config.DIRECTORY_PROCESSING, ".ca")
 
     return it.getB64Keys(CA_public_key)

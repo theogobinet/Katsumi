@@ -56,15 +56,18 @@ def menu():
     it.clear()
 
     choices = [
-        "Symmetric", "Asymmetric", "Hash", "Get X509 Certificate",
-        "BlockChain", "Prime Numbers Fountain's", "Exit"
+        "Symmetric",
+        "Asymmetric",
+        "Hash",
+        "Get X509 Certificate",
+        "BlockChain",
+        "Prime Numbers Fountain's",
+        "Exit",
     ]
 
     if it.correctSizeHook():
 
-        print(
-            "------------------------------------------------------------------"
-        )
+        print("------------------------------------------------------------------")
         asc.asciiCat()
         print("- Created by: Gobinet Théo && Martin Azaël ")
         print("- Free to use")
@@ -94,5 +97,5 @@ def main():
     menu()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -14,9 +14,10 @@ from math import floor
 
 
 def poly_mult_2(a: int, b: int):
-    '''
-        Return binary multplication in Z2
-    '''
+    """
+    Return binary multplication in Z2
+    """
+
     def multbiggest(a, b):
 
         r = 0
@@ -27,7 +28,7 @@ def poly_mult_2(a: int, b: int):
             if (a >> i) & 1:
 
                 # Adding result of ith multiplication
-                r ^= (b << i)
+                r ^= b << i
         return r
 
     if a.bit_length() >= b.bit_length():
@@ -37,9 +38,9 @@ def poly_mult_2(a: int, b: int):
 
 
 def poly_mult_mod_2(a: int, b: int, mod: int):
-    '''
-        Return the modular multiplication in Z2
-    '''
+    """
+    Return the modular multiplication in Z2
+    """
     config.WATCH_MULT_NUMBER += 1
     exTime = time.time()
 
@@ -51,13 +52,14 @@ def poly_mult_mod_2(a: int, b: int, mod: int):
 
 
 def poly_mod_2(a: int, mod: int):
-    '''
-        Return polynomial "a" mod "mod"
-    '''
+    """
+    Return polynomial "a" mod "mod"
+    """
+
     def rec(a: int, mod: int, c: int, m: int, degM: int, fullBits: int):
-        '''
-            Recursive function to compute overflowed bits
-        '''
+        """
+        Recursive function to compute overflowed bits
+        """
         # For each bit in poly a
         for i in range(a.bit_length()):
 
@@ -99,7 +101,7 @@ def poly_mod_2(a: int, mod: int):
 def poly_exp_mod_2(P: int, exp: int, mod: int):
     """
     General method for fast computation of polynomials powers of a number.
-    
+
     P: Polynomial
     exp: exposant
     mod: polynial to be coungruent to
@@ -110,8 +112,8 @@ def poly_exp_mod_2(P: int, exp: int, mod: int):
     res = 1
     P = poly_mod_2(P, mod)
 
-    while (exp > 0):
-        if (exp % 2 == 1):
+    while exp > 0:
+        if exp % 2 == 1:
             res = poly_mult_mod_2(P, res, mod)
 
         # Deleting LSB
@@ -165,7 +167,8 @@ def genElts_2():
     config.ALPHA_ELEMENTS = []
     for expo in range(0, config.NBR_ELEMENTS):
         config.ALPHA_ELEMENTS.append(
-            poly_exp_mod_2(config.GENERATOR, expo, config.IRRED_POLYNOMIAL))
+            poly_exp_mod_2(config.GENERATOR, expo, config.IRRED_POLYNOMIAL)
+        )
 
     return True
 
@@ -191,7 +194,7 @@ def invertGalois2(toInv: object):
     ! You need to have a dictionary file available !
 
     Output: bytes
-    
+
     """
 
     d = int(config.DEGREE / 8)
@@ -205,8 +208,9 @@ def invertGalois2(toInv: object):
         # where P(x) irreductible polynomial of given degree
         # A ^ p^n - 2 = inverted
 
-        inv = poly_exp_mod_2(bm.bytes_to_int(toInv), config.NBR_ELEMENTS - 2,
-                             config.IRRED_POLYNOMIAL)
+        inv = poly_exp_mod_2(
+            bm.bytes_to_int(toInv), config.NBR_ELEMENTS - 2, config.IRRED_POLYNOMIAL
+        )
         inv = inv.to_bytes(bm.bytes_needed(inv), "big")
 
         config.WATCH_GLOBAL_INVERSION += time.time() - exTime
@@ -235,20 +239,21 @@ def genInverses2():
 def GF2(degree):
     """Initialize the Galois Field GF(p^degree) in Zn."""
     config.DEGREE = degree
-    config.NBR_ELEMENTS = 2**degree
+    config.NBR_ELEMENTS = 2 ** degree
     config.IRRED_POLYNOMIAL = int.from_bytes(
-        bm.mult_to_bytes(config.IRRED_POLYNOMIAL), "big")
+        bm.mult_to_bytes(config.IRRED_POLYNOMIAL), "big"
+    )
     config.GENERATOR = gen_GL_2(config.IRRED_POLYNOMIAL, degree)
 
     it.handleInvBox()
 
     if config.IN_CREATION:
         import time
+
         start = time.time()
 
         while config.IN_CREATION:
             it.clear()
             print(" --- Wait for the creation please --- ")
-            print((" --- Time elapsed: {:.1f} seconds").format(time.time() -
-                                                               start))
+            print((" --- Time elapsed: {:.1f} seconds").format(time.time() - start))
             time.sleep(1)

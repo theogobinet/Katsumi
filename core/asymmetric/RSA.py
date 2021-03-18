@@ -17,10 +17,7 @@ import random as rd
 #############################################
 
 
-def key_gen(size: int = 2048,
-            randomFunction=None,
-            saving=False,
-            Verbose=False):
+def key_gen(size: int = 2048, randomFunction=None, saving=False, Verbose=False):
     """
     RSA key generation.
 
@@ -42,10 +39,9 @@ def key_gen(size: int = 2048,
             f"Let's try to generate two distinct prime numbers p and q of {size} bits."
         )
 
-    p, q = prng.randomPrime(sizeB, randomFunction,
-                            Verbose=Verbose), prng.randomPrime(sizeB,
-                                                               randomFunction,
-                                                               Verbose=Verbose)
+    p, q = prng.randomPrime(sizeB, randomFunction, Verbose=Verbose), prng.randomPrime(
+        sizeB, randomFunction, Verbose=Verbose
+    )
 
     # 2- Compute n = pq.
     n = p * q  # new modulus
@@ -57,11 +53,10 @@ def key_gen(size: int = 2048,
     # 4- Choosing e, part of the public key
     e = rd.randrange(1, carmichaelTotient)
 
-    while not ut.coprime(
-            e, carmichaelTotient) or bm.hammingWeight(e) > (0.995 * sizeB):
+    while not ut.coprime(e, carmichaelTotient) or bm.hammingWeight(e) > (0.995 * sizeB):
         e = rd.randrange(1, carmichaelTotient)
-        #e having a short bit-length and small Hamming weight results in more efficient encryption
-        #https://en.wikipedia.org/wiki/Hamming_weight
+        # e having a short bit-length and small Hamming weight results in more efficient encryption
+        # https://en.wikipedia.org/wiki/Hamming_weight
 
     # 5- Chossing d, modular multiplicative inverse of e modulo carmichaelTotient(n)
     d = multGroup.inv(e, carmichaelTotient)  # Private Key exponent
@@ -72,17 +67,18 @@ def key_gen(size: int = 2048,
     public_key, private_key = (n, e), (n, d)
 
     if saving:
-        public_key = it.writeKeytoFile(public_key, "public_key",
-                                       config.DIRECTORY_PROCESSING, ".kpk")
-        it.writeKeytoFile(private_key, "private_key",
-                          config.DIRECTORY_PROCESSING, ".kpk")
+        public_key = it.writeKeytoFile(
+            public_key, "public_key", config.DIRECTORY_PROCESSING, ".kpk"
+        )
+        it.writeKeytoFile(
+            private_key, "private_key", config.DIRECTORY_PROCESSING, ".kpk"
+        )
 
     if Verbose:
         print(
             "\nYour private key has been generated Bob, keep it safe and never distibute them !"
         )
-        print("\nThe public key has been generated, send this to your Alice: ",
-              end="")
+        print("\nThe public key has been generated, send this to your Alice: ", end="")
 
         it.prGreen(public_key)
 
@@ -122,8 +118,7 @@ def encrypt(M: bytes, publicKey, saving: bool = False):
         e = [process(bm.bytes_to_int(elt)) for elt in bm.splitBytes(M, size)]
 
     if saving:
-        e = it.writeKeytoFile(e, "encrypted", config.DIRECTORY_PROCESSING,
-                              ".kat")
+        e = it.writeKeytoFile(e, "encrypted", config.DIRECTORY_PROCESSING, ".kat")
 
     return e
 
@@ -135,7 +130,7 @@ def encrypt(M: bytes, publicKey, saving: bool = False):
 
 def decrypt(c, privateKey: tuple, asTxt=False):
     """
-    Decryption of given ciphertext 'c' with secret key 'privateKey'. 
+    Decryption of given ciphertext 'c' with secret key 'privateKey'.
     Return bytes/bytearray or txt if asTxt set to 'True'.
     """
 
@@ -156,7 +151,7 @@ def decrypt(c, privateKey: tuple, asTxt=False):
 
     if asTxt:
         return r.decode()
-    
+
     return r
 
 
@@ -165,13 +160,12 @@ def decrypt(c, privateKey: tuple, asTxt=False):
 #############################################################
 
 
-def signing(M: bytes,
-            privateK: tuple = None,
-            saving: bool = False,
-            Verbose: bool = False):
+def signing(
+    M: bytes, privateK: tuple = None, saving: bool = False, Verbose: bool = False
+):
     """
     Signing the message (M).
-    You need to attach this signature to the message. 
+    You need to attach this signature to the message.
     """
 
     assert isinstance(M, bytes)
@@ -187,7 +181,7 @@ def signing(M: bytes,
         print("Hashing in progress...")
 
     hm = hashF.sponge(M, size)
-    #base64 to int
+    # base64 to int
     hm = bm.bytes_to_int(bm.mult_to_bytes(hm))
 
     if Verbose:

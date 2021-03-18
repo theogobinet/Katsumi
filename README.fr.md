@@ -18,10 +18,10 @@
 
 **Conçu** sur Arch Linux et Windows 10 **pour les systèmes d'exploitation Linux et Windows**.
 
-[Yapf](https://github.com/google/yapf) a été utilisé pour vérifier le formatage de notre code:
+[Black](https://github.com/psf/black) a été utilisé pour vérifier le formatage de notre code:
 
 ```
-sudo yapf -ri Katsumi/
+sudo black Katsumi/
 ```
 
 Réalisé sous le respect de [PEP8](https://www.python.org/dev/peps/pep-0008/)

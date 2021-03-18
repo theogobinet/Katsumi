@@ -79,12 +79,12 @@ def euclid(a: int, b: int, Verbose=False):
     # of the Euclidean division of the larger
     # number by the smaller one.
 
-    if (b == 0):
+    if b == 0:
         return a
 
-    if (b > a):
+    if b > a:
         return euclid(b, a, Verbose)
-    
+
     r = a % b
 
     if Verbose:
@@ -162,12 +162,12 @@ def square_and_multiply(x, k, p=None, Verbose=False):
 
     Returns: x**k or x**k mod p when p is given
     """
-    b = bin(k).lstrip('0b')
+    b = bin(k).lstrip("0b")
     r = 1
     for i in b:
         rBuffer = r
-        r = r**2
-        if i == '1':
+        r = r ** 2
+        if i == "1":
             r = r * x
         if p:
             r %= p
@@ -232,15 +232,15 @@ def findPrimeFactors(n: int, exponent: bool = False):
 
     A prime number can only be divided by 1 or itself,
     so it cannot be factored any further!
-    Every other whole number can be broken down into prime number factors. 
+    Every other whole number can be broken down into prime number factors.
     It is like the Prime Numbers are the basic building blocks of all numbers.
 
-    Set exponent to True if you want to print p^e. 
+    Set exponent to True if you want to print p^e.
     """
     s = []
 
     # Number of 2s that divide n
-    while (n % 2 == 0):
+    while n % 2 == 0:
         s.append(2)
         n = n // 2
 
@@ -251,13 +251,13 @@ def findPrimeFactors(n: int, exponent: bool = False):
     for i in range(3, nroot, 2):
 
         # While i divides n, print i and divide n
-        while (n % i == 0):
+        while n % i == 0:
             s.append(i)
             n = n // i
 
     # This condition is to handle the case
     # when n is a prime number greater than 2
-    if (n > 2):
+    if n > 2:
         s.append(n)
 
     uniqSorted = sorted(list(set(s)))
@@ -265,7 +265,7 @@ def findPrimeFactors(n: int, exponent: bool = False):
     if exponent:
         # using set to get unique list
         return dict(zip(uniqSorted, [s.count(e) for e in uniqSorted]))
-    
+
     return uniqSorted
 
 
@@ -279,7 +279,7 @@ def ChineseRemainder(integers: list, modulis: list, Verbose=False):
     Return result of Chinese Remainder.
 
         integers: [a1, .., ak]
-        modulis: [n1, .., nk] 
+        modulis: [n1, .., nk]
         Verbose: wether print or not the function steps
     """
 
@@ -298,9 +298,7 @@ def ChineseRemainder(integers: list, modulis: list, Verbose=False):
         a, b = integers[0], integers[1]
         m, n = modulis[0], modulis[1]
         if Verbose:
-            print(
-                f"x = [ {b} * {m}^(-1) * {m}  +  {a} * {n}^(-1) * {n} ] mod ({m*n}) "
-            )
+            print(f"x = [ {b} * {m}^(-1) * {m}  +  {a} * {n}^(-1) * {n} ] mod ({m*n}) ")
             m1, n1 = inv(m, n, Verbose)[0], inv(n, m, Verbose)[0]
         else:
             m1, n1 = inv(m, n, Verbose), inv(n, m, Verbose)
@@ -340,8 +338,11 @@ def ChineseRemainder(integers: list, modulis: list, Verbose=False):
             solution += a * yk * Mk
 
     if Verbose:
-        return (solution % product, product,
-                f" x congruent to {solution%product} mod {product}")
+        return (
+            solution % product,
+            product,
+            f" x congruent to {solution%product} mod {product}",
+        )
 
     return solution % product
 
@@ -350,12 +351,12 @@ def mapperCRT(elt, p: int, q: int, action: bool = True, Verbose: bool = False):
     """
     Reversible mapping using Chinese Remainder Theorem into/from Zpq.
 
-    Bijection: 
+    Bijection:
         Zpq = Zp * Zq
 
-    Action: 
+    Action:
         True - map
-        False - unmap 
+        False - unmap
     """
     # Mapping
     if action:
@@ -394,13 +395,12 @@ def bsgs(g: int, res: int, modulo: int):
 
     m = integer_sqrt(modulo) + 1
 
-    hashTable = {square_and_multiply(g, j, modulo): j
-                 for j in range(m)}  # Baby-Step
+    hashTable = {square_and_multiply(g, j, modulo): j for j in range(m)}  # Baby-Step
 
     gm = square_and_multiply(g, m, modulo)
     invGm = inv(gm, modulo)
 
-    #Initialization
+    # Initialization
     y = res
 
     # Search for an equivalence in the table - Giant-Step
@@ -495,6 +495,7 @@ def pohlig_hellman(g: int, h: int, n: int):
     Compute discrete logarithms in a finite abelian group whose order is a smooth integer.
     Based on https://en.wikipedia.org/wiki/Pohlig%E2%80%93Hellman_algorithm
     """
+
     def group_of_prime_power_order(g, h, n=tuple):
         # n = (p, e) prime factor exponent times he appears
         p, e = n
@@ -507,7 +508,9 @@ def pohlig_hellman(g: int, h: int, n: int):
         for k in range(e):
             hk = square_and_multiply(
                 square_and_multiply(g, -x, n) * h,
-                square_and_multiply(p, e - 1 - k, n), n)
+                square_and_multiply(p, e - 1 - k, n),
+                n,
+            )
             dk = pollard_rho(y, hk, n)
             x += dk * square_and_multiply(p, k, n)
 
@@ -532,14 +535,14 @@ def pohlig_hellman(g: int, h: int, n: int):
 # Function to calculate k for given a, b, m
 def discreteLog(g: int, h: int, p: int, method: int = 1):
     """
-    Given a cyclic group of order 'p' a generator 'g' and a group element h, 
+    Given a cyclic group of order 'p' a generator 'g' and a group element h,
     the problem is to find an integer 'k' such that g^k = h (mod p) by using
     baby-step, giant-step algorithm or Pohlig-Hellman algorithm.
 
     method:
         0 - baby-step giant-step
         1 - pollard rho's algorithm (default - fastest)
-        2 - pohlig-hellman 
+        2 - pohlig-hellman
     """
 
     if method == 0:

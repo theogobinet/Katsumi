@@ -23,10 +23,11 @@ def isBase64(sb):
     Check if both string and bytes objects are in base64.
     """
     import base64
+
     try:
         if isinstance(sb, str):
             # If there's any unicode here, an exception will be thrown and the function will return false
-            sb_bytes = bytes(sb, 'ascii')
+            sb_bytes = bytes(sb, "ascii")
         elif isinstance(sb, bytes):
             sb_bytes = sb
         else:
@@ -40,14 +41,15 @@ def mult_to_bytes(obj: object) -> bytes:
     """Convert given {array of bits, bytes, int, str, b64} to bytes"""
 
     if isinstance(obj, list):
-        i = int(''.join(['{:01b}'.format(x) for x in obj]), 2)
-        res = i.to_bytes(bytes_needed(i), byteorder='big')
+        i = int("".join(["{:01b}".format(x) for x in obj]), 2)
+        res = i.to_bytes(bytes_needed(i), byteorder="big")
 
     elif isinstance(obj, int):
         res = obj.to_bytes(bytes_needed(obj), "big")
 
     elif isBase64(obj):
         import base64
+
         res = base64.b64decode(obj)
 
     elif isinstance(obj, bytes):
@@ -80,10 +82,9 @@ file_name = ""
 without_ext = ""
 
 
-def fileToBytes(file,
-                message=True,
-                directory=config.DIRECTORY_PROCESSING,
-                Verbose=False):
+def fileToBytes(
+    file, message=True, directory=config.DIRECTORY_PROCESSING, Verbose=False
+):
     """
     Read a file and convert to bytearray.
     True if it's a .txt file with a message.
@@ -98,7 +99,7 @@ def fileToBytes(file,
         print(f"Opening the {file} file.")
 
     readTime = time.time()
-    with open(file_name, 'rb') as f:
+    with open(file_name, "rb") as f:
         data = bytearray(f.read())
     config.WATCH_READ_TIME = time.time() - readTime
 
@@ -115,17 +116,17 @@ def fileToBytes(file,
 
 
 def codeOut(thing, coded=True, inFile=""):
-    '''
+    """
     Choose what to do with the text (ciphered or not) and deal with it.
 
     thing: Array of bytesArrays
-    '''
+    """
 
     import time
 
     # Pack and remove null bytes added by z_filling.
     if not coded:
-        thing[-1] = thing[-1].replace(b'\x00', b'')
+        thing[-1] = thing[-1].replace(b"\x00", b"")
 
     packed = packSplittedBytes(thing)
 
@@ -139,8 +140,11 @@ def codeOut(thing, coded=True, inFile=""):
             katFile.write(bytes(packed))
         else:
             katFile = open(
-                os.path.join(os.path.dirname(inFile),
-                             f'dec_{os.path.basename(inFile)[:-4]}'), "wb")
+                os.path.join(
+                    os.path.dirname(inFile), f"dec_{os.path.basename(inFile)[:-4]}"
+                ),
+                "wb",
+            )
             katFile.write(bytes(packed))
 
         katFile.close()
@@ -209,7 +213,7 @@ def b_op(b1, b2, ope="XOR"):
 
 def splitBytes(data, n=8):
     """Split BytesArray into chunks of n (=8 by default) bytes."""
-    return [data[i:i + n] for i in range(0, len(data), n)]
+    return [data[i : i + n] for i in range(0, len(data), n)]
 
 
 def packSplittedBytes(pSplitted):
@@ -227,13 +231,13 @@ def packSplittedBytes(pSplitted):
 
 
 def circularRotation(arr, dir=0, n=1):
-    '''
+    """
     Circular shift to dir (left=0, right=1) of n (=1 by default) bits
     Output: bytes
-    '''
+    """
 
     nB = len(arr) * 8
-    arrInt = int.from_bytes(arr, 'big')
+    arrInt = int.from_bytes(arr, "big")
 
     # Generate full bytes of 1 of the size of the array
     size = int("0x" + "".join(["FF" for _ in range(0, len(arr))]), 16)
@@ -245,12 +249,12 @@ def circularRotation(arr, dir=0, n=1):
 
     r = 0
 
-    if (dir == 0):
-        r = (((arrInt << n) | (arrInt >> (nB - n))) & size)
+    if dir == 0:
+        r = ((arrInt << n) | (arrInt >> (nB - n))) & size
     else:
-        r = (((arrInt >> n) | (arrInt << (nB - n))) & size)
+        r = ((arrInt >> n) | (arrInt << (nB - n))) & size
 
-    return r.to_bytes(len(arr), 'big')
+    return r.to_bytes(len(arr), "big")
 
 
 def hammingWeight(n: object):
@@ -263,7 +267,7 @@ def hammingWeight(n: object):
     weight = 0
 
     for i in range(n.bit_length()):
-        if ((n >> i) & 1):
+        if (n >> i) & 1:
             weight += 1
 
     return weight

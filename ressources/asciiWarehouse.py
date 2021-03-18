@@ -6,17 +6,20 @@ from ressources import interactions as it
 
 def asciiGoodBye():
     it.clear()
-    return print("""
+    return print(
+        """
      __                                                  
     /__  _   _   _| |_      _    ._ _       |   _  ._ _| 
     \_| (_) (_) (_| |_) \/ (/_   | | | \/   |_ (_) | (_| 
                         /              /                 
-        """)
+        """
+    )
 
 
 def asciiArt():
     it.clear()
-    return print("""
+    return print(
+        """
                                         .      .       .       .
             .   .       .   1217   .      . .      .         .     337   .    .
                     .       .         .    .   .         .         .            .
@@ -39,12 +42,14 @@ def asciiArt():
                               (=+=+=+=+=+=+=+=+=+=+=+=+=)
                                ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    """)
+    """
+    )
 
 
 def asciiBlockC():
     it.clear()
-    return print("""
+    return print(
+        """
         _______   __                      __         ______   __                  __           
         |       \ |  \                    |  \       /      \ |  \                |  \          
         | $$$$$$$\| $$  ______    _______ | $$   __ |  $$$$$$\| $$____    ______   \$$ _______  
@@ -54,12 +59,14 @@ def asciiBlockC():
         | $$__/ $$| $$| $$__/ $$| $$_____ | $$$$$$\ | $$__/  \| $$  | $$|  $$$$$$$| $$| $$  | $$
         | $$    $$| $$ \$$    $$ \$$     \| $$  \$$\ \$$    $$| $$  | $$ \$$    $$| $$| $$  | $$
          \$$$$$$$  \$$  \$$$$$$   \$$$$$$$ \$$   \$$  \$$$$$$  \$$   \$$  \$$$$$$$ \$$ \$$   \$$
-        """)
+        """
+    )
 
 
 def asciiJongling():
     it.clear()
-    return print("""
+    return print(
+        """
                             '   '    '     
                             '   '    '   
                         o/          '  \o 
@@ -68,12 +75,14 @@ def asciiJongling():
                         
             Do you feel as though you are juggling 
                 a few to many responsibilities?
-        """)
+        """
+    )
 
 
 def asciiDeath():
     it.clear()
-    return print('''
+    return print(
+        """
                     %%% %%%%%%%            |#|
                 %%%% %%%%%%%%%%%        |#|####
             %%%%% %         %%%       |#|=#####
@@ -84,12 +93,14 @@ def asciiDeath():
                 %%%% %%%%%%%%%      | |           V
             
             ~ Death is irreversible ~
-    ''')
+    """
+    )
 
 
 def asciiKeys():
     it.clear()
-    return print("""
+    return print(
+        """
         8 8          , o.                                       , o.          8 8
         d8o8azzzzzzzzd   b        Diffie Hellman Key           d   bzzzzzzzza8o8b
                       `o'               Exchange                `o'
@@ -99,12 +110,14 @@ def asciiKeys():
             d888a888zzzzzzzzzzzzzzzzzzzz8     8b
             `""^""'                    ?o___oP'
             
-            """)
+            """
+    )
 
 
 def asciiBark():
     it.clear()
-    return print("""
+    return print(
+        """
     .-------------.                        .    .   *       *   
     /_/_/_/_/_/_/_/ \    certification        *   .   )    .
     //_/_/_/_/_/_// _ \ __      authority (CA)   .        .   
@@ -114,12 +127,14 @@ def asciiBark():
     |             ||'' ||         (The dog is a lie)     
     |_____________|| |_|L                     
 
-        """)
+        """
+    )
 
 
 def asciiCat():
     it.clear()
-    return print('''                         
+    return print(
+        """                         
        _                        
        \`*-.                 _  __     _                       _    
         )  _`-.             | |/ /    | |                     (_)    
@@ -136,4 +151,5 @@ def asciiCat():
      .*' /  .*' ; .*`- +'  `*' 
       `*-*   `*-*  `*-*'           
                                                
-''')
+"""
+    )

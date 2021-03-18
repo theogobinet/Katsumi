@@ -18,10 +18,10 @@
 
 **Designed** on Arch Linux and Windows 10 **for Linux and Windows operating systems**.
 
-[Yapf](https://github.com/google/yapf) was used to check the formatting of our code:
+[Black](https://github.com/psf/black) was used to check the formatting of our code:
 
 ```
-sudo yapf -ri Katsumi/
+sudo black Katsumi/
 ```
 
 Carried out in accordance with [PEP8](https://www.python.org/dev/peps/pep-0008/)

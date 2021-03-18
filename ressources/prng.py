@@ -12,8 +12,8 @@ from secrets import randbits
 
 
 def xorshiftperso(evenOrodd: int = 0, nBits: int = 512):
-    '''
-    Personal implementation of a random number generator using XORshift 
+    """
+    Personal implementation of a random number generator using XORshift
 
     nBits: number of bits needed (e.g 2048 bits to output 2048 bits lenght's number).
 
@@ -21,7 +21,7 @@ def xorshiftperso(evenOrodd: int = 0, nBits: int = 512):
          - 0 odd
          - 1 even
          - both
-    '''
+    """
 
     assert nBits > 23
     bytes = int(nBits / 8)
@@ -56,7 +56,7 @@ def xorshiftperso(evenOrodd: int = 0, nBits: int = 512):
 def randomInt(evenOrodd: int = 0, n: int = 512):
     """
     Return a random integer using secrets module.
-    
+
     For even or odd number:
          - 0 odd
          - 1 even
@@ -75,11 +75,9 @@ def randomInt(evenOrodd: int = 0, n: int = 512):
     return r
 
 
-def randomPrime(nBits: int = 512,
-                gen=None,
-                condition=lambda p: p == p,
-                k: int = 1,
-                Verbose=False):
+def randomPrime(
+    nBits: int = 512, gen=None, condition=lambda p: p == p, k: int = 1, Verbose=False
+):
     """
     Return generated prime numbers with bitlength nBits.
     Stops after the generation of k prime numbers.
@@ -104,7 +102,7 @@ def randomPrime(nBits: int = 512,
 
         if Verbose:
             print("Found !")
-        
+
         return maybe
 
     maybe = find(Verbose)
@@ -126,9 +124,9 @@ def randomPrime(nBits: int = 512,
     return primes
 
 
-def safePrime(nBits: int = 1024,
-              randomFunction=xorshiftperso,
-              easyGenerator: bool = False):
+def safePrime(
+    nBits: int = 1024, randomFunction=xorshiftperso, easyGenerator: bool = False
+):
     """
     The number 2p + 1 associated with a Sophie Germain prime is called a safe prime.
     In number theory, a prime number p is a Sophie Germain prime if 2p + 1 is also prime
@@ -156,12 +154,14 @@ def safePrime(nBits: int = 1024,
     poule = Pool(c)
     signal.signal(signal.SIGINT, original_sigint_handler)
 
-    flag = manager.Value('i', 0)  # Can be shared between processes.
+    flag = manager.Value("i", 0)  # Can be shared between processes.
 
     return_list = manager.list([])
 
-    data = [(nBits, randomFunction, easyGenerator, False, flag, return_list)
-            for _ in range(c)]
+    data = [
+        (nBits, randomFunction, easyGenerator, False, flag, return_list)
+        for _ in range(c)
+    ]
 
     # Permit to quit safe prime generation with exit signal
     try:
@@ -175,21 +175,23 @@ def safePrime(nBits: int = 1024,
     return list(return_list)[0]
 
 
-def safePrime_worker(nBits: int = 1024,
-                     randomFunction=None,
-                     easyGenerator: bool = False,
-                     Verbose: bool = False,
-                     flag=None,
-                     returnL: list = []):
-    '''
-        Function executed on each process for safe prime generation
-    '''
+def safePrime_worker(
+    nBits: int = 1024,
+    randomFunction=None,
+    easyGenerator: bool = False,
+    Verbose: bool = False,
+    flag=None,
+    returnL: list = [],
+):
+    """
+    Function executed on each process for safe prime generation
+    """
 
     import ressources.interactions as it
     from multiprocessing import Manager
 
     if not flag:
-        flag = Manager().Value('i', 0)
+        flag = Manager().Value("i", 0)
 
     if easyGenerator:
         if Verbose:

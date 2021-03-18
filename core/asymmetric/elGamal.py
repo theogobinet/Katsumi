@@ -67,7 +67,7 @@ def isEasyGeneratorPossible(s: tuple):
 
     # Control if easy generator is possible
     def p_filter(to_be_filtered: int):
-        return (p % 3 == 2 and (p % 12 == 1 or p % 12 == 11))
+        return p % 3 == 2 and (p % 12 == 1 or p % 12 == 11)
 
     p, _ = s
 
@@ -84,12 +84,14 @@ def isEasyGeneratorPossible(s: tuple):
 #############################################
 
 
-def key_gen(n: int = 2048,
-            primeFount=True,
-            easyGenerator: bool = False,
-            randomFunction=None,
-            saving=False,
-            Verbose=False) -> tuple:
+def key_gen(
+    n: int = 2048,
+    primeFount=True,
+    easyGenerator: bool = False,
+    randomFunction=None,
+    saving=False,
+    Verbose=False,
+) -> tuple:
     """
     ElGamal key generation.
 
@@ -151,8 +153,9 @@ def key_gen(n: int = 2048,
     private_key = (p, gen, x)
 
     if saving:
-        it.writeKeytoFile(private_key, "private_key",
-                          config.DIRECTORY_PROCESSING, ".kpk")
+        it.writeKeytoFile(
+            private_key, "private_key", config.DIRECTORY_PROCESSING, ".kpk"
+        )
 
     if Verbose:
         print("\nYour private key has been generated Alice, keep it safe !")
@@ -163,8 +166,9 @@ def key_gen(n: int = 2048,
     public_key = (p, gen, h)
 
     if saving:
-        public_key = it.writeKeytoFile(public_key, "public_key",
-                                       config.DIRECTORY_PROCESSING, ".kpk")
+        public_key = it.writeKeytoFile(
+            public_key, "public_key", config.DIRECTORY_PROCESSING, ".kpk"
+        )
 
     if Verbose:
         print("\nThe public key has been generated too: ", end="")
@@ -214,8 +218,7 @@ def encrypt(M: bytes, publicKey, saving: bool = False):
         e = [process(bm.bytes_to_int(elt)) for elt in bm.splitBytes(M, size)]
 
     if saving:
-        e = it.writeKeytoFile(e, "encrypted", config.DIRECTORY_PROCESSING,
-                              ".kat")
+        e = it.writeKeytoFile(e, "encrypted", config.DIRECTORY_PROCESSING, ".kat")
 
     return e
 
@@ -254,7 +257,7 @@ def decrypt(c, privateKey: tuple, asTxt=False):
 
     if asTxt:
         return r.decode()
-    
+
     return r
 
 
@@ -263,10 +266,9 @@ def decrypt(c, privateKey: tuple, asTxt=False):
 #############################################################
 
 
-def signing(M: bytes,
-            privateK: tuple = None,
-            saving: bool = False,
-            Verbose: bool = False):
+def signing(
+    M: bytes, privateK: tuple = None, saving: bool = False, Verbose: bool = False
+):
     """
     Signing a message M (bytes).
     """
@@ -316,7 +318,7 @@ def signing(M: bytes,
         if Verbose:
             print("Unlikely, s2 is equal to 0. Restart signing...")
         signing(M, privateK, saving, Verbose)
-        
+
     else:
         sign = (s1, s2)
 
@@ -350,9 +352,11 @@ def verifying(M: bytes, sign: tuple, publicKey: tuple = None):
 
     s1, s2 = sign
 
-    if ((0 < s1 < p) and (0 < s2 < p - 1)):
+    if (0 < s1 < p) and (0 < s2 < p - 1):
 
-        test1 = (ut.square_and_multiply(h, s1, p) * ut.square_and_multiply(s1, s2, p)) % p
+        test1 = (
+            ut.square_and_multiply(h, s1, p) * ut.square_and_multiply(s1, s2, p)
+        ) % p
         test2 = ut.square_and_multiply(g, hm, p)
 
         if test1 == test2:
@@ -372,6 +376,7 @@ def delog(publicKey, encrypted=None, asTxt=False, method=1):
     Retrieve private key with publicKey.
     And if you get the encrypted message, thus you can decrypt them.
     """
+
     def dlog_get_x(publicKey):
         """
         Find private key using discrete logarithmic method.

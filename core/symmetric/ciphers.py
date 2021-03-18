@@ -50,7 +50,7 @@ def cipher(arr, method=3, encrypt=True, aad=""):
 def run(data, inFile="", encrypt=False, method=3, aad="", key=config.KEY):
     """
     Run encryption of decryption.
-    
+
     data: file name with extension
     encrypt: False to decrypte
     method: Block cyphering method
@@ -67,7 +67,7 @@ def run(data, inFile="", encrypt=False, method=3, aad="", key=config.KEY):
     # Keys initialisation
     kasu.set_key(key)
 
-    if (len(data) > 0):
+    if len(data) > 0:
         splitted = bm.splitBytes(data)
         ciphered = cipher(splitted, method, encrypt, aad)
 
@@ -85,8 +85,7 @@ def ECB(arr, encrypt=True):
 
     for i, elt in enumerate(arr):
 
-        config.WATCH_PERCENTAGE = ((len(arr) -
-                                    (len(arr) - i)) / len(arr)) * 100
+        config.WATCH_PERCENTAGE = ((len(arr) - (len(arr) - i)) / len(arr)) * 100
         exTime = time.time()
 
         res.append(kasu.kasumi(elt, encrypt))
@@ -116,8 +115,7 @@ def CBC(arr, encrypt=True):
 
     for i, message in enumerate(arr):
 
-        config.WATCH_PERCENTAGE = ((len(arr) -
-                                    (len(arr) - i)) / len(arr)) * 100
+        config.WATCH_PERCENTAGE = ((len(arr) - (len(arr) - i)) / len(arr)) * 100
         exTime = time.time()
 
         if i == 0:
@@ -130,8 +128,7 @@ def CBC(arr, encrypt=True):
             if encrypt:
                 res.append(kasu.kasumi(bm.b_op(res[i - 1], message, "XOR")))
             else:
-                res.append(
-                    bm.b_op(kasu.kasumi(message, False), arr[i - 1], "XOR"))
+                res.append(bm.b_op(kasu.kasumi(message, False), arr[i - 1], "XOR"))
 
         config.WATCH_GLOBAL_CIPHER += time.time() - exTime
         config.WATCH_BLOC_CIPHER = config.WATCH_GLOBAL_CIPHER / (i + 1)
@@ -142,6 +139,7 @@ def CBC(arr, encrypt=True):
         IV_action(res, iv, "store")
 
     return res
+
 
 #################################################
 ###### Propagating cipher block chaining ########
@@ -161,8 +159,7 @@ def PCBC(arr, encrypt=True):
 
     for i, message in enumerate(arr):
 
-        config.WATCH_PERCENTAGE = ((len(arr) -
-                                    (len(arr) - i)) / len(arr)) * 100
+        config.WATCH_PERCENTAGE = ((len(arr) - (len(arr) - i)) / len(arr)) * 100
         exTime = time.time()
 
         if i == 0:
@@ -201,12 +198,12 @@ def PCBC(arr, encrypt=True):
 
 
 def CTR(arr, encrypt=True):
-    '''
+    """
     Counter Mode is xoring the message with a encrypted counter (IV + incr(0))
 
     arr: array of bytearray of 8 bytes of data to encrypt/decrypt
     encrypt: true to encrypt
-    '''
+    """
 
     if encrypt:
         iv = IV(arr)
@@ -217,8 +214,7 @@ def CTR(arr, encrypt=True):
 
     for i, message in enumerate(arr):
 
-        config.WATCH_PERCENTAGE = ((len(arr) -
-                                    (len(arr) - i)) / len(arr)) * 100
+        config.WATCH_PERCENTAGE = ((len(arr) - (len(arr) - i)) / len(arr)) * 100
         exTime = time.time()
 
         noc = bm.b_op(iv, (i + 1).to_bytes(8, "big"), "XOR")
@@ -246,13 +242,13 @@ def CTR(arr, encrypt=True):
 
 
 def GCM(arr, encrypt=True, aad=""):
-    '''
+    """
     GCM is CTR mode with authentification of additional data (AAD) authenticated with multiplication in a Galois Field
 
     arr: array of bytearray of 8 bytes of data to encrypt/decrypt
     encrypt: boolean, true to encypt
     aad: string of additional authenticated data
-    '''
+    """
 
     if encrypt:
         iv = IV(arr)
@@ -265,7 +261,7 @@ def GCM(arr, encrypt=True, aad=""):
     A = []
 
     if encrypt:
-        if (aad != ""):
+        if aad != "":
             aadc = aad.encode()
 
             if len(aadc) > 1 << 64:
@@ -283,8 +279,7 @@ def GCM(arr, encrypt=True, aad=""):
     C = []
 
     # 1 + α + α3 + α4 + α64 - 64 field polynomial
-    p = int(
-        "10000000000000000000000000000000000000000000000000000000000001111", 2)
+    p = int("10000000000000000000000000000000000000000000000000000000000001111", 2)
 
     def bti(b):
         return int.from_bytes(b, "big")
@@ -300,19 +295,25 @@ def GCM(arr, encrypt=True, aad=""):
             # A1 = A[1-1]
             return gz2.poly_mult_mod_2(bti(bm.b_op(X, A[i - 1], "XOR")), H, p)
         elif i <= m + n:
-            return gz2.poly_mult_mod_2(bti(bm.b_op(X, C[i - m - 1], "XOR")), H,
-                                       p)
+            return gz2.poly_mult_mod_2(bti(bm.b_op(X, C[i - m - 1], "XOR")), H, p)
         elif i == m + n + 1:
             return gz2.poly_mult_mod_2(
                 bti(
                     bm.b_op(
-                        gz2.poly_mult_mod_2(bti(bm.b_op(X, lenb(A), "XOR")), H,
-                                            p).to_bytes(8, "big"), lenb(C),
-                        "XOR")), H, p)
+                        gz2.poly_mult_mod_2(
+                            bti(bm.b_op(X, lenb(A), "XOR")), H, p
+                        ).to_bytes(8, "big"),
+                        lenb(C),
+                        "XOR",
+                    )
+                ),
+                H,
+                p,
+            )
 
-    H = bti(kasu.kasumi(b'\x00' * 8))
+    H = bti(kasu.kasumi(b"\x00" * 8))
 
-    Y = GHASH64(H, b'', [iv], b'\x00', 1).to_bytes(8, "big")
+    Y = GHASH64(H, b"", [iv], b"\x00", 1).to_bytes(8, "big")
     E0 = kasu.kasumi(Y)
 
     n = len(arr)
@@ -320,13 +321,13 @@ def GCM(arr, encrypt=True, aad=""):
 
     # equivalent of CTR mode
     for i in range(n):
-        config.WATCH_PERCENTAGE = (((n * 2 + m + 1) - ((n * 2 + m + 1) - i)) /
-                                   (n * 2 + m + 1)) * 100
+        config.WATCH_PERCENTAGE = (
+            ((n * 2 + m + 1) - ((n * 2 + m + 1) - i)) / (n * 2 + m + 1)
+        ) * 100
         exTime = time.time()
 
         # treats the rightmost 32bits of its argument as a nonnegative integer with the least significant bit on the right, and increments this value modulo 2^32
-        Y = Y[:4] + (
-            (int.from_bytes(Y[-4:], "big") + 1) % 1 << 32).to_bytes(4, "big")
+        Y = Y[:4] + ((int.from_bytes(Y[-4:], "big") + 1) % 1 << 32).to_bytes(4, "big")
         E = kasu.kasumi(Y)
 
         C.append(bm.b_op(arr[i], E, "XOR"))
@@ -342,12 +343,12 @@ def GCM(arr, encrypt=True, aad=""):
         C = arr
 
     # first init of X = GHASH64(i=0) = b'\x00'
-    X = b'\x00'
+    X = b"\x00"
 
     for i in range(n + m + 1):
-        config.WATCH_PERCENTAGE = (((n * 2 + m + 1) - ((n * 2 + m + 1) -
-                                                       (i + n))) /
-                                   (n * 2 + m + 1)) * 100
+        config.WATCH_PERCENTAGE = (
+            ((n * 2 + m + 1) - ((n * 2 + m + 1) - (i + n))) / (n * 2 + m + 1)
+        ) * 100
         exTime = time.time()
 
         X = GHASH64(H, A, C, X, i + 1).to_bytes(8, "big")
@@ -375,9 +376,9 @@ def GCM(arr, encrypt=True, aad=""):
 
 
 #################### Initialization Vector #################################
-#https://en.wikipedia.org/wiki/Initialization_vector#Block_ciphers
-#https://www.cryptofails.com/post/70059609995/crypto-noobs-1-initialization-vectors
-#https://defuse.ca/cbcmodeiv.htm
+# https://en.wikipedia.org/wiki/Initialization_vector#Block_ciphers
+# https://www.cryptofails.com/post/70059609995/crypto-noobs-1-initialization-vectors
+# https://defuse.ca/cbcmodeiv.htm
 ############################################################################
 
 
@@ -397,12 +398,13 @@ def IV_action(arr, iv=None, action="extract"):
 def IV(arr, key="y/B?E(H+MbQeThVm".encode()):
     """
     The IV must, in addition to being unique, be unpredictable at encryption time.
-    
+
     Return a 8 bytes array.
     """
 
     # Select a random encrypted message as initial vector to transform.
     import secrets as sr
+
     r1 = sr.randbelow(len(arr))
     r2 = sr.randbits(8)
     message = bm.bytes_to_int(arr[r1]) ^ r2

@@ -13,10 +13,10 @@ import time
 
 
 def set_key(km=config.KEY):
-    '''Kasumi's keyscheduler.'''
+    """Kasumi's keyscheduler."""
 
     # Chosen as a "nothing up my sleeve" number
-    nums = b'\x124Vx\x9a\xbc\xde\xff\xed\xcb\xa9\x87eC!\x00'
+    nums = b"\x124Vx\x9a\xbc\xde\xff\xed\xcb\xa9\x87eC!\x00"
 
     # Additionally a modified key K', similarly divided into 16-bit sub keys K'i, is used.
     kp = bm.b_op(km, nums, "XOR")
@@ -24,21 +24,16 @@ def set_key(km=config.KEY):
     # The 128-bit key K is divided into eight 16-bit sub keys Ki
     skm, skp = bm.splitBytes(km, 2), bm.splitBytes(kp, 2)
 
-    config.KL1 = [
-        bytearray(bm.circularRotation(skm[x], 0, 1)) for x in range(0, 8)
-    ]
+    config.KL1 = [bytearray(bm.circularRotation(skm[x], 0, 1)) for x in range(0, 8)]
     config.KL2 = [skp[(x + 2) % 8] for x in range(0, 8)]
     config.KO1 = [
-        bytearray(bm.circularRotation(skm[(x + 1) % 8], 0, 5))
-        for x in range(0, 8)
+        bytearray(bm.circularRotation(skm[(x + 1) % 8], 0, 5)) for x in range(0, 8)
     ]
     config.KO2 = [
-        bytearray(bm.circularRotation(skm[(x + 5) % 8], 0, 8))
-        for x in range(0, 8)
+        bytearray(bm.circularRotation(skm[(x + 5) % 8], 0, 8)) for x in range(0, 8)
     ]
     config.KO3 = [
-        bytearray(bm.circularRotation(skm[(x + 6) % 8], 0, 13))
-        for x in range(0, 8)
+        bytearray(bm.circularRotation(skm[(x + 6) % 8], 0, 13)) for x in range(0, 8)
     ]
     config.KI1 = [skp[(x + 4) % 8] for x in range(0, 8)]
     config.KI2 = [skp[(x + 3) % 8] for x in range(0, 8)]
@@ -52,7 +47,7 @@ def set_key(km=config.KEY):
 ############### Algorithm #######################
 #################################################
 def kasumi(arr, encrypt=True):
-    if (len(arr) > 8):
+    if len(arr) > 8:
         raise ValueError("Error: Kasumi takes 64 bits as 8 bytes array in input")
 
     config.WATCH_KASUMI_NUMBER += 1
@@ -72,7 +67,7 @@ def kasumi(arr, encrypt=True):
         KL = [config.KL1[i], config.KL2[i]]
         lp = left
 
-        if (i % 2 == 0):
+        if i % 2 == 0:
             left = FL(KL, FO(KO, KI, left))
         else:
             left = FO(KO, KI, FL(KL, left))
@@ -90,7 +85,7 @@ def kasumi(arr, encrypt=True):
 #######
 def FL(pKL, arr):
 
-    if (len(arr) != 4):
+    if len(arr) != 4:
         raise ValueError("FL takes 32 bits as 4 bytes array in input")
 
     arr = bm.splitBytes(arr, 2)
@@ -112,7 +107,7 @@ def FL(pKL, arr):
 #######
 def FO(pKO, pKI, arr):
 
-    if (len(arr) != 4):
+    if len(arr) != 4:
         raise ValueError("FO takes 32 bits as 4 bytes array in input")
 
     arr = bm.splitBytes(arr, 2)
@@ -121,8 +116,7 @@ def FO(pKO, pKI, arr):
 
     for i in range(0, 3):
         left = right
-        right = bm.b_op(right, FI(bm.b_op(left, pKO[i], "XOR"), pKI[i]),
-                        "XOR")
+        right = bm.b_op(right, FI(bm.b_op(left, pKO[i], "XOR"), pKI[i]), "XOR")
 
     return left + right
 

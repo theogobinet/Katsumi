@@ -11,15 +11,14 @@ def inv(a: int, m: int, Verbose: bool = False):
     If a and m are prime to each other, then there is an a^(-1) such that a^(-1) * a is congruent to 1 mod m.
     """
 
-    # Error raising 
+    # Error raising
 
     if ut.euclid(a, m) != 1:
         if Verbose:
             print(
                 f"gcd({a}, {m}) = {ut.euclid(a, m)} != 1 thus you cannot get an invert of {a}."
             )
-        raise ValueError(
-            f"gcd({a}, {m}) != 1 thus you cannot get an invert of {a}.")
+        raise ValueError(f"gcd({a}, {m}) != 1 thus you cannot get an invert of {a}.")
         # a modular multiplicative inverse can be found directly
 
     if a == 0:
@@ -41,7 +40,7 @@ def inv(a: int, m: int, Verbose: bool = False):
         u = ut.square_and_multiply(a, m - 2, m)
 
     elif ut.coprime(a, m) and m < (1 << 20):
-        #From Euler's theorem, if a and n are coprime, then a^−1 ≡ a^(φ(n) − 1) (mod n).
+        # From Euler's theorem, if a and n are coprime, then a^−1 ≡ a^(φ(n) − 1) (mod n).
         if Verbose:
             print(
                 f"From Euler's theorem, because {a} and {m} are coprime -> {a}^-1 = {a}^(phi({m})-1) mod {m}"
@@ -87,8 +86,11 @@ def phi(n: int, m: int = 1, k: int = 1, Verbose: bool = False):
         if Verbose:
             print(f"gcd({n}, {m}) = {d}")
             print(f"phi({n})*phi({m})*({d}/phi({d}))")
-        return phi(n, 1, k, Verbose) * phi(m, 1, k, Verbose) * int(
-            (d / phi(d, 1, k, Verbose)))
+        return (
+            phi(n, 1, k, Verbose)
+            * phi(m, 1, k, Verbose)
+            * int((d / phi(d, 1, k, Verbose)))
+        )
 
     if k != 1:
         # phi(n^k) = n ^(k-1) * phi(n)
@@ -104,16 +106,152 @@ def phi(n: int, m: int = 1, k: int = 1, Verbose: bool = False):
     if n >= 0 and n <= 123:
         # Fastest results for common totients (sequence A000010 in the OEIS)
         totients = [
-            0, 1, 1, 2, 2, 4, 2, 6, 4, 6, 4, 10, 4, 12, 6, 8, 8, 16, 6, 18,
-            8, 12, 10, 22, 8, 20, 12, 18, 12, 28, 8, 30, 16, 20, 16, 24,
-            12, 36, 18, 24, 16, 40, 12, 42, 20, 24, 22, 46, 16, 42, 20, 32,
-            24, 52, 18, 40, 24, 36, 28, 58, 16, 60, 30, 36, 32, 48, 20, 66,
-            32, 44, 24, 70, 24, 72, 36, 40, 36, 60, 24, 78, 32, 54, 40, 82,
-            24, 64, 42, 56, 40, 88, 24, 72, 44, 60, 46, 72, 32, 96, 42, 60,
-            40, 100, 32, 102, 48, 48, 52, 106, 36, 108, 40, 72, 48, 112,
-            36, 88, 56, 72, 58, 96, 32, 110, 60, 80, 60, 100, 36, 126, 64,
-            84, 48, 130, 40, 108, 66, 72, 64, 136, 44, 138, 44, 138, 48,
-            92, 70, 120
+            0,
+            1,
+            1,
+            2,
+            2,
+            4,
+            2,
+            6,
+            4,
+            6,
+            4,
+            10,
+            4,
+            12,
+            6,
+            8,
+            8,
+            16,
+            6,
+            18,
+            8,
+            12,
+            10,
+            22,
+            8,
+            20,
+            12,
+            18,
+            12,
+            28,
+            8,
+            30,
+            16,
+            20,
+            16,
+            24,
+            12,
+            36,
+            18,
+            24,
+            16,
+            40,
+            12,
+            42,
+            20,
+            24,
+            22,
+            46,
+            16,
+            42,
+            20,
+            32,
+            24,
+            52,
+            18,
+            40,
+            24,
+            36,
+            28,
+            58,
+            16,
+            60,
+            30,
+            36,
+            32,
+            48,
+            20,
+            66,
+            32,
+            44,
+            24,
+            70,
+            24,
+            72,
+            36,
+            40,
+            36,
+            60,
+            24,
+            78,
+            32,
+            54,
+            40,
+            82,
+            24,
+            64,
+            42,
+            56,
+            40,
+            88,
+            24,
+            72,
+            44,
+            60,
+            46,
+            72,
+            32,
+            96,
+            42,
+            60,
+            40,
+            100,
+            32,
+            102,
+            48,
+            48,
+            52,
+            106,
+            36,
+            108,
+            40,
+            72,
+            48,
+            112,
+            36,
+            88,
+            56,
+            72,
+            58,
+            96,
+            32,
+            110,
+            60,
+            80,
+            60,
+            100,
+            36,
+            126,
+            64,
+            84,
+            48,
+            130,
+            40,
+            108,
+            66,
+            72,
+            64,
+            136,
+            44,
+            138,
+            44,
+            138,
+            48,
+            92,
+            70,
+            120,
         ]
 
         r = totients[n]
@@ -130,7 +268,7 @@ def phi(n: int, m: int = 1, k: int = 1, Verbose: bool = False):
         if Verbose:
             print(f"\n{n} is a prime number so phi(p) = (p-1)")
 
-        return (n - 1)
+        return n - 1
 
     # If even:
     if not twoN & 1:
@@ -154,10 +292,9 @@ def phi(n: int, m: int = 1, k: int = 1, Verbose: bool = False):
     return tot
 
 
-def multiplicativeOrder(n: int,
-                        p: int,
-                        iterativeWay: bool = False,
-                        Verbose: bool = False):
+def multiplicativeOrder(
+    n: int, p: int, iterativeWay: bool = False, Verbose: bool = False
+):
     """
     Returns the multiplicative order of n mod p.
 
@@ -175,9 +312,7 @@ def multiplicativeOrder(n: int,
             print(
                 f"\nBy the Chinese Remainder Theorem, it's enough to calculate the multiplicative order for each prime exponent p^k of {p}, "
             )
-            print(
-                "and combine the results with the least common multiple operation."
-            )
+            print("and combine the results with the least common multiple operation.")
 
         from functools import reduce
 
@@ -192,7 +327,7 @@ def multiplicativeOrder(n: int,
             qs = [1]
 
             for elt, exp in ut.findPrimeFactors(totient, True).items():
-                qs = [q * (elt**j) for j in range(1 + exp) for q in qs]
+                qs = [q * (elt ** j) for j in range(1 + exp) for q in qs]
 
             qs.sort()
 
@@ -201,6 +336,7 @@ def multiplicativeOrder(n: int,
                     break
 
             return q
+
         # embedded function #
         pf = ut.findPrimeFactors(p, True)
 
@@ -245,7 +381,7 @@ def congruenceClasses(e: int):
 
 
 def primitiveRoot(n: int, totient=None, Verbose: bool = False):
-    """ 
+    """
     Returns primitive root modulo n.
 
     https://en.wikipedia.org/wiki/Fermat%27s_little_theorem
@@ -280,7 +416,10 @@ def primitiveRoot(n: int, totient=None, Verbose: bool = False):
                     "To verify if g is a generator, you have to verify than g^2 and g^q are differents from 1."
                 )
 
-            while 1 in [ut.square_and_multiply(g, 2, n), ut.square_and_multiply(g, q, n)]:
+            while 1 in [
+                ut.square_and_multiply(g, 2, n),
+                ut.square_and_multiply(g, q, n),
+            ]:
                 g = rd.randrange(2, n)
 
             if Verbose:
@@ -296,9 +435,7 @@ def primitiveRoot(n: int, totient=None, Verbose: bool = False):
             if Verbose:
                 print("\n-----------------------------")
                 print(f"{n} is prime and prime factors of totient are: {s} ")
-                print(
-                    f"Computing all g^(phi({n})/p_i) mod {n} with p_i prime factors."
-                )
+                print(f"Computing all g^(phi({n})/p_i) mod {n} with p_i prime factors.")
                 print(
                     "If all the calculated values are different from 1, then g is a primitive root."
                 )
@@ -390,7 +527,7 @@ def reducedResidueSystem(n: int, g: int = None, Verbose: bool = False):
 
 def findOtherGenerators(gen: int, mod: int, Verbose=False):
     """
-    In a cyclic group of order n, with generator a, all subgroups are cyclic, generated (by definition) by some a^k, 
+    In a cyclic group of order n, with generator a, all subgroups are cyclic, generated (by definition) by some a^k,
     and the order of a^k is equal to (n/gcd(n, k)).
 
     Therefore a^k mod n is another generator of the group if and only if k is coprime to n.
@@ -413,20 +550,20 @@ def findOtherGenerators(gen: int, mod: int, Verbose=False):
         )
 
     return list(
-        set([
-            ut.square_and_multiply(gen, e, mod)
-            for e in congruenceClasses(totient)
-        ]))
+        set([ut.square_and_multiply(gen, e, mod) for e in congruenceClasses(totient)])
+    )
 
 
-def isGenerator(e: int,
-                n: int,
-                lagrangeWay: bool = True,
-                printOther: bool = False,
-                Verbose: bool = False):
+def isGenerator(
+    e: int,
+    n: int,
+    lagrangeWay: bool = True,
+    printOther: bool = False,
+    Verbose: bool = False,
+):
     """
     Returns whether an element e is generator of Zn.
-    A unit g ∈ Zn* is called a generator or primitive root of Zn* if for every a ∈ Zn* we have g^k = a for some integer k. 
+    A unit g ∈ Zn* is called a generator or primitive root of Zn* if for every a ∈ Zn* we have g^k = a for some integer k.
     In other words, if we start with g, and keep multiplying by g eventually we see every element.
     By definition, g is a generator of Zn* if and only if that cycling does not occur before these n−1 iterations.
 
@@ -472,7 +609,7 @@ def isGenerator(e: int,
             if Verbose:
                 print(f"\n{e}^{i} = {t} mod {n}")
 
-            #if cycling occurs
+            # if cycling occurs
             if t == 1 and t in elements:
                 return False
 
@@ -481,17 +618,13 @@ def isGenerator(e: int,
         if printOther:
             if Verbose:
                 print(f"There are {phi(phi(n))} generators in Z{n}.")
-                print(
-                    f"{e} is the a generator of Z{n} with elements: {elements}\n"
-                )
+                print(f"{e} is the a generator of Z{n} with elements: {elements}\n")
 
             return True, findOtherGenerators(e, n, Verbose)
 
         if Verbose:
             print(f"There are {phi(phi(n))} generators in Z{n}.")
-            print(
-                f"{e} is the a generator of Z{n} with elements: {elements}\n"
-            )
+            print(f"{e} is the a generator of Z{n} with elements: {elements}\n")
 
         return True
 
@@ -503,19 +636,17 @@ def isGenerator(e: int,
         L = ut.findPrimeFactors(n - 1)
 
         if Verbose:
-            print(
-                f"{e} doesn't divide {n}, let's check if {e}^k mod {n} != 1."
-            )
+            print(f"{e} doesn't divide {n}, let's check if {e}^k mod {n} != 1.")
             print(
                 f"With k = ({n} -1 ) / q for q each of prime factors of {n}-1 ( = {L})."
             )
 
         for k in L:
             t = ut.square_and_multiply(e, k, n)
-            
+
             if Verbose:
                 print(f"\n{e}^{k} = {t} mod {n}")
-            
+
             if t == 1:
                 return False
 
@@ -536,21 +667,20 @@ def carmichaelFunction(n):
 
     https://mathworld.wolfram.com/CarmichaelFunction.html
     """
-    return max(
-        multiplicativeOrder(a, n) for a in range(n + 1) if ut.coprime(a, n))
+    return max(multiplicativeOrder(a, n) for a in range(n + 1) if ut.coprime(a, n))
 
 
 def quadraticsResidues(n: int, sortedList=True):
     """
     For a given n a list of the quadratic residues modulo n may be obtained by simply squaring the numbers 0, 1, ..., n − 1.
-    Because a2 ≡ (n − a)2 (mod n), the list of squares modulo n is symmetrical around n/2, and the list only needs to go that high. 
-    
+    Because a2 ≡ (n − a)2 (mod n), the list of squares modulo n is symmetrical around n/2, and the list only needs to go that high.
+
     N.B: 0 and 1 are always quadratics residues by definition.
     """
 
     if sortedList:
         return sorted(set([ut.square_and_multiply(e, 2, n) for e in range(n)]))
-    
+
     return [ut.square_and_multiply(e, 2, n) for e in range(n)]
 
 
