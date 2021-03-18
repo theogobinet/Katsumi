@@ -15,17 +15,13 @@ def inv(a: int, m: int, Verbose: bool = False):
 
     if ut.euclid(a, m) != 1:
         if Verbose:
-            print(
-                f"gcd({a}, {m}) = {ut.euclid(a, m)} != 1 thus you cannot get an invert of {a}."
-            )
+            print(f"gcd({a}, {m}) = {ut.euclid(a, m)} != 1 thus you cannot get an invert of {a}.")
         raise ValueError(f"gcd({a}, {m}) != 1 thus you cannot get an invert of {a}.")
         # a modular multiplicative inverse can be found directly
 
     if a == 0:
         if Verbose:
-            print(
-                "a = 0 and 0 cannot have multiplicative inverse ( 0 * nothing = 1 ) ."
-            )
+            print("a = 0 and 0 cannot have multiplicative inverse ( 0 * nothing = 1 ) .")
         raise ValueError("0 cannot have multiplicative inverse.")
 
     # Next
@@ -34,25 +30,19 @@ def inv(a: int, m: int, Verbose: bool = False):
         # A simple consequence of Fermat's little theorem is that if p is prime and does not divide a
         # then a^−1 ≡ a^(p − 2) (mod p) is the multiplicative
         if Verbose:
-            print(
-                f"From Fermat's little theorem, because {m} is prime and does not divide {a} so: {a}^-1 = {a}^({m}-2) mod {m}"
-            )
+            print(f"From Fermat's little theorem, because {m} is prime and does not divide {a} so: {a}^-1 = {a}^({m}-2) mod {m}")
         u = ut.square_and_multiply(a, m - 2, m)
 
     elif ut.coprime(a, m) and m < (1 << 20):
         # From Euler's theorem, if a and n are coprime, then a^−1 ≡ a^(φ(n) − 1) (mod n).
         if Verbose:
-            print(
-                f"From Euler's theorem, because {a} and {m} are coprime -> {a}^-1 = {a}^(phi({m})-1) mod {m}"
-            )
+            print(f"From Euler's theorem, because {a} and {m} are coprime -> {a}^-1 = {a}^(phi({m})-1) mod {m}")
 
         u = ut.square_and_multiply(a, phi(m, 1, 1, Verbose) - 1, m)
 
     else:
         if Verbose:
-            print(
-                "Modular inverse u solves the given equation: a.u+m.v=1.\n Let's use the euclid extended algorithm tho."
-            )
+            print("Modular inverse u solves the given equation: a.u+m.v=1.\n Let's use the euclid extended algorithm tho.")
 
         # Modular inverse u solves the given equation: a.u+m.v=1
         # n number of iterations
@@ -86,11 +76,7 @@ def phi(n: int, m: int = 1, k: int = 1, Verbose: bool = False):
         if Verbose:
             print(f"gcd({n}, {m}) = {d}")
             print(f"phi({n})*phi({m})*({d}/phi({d}))")
-        return (
-            phi(n, 1, k, Verbose)
-            * phi(m, 1, k, Verbose)
-            * int((d / phi(d, 1, k, Verbose)))
-        )
+        return phi(n, 1, k, Verbose) * phi(m, 1, k, Verbose) * int((d / phi(d, 1, k, Verbose)))
 
     if k != 1:
         # phi(n^k) = n ^(k-1) * phi(n)
@@ -292,9 +278,7 @@ def phi(n: int, m: int = 1, k: int = 1, Verbose: bool = False):
     return tot
 
 
-def multiplicativeOrder(
-    n: int, p: int, iterativeWay: bool = False, Verbose: bool = False
-):
+def multiplicativeOrder(n: int, p: int, iterativeWay: bool = False, Verbose: bool = False):
     """
     Returns the multiplicative order of n mod p.
 
@@ -309,9 +293,7 @@ def multiplicativeOrder(
 
     if not iterativeWay:
         if Verbose:
-            print(
-                f"\nBy the Chinese Remainder Theorem, it's enough to calculate the multiplicative order for each prime exponent p^k of {p}, "
-            )
+            print(f"\nBy the Chinese Remainder Theorem, it's enough to calculate the multiplicative order for each prime exponent p^k of {p}, ")
             print("and combine the results with the least common multiple operation.")
 
         from functools import reduce
@@ -412,9 +394,7 @@ def primitiveRoot(n: int, totient=None, Verbose: bool = False):
             g = rd.randrange(2, n)
 
             if Verbose:
-                print(
-                    "To verify if g is a generator, you have to verify than g^2 and g^q are differents from 1."
-                )
+                print("To verify if g is a generator, you have to verify than g^2 and g^q are differents from 1.")
 
             while 1 in [
                 ut.square_and_multiply(g, 2, n),
@@ -436,9 +416,7 @@ def primitiveRoot(n: int, totient=None, Verbose: bool = False):
                 print("\n-----------------------------")
                 print(f"{n} is prime and prime factors of totient are: {s} ")
                 print(f"Computing all g^(phi({n})/p_i) mod {n} with p_i prime factors.")
-                print(
-                    "If all the calculated values are different from 1, then g is a primitive root."
-                )
+                print("If all the calculated values are different from 1, then g is a primitive root.")
                 print("-----------------------------")
 
             for e in range(2, totient + 1):
@@ -465,9 +443,7 @@ def primitiveRoot(n: int, totient=None, Verbose: bool = False):
             return -1
     else:
         if Verbose:
-            print(
-                f"\nAccording to Euler's theorem, a is a primitive root mod {n} if and only if the multiplicative order of a is ϕ(n) = {totient}."
-            )
+            print(f"\nAccording to Euler's theorem, a is a primitive root mod {n} if and only if the multiplicative order of a is ϕ(n) = {totient}.")
 
         for e in range(1, n):
             o = multiplicativeOrder(e, n, Verbose)
@@ -482,9 +458,7 @@ def primitiveRoot(n: int, totient=None, Verbose: bool = False):
 
         # If no primitive root found
         if Verbose:
-            print(
-                f"Since there is no number whose order is {totient}, there are no pritive roots modulo {n}."
-            )
+            print(f"Since there is no number whose order is {totient}, there are no pritive roots modulo {n}.")
         return -1
 
 
@@ -539,19 +513,11 @@ def findOtherGenerators(gen: int, mod: int, Verbose=False):
     totient = phi(mod, 1, 1, Verbose)
 
     if Verbose:
-        print(
-            f"\nBased on the fact that {gen} is a generator of Z{mod}, the generators are {gen}^k with gcd(phi({mod}), k) = 1. "
-        )
-        print(
-            f"Therefore the generators of Z{mod} are {gen}^k for k coprime with {totient}."
-        )
-        print(
-            f"Or you can say: {gen}^k (with k elements from congruences classes of {totient}) are generators of Z{mod}."
-        )
+        print(f"\nBased on the fact that {gen} is a generator of Z{mod}, the generators are {gen}^k with gcd(phi({mod}), k) = 1. ")
+        print(f"Therefore the generators of Z{mod} are {gen}^k for k coprime with {totient}.")
+        print(f"Or you can say: {gen}^k (with k elements from congruences classes of {totient}) are generators of Z{mod}.")
 
-    return list(
-        set([ut.square_and_multiply(gen, e, mod) for e in congruenceClasses(totient)])
-    )
+    return list(set([ut.square_and_multiply(gen, e, mod) for e in congruenceClasses(totient)]))
 
 
 def isGenerator(
@@ -578,9 +544,7 @@ def isGenerator(
         order = multiplicativeOrder(e, n, False, Verbose)
 
         if Verbose:
-            print(
-                f"\nIf phi({n}) is equal to mutliplicative order of {e} modulo {n} then it's a generator of {n}."
-            )
+            print(f"\nIf phi({n}) is equal to mutliplicative order of {e} modulo {n} then it's a generator of {n}.")
             print(f"phi(n) = {totient} and order(e, n) = {order}.\n")
 
         if totient == order:
@@ -637,9 +601,7 @@ def isGenerator(
 
         if Verbose:
             print(f"{e} doesn't divide {n}, let's check if {e}^k mod {n} != 1.")
-            print(
-                f"With k = ({n} -1 ) / q for q each of prime factors of {n}-1 ( = {L})."
-            )
+            print(f"With k = ({n} -1 ) / q for q each of prime factors of {n}-1 ( = {L}).")
 
         for k in L:
             t = ut.square_and_multiply(e, k, n)

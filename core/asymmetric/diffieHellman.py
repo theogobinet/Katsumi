@@ -29,9 +29,7 @@ def agreement(n: int = 2048, fountain=True):
 
 
 # 2) and 3)
-def chooseAndSend(
-    accord: tuple, secret=None, n: int = 2048, saving=False, Verbose=False
-):
+def chooseAndSend(accord: tuple, secret=None, n: int = 2048, saving=False, Verbose=False):
     """
     Choose a secret integer randomly and send a ciphered result to someone.
 

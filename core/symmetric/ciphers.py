@@ -300,9 +300,7 @@ def GCM(arr, encrypt=True, aad=""):
             return gz2.poly_mult_mod_2(
                 bti(
                     bm.b_op(
-                        gz2.poly_mult_mod_2(
-                            bti(bm.b_op(X, lenb(A), "XOR")), H, p
-                        ).to_bytes(8, "big"),
+                        gz2.poly_mult_mod_2(bti(bm.b_op(X, lenb(A), "XOR")), H, p).to_bytes(8, "big"),
                         lenb(C),
                         "XOR",
                     )
@@ -321,9 +319,7 @@ def GCM(arr, encrypt=True, aad=""):
 
     # equivalent of CTR mode
     for i in range(n):
-        config.WATCH_PERCENTAGE = (
-            ((n * 2 + m + 1) - ((n * 2 + m + 1) - i)) / (n * 2 + m + 1)
-        ) * 100
+        config.WATCH_PERCENTAGE = (((n * 2 + m + 1) - ((n * 2 + m + 1) - i)) / (n * 2 + m + 1)) * 100
         exTime = time.time()
 
         # treats the rightmost 32bits of its argument as a nonnegative integer with the least significant bit on the right, and increments this value modulo 2^32
@@ -346,9 +342,7 @@ def GCM(arr, encrypt=True, aad=""):
     X = b"\x00"
 
     for i in range(n + m + 1):
-        config.WATCH_PERCENTAGE = (
-            ((n * 2 + m + 1) - ((n * 2 + m + 1) - (i + n))) / (n * 2 + m + 1)
-        ) * 100
+        config.WATCH_PERCENTAGE = (((n * 2 + m + 1) - ((n * 2 + m + 1) - (i + n))) / (n * 2 + m + 1)) * 100
         exTime = time.time()
 
         X = GHASH64(H, A, C, X, i + 1).to_bytes(8, "big")
@@ -360,9 +354,7 @@ def GCM(arr, encrypt=True, aad=""):
 
     if not encrypt:
         if icv != icvc:
-            print(
-                "\nWARNING: INTEGRITY CHECK CONTROL INCORRECT, AAD HAVE BEEN MODIFIED !!"
-            )
+            print("\nWARNING: INTEGRITY CHECK CONTROL INCORRECT, AAD HAVE BEEN MODIFIED !!")
 
     if encrypt:
         IV_action(res, icvc, "store")

@@ -126,9 +126,7 @@ def key_gen(
     if easyGenerator:
         # https://en.wikipedia.org/wiki/Quadratic_residue#Table_of_quadratic_residues
         if Verbose:
-            print(
-                "Easy generator => gen = 12 (condition in prime generation) or (4, 9) (for every prime)"
-            )
+            print("Easy generator => gen = 12 (condition in prime generation) or (4, 9) (for every prime)")
 
         gen = rd.choice([12, 4, 9])
 
@@ -153,9 +151,7 @@ def key_gen(
     private_key = (p, gen, x)
 
     if saving:
-        it.writeKeytoFile(
-            private_key, "private_key", config.DIRECTORY_PROCESSING, ".kpk"
-        )
+        it.writeKeytoFile(private_key, "private_key", config.DIRECTORY_PROCESSING, ".kpk")
 
     if Verbose:
         print("\nYour private key has been generated Alice, keep it safe !")
@@ -166,9 +162,7 @@ def key_gen(
     public_key = (p, gen, h)
 
     if saving:
-        public_key = it.writeKeytoFile(
-            public_key, "public_key", config.DIRECTORY_PROCESSING, ".kpk"
-        )
+        public_key = it.writeKeytoFile(public_key, "public_key", config.DIRECTORY_PROCESSING, ".kpk")
 
     if Verbose:
         print("\nThe public key has been generated too: ", end="")
@@ -266,9 +260,7 @@ def decrypt(c, privateKey: tuple, asTxt=False):
 #############################################################
 
 
-def signing(
-    M: bytes, privateK: tuple = None, saving: bool = False, Verbose: bool = False
-):
+def signing(M: bytes, privateK: tuple = None, saving: bool = False, Verbose: bool = False):
     """
     Signing a message M (bytes).
     """
@@ -354,9 +346,7 @@ def verifying(M: bytes, sign: tuple, publicKey: tuple = None):
 
     if (0 < s1 < p) and (0 < s2 < p - 1):
 
-        test1 = (
-            ut.square_and_multiply(h, s1, p) * ut.square_and_multiply(s1, s2, p)
-        ) % p
+        test1 = (ut.square_and_multiply(h, s1, p) * ut.square_and_multiply(s1, s2, p)) % p
         test2 = ut.square_and_multiply(g, hm, p)
 
         if test1 == test2:

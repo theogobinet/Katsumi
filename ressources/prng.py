@@ -75,9 +75,7 @@ def randomInt(evenOrodd: int = 0, n: int = 512):
     return r
 
 
-def randomPrime(
-    nBits: int = 512, gen=None, condition=lambda p: p == p, k: int = 1, Verbose=False
-):
+def randomPrime(nBits: int = 512, gen=None, condition=lambda p: p == p, k: int = 1, Verbose=False):
     """
     Return generated prime numbers with bitlength nBits.
     Stops after the generation of k prime numbers.
@@ -124,9 +122,7 @@ def randomPrime(
     return primes
 
 
-def safePrime(
-    nBits: int = 1024, randomFunction=xorshiftperso, easyGenerator: bool = False
-):
+def safePrime(nBits: int = 1024, randomFunction=xorshiftperso, easyGenerator: bool = False):
     """
     The number 2p + 1 associated with a Sophie Germain prime is called a safe prime.
     In number theory, a prime number p is a Sophie Germain prime if 2p + 1 is also prime
@@ -158,10 +154,7 @@ def safePrime(
 
     return_list = manager.list([])
 
-    data = [
-        (nBits, randomFunction, easyGenerator, False, flag, return_list)
-        for _ in range(c)
-    ]
+    data = [(nBits, randomFunction, easyGenerator, False, flag, return_list) for _ in range(c)]
 
     # Permit to quit safe prime generation with exit signal
     try:
@@ -197,9 +190,7 @@ def safePrime_worker(
         if Verbose:
             print("Easy generator choosen.")
 
-        p_filter = lambda p: p % 3 == 2 and (
-            p % 12 == 1 or p % 12 == 11
-        )  # p = 1 mod 12 make 11 as primitive root
+        p_filter = lambda p: p % 3 == 2 and (p % 12 == 1 or p % 12 == 11)  # p = 1 mod 12 make 11 as primitive root
 
     else:
 
@@ -249,9 +240,7 @@ def safePrime_worker(
 
         else:
             if Verbose:
-                print(
-                    "But 2 * him + 1 and (him - 1) / 2 doesn't seem to be primes...\n"
-                )
+                print("But 2 * him + 1 and (him - 1) / 2 doesn't seem to be primes...\n")
 
 
 def genSafePrimes(n: int, L: list, nBits: int, randomFunction=None):

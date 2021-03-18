@@ -281,9 +281,7 @@ def validChain(user: int):
     return True
 
 
-def isValidBlock(
-    blockI: int, user: int, lastValidedBlock: bool = False, UTXO: list = c.BC_UTXO
-):
+def isValidBlock(blockI: int, user: int, lastValidedBlock: bool = False, UTXO: list = c.BC_UTXO):
     """
     Check block integrity: previous hash, salt, transactions signature, transactions funds
 
@@ -314,9 +312,7 @@ def isValidBlock(
 
     # Salt is verified
     bH = getBlockHash(blockI, False)
-    saltValid = hf.nullBits(
-        bH, getAdaptativePOWnb(len(arrayToBytes(cBlock[:-1])), blockI < 2)
-    )
+    saltValid = hf.nullBits(bH, getAdaptativePOWnb(len(arrayToBytes(cBlock[:-1])), blockI < 2))
 
     # Previous hash is verified
     hashValid = prevBlockH == prevH
@@ -734,13 +730,9 @@ def displayLogs(last: int = 0):
             elif logID == 3:
                 core = f"{bcolors.FAIL}Wrong signature for transaction: {params[0]}{bcolors.ENDC}"
             elif logID == 4:
-                core = (
-                    f"{bcolors.OKGREEN}Transaction performed: {params[0]}{bcolors.ENDC}"
-                )
+                core = f"{bcolors.OKGREEN}Transaction performed: {params[0]}{bcolors.ENDC}"
             elif logID == 5:
-                core = (
-                    f"Calculating POW({params[1]}-{params[2]}) for block: {params[0]}"
-                )
+                core = f"Calculating POW({params[1]}-{params[2]}) for block: {params[0]}"
             elif logID == 6:
                 core = f"{bcolors.OKGREEN}Found POW for block {params[0]}: {base64.b64encode(params[1]).decode()}{bcolors.ENDC}"
             elif logID == 7:
@@ -767,9 +759,7 @@ def displayBC():
     Display the content of the blockchain
     """
 
-    print(
-        f"{bcolors.BOLD}==================== BLOCK-CHAIN ({len(c.BC_CHAIN)} blocks) ===================={bcolors.ENDC}"
-    )
+    print(f"{bcolors.BOLD}==================== BLOCK-CHAIN ({len(c.BC_CHAIN)} blocks) ===================={bcolors.ENDC}")
     print()
 
     print(f"{bcolors.BOLD}USERS:{bcolors.ENDC}")
@@ -780,9 +770,7 @@ def displayBC():
     print()
 
     for i, b in enumerate(c.BC_CHAIN):
-        print(
-            f"{bcolors.BOLD}BLOCK {i} - HASH: {base64.b64encode(getBlockHash(b)).decode()}{bcolors.ENDC}"
-        )
+        print(f"{bcolors.BOLD}BLOCK {i} - HASH: {base64.b64encode(getBlockHash(b)).decode()}{bcolors.ENDC}")
         print()
 
         complete = False

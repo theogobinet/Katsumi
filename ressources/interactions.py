@@ -151,9 +151,7 @@ def getFile():
         if isFileHere(f, c.DIRECTORY_PROCESSING):
             return c.DIRECTORY_PROCESSING + f
 
-        print(
-            f"Error: file '{f}' not found, enter [c] to go back or enter a valid filename:"
-        )
+        print(f"Error: file '{f}' not found, enter [c] to go back or enter a valid filename:")
 
 
 def getInt(default=256, expected="hash", size=False, limit: int = inf):
@@ -171,9 +169,7 @@ def getInt(default=256, expected="hash", size=False, limit: int = inf):
             if val >= 0 and (not size or (val % 8 == 0 and val >= 32)) and val <= limit:
                 return val
 
-            print(
-                f"Error: {i} is not a valid {expected}, leave blank or enter a valid {expected}:"
-            )
+            print(f"Error: {i} is not a valid {expected}, leave blank or enter a valid {expected}:")
 
         except ValueError:
             print(f"'{i}' is not an integer, leave blank or enter a valid {expected}:")
@@ -197,9 +193,7 @@ def getFloat(default=0.5, expected="value", limit: int = inf):
             raise ValueError
 
         except ValueError:
-            print(
-                f"'{f}' is not valid [float + under {limit}], leave blank or enter a valid {expected}:"
-            )
+            print(f"'{f}' is not valid [float + under {limit}], leave blank or enter a valid {expected}:")
 
 
 def getRange(default=(1, 1)):
@@ -210,9 +204,7 @@ def getRange(default=(1, 1)):
         if t1 <= t2:
             return (t1, t2)
 
-        print(
-            f"Error: ({t1}, {t2}) is not a valid range, leave blank or enter a valid range"
-        )
+        print(f"Error: ({t1}, {t2}) is not a valid range, leave blank or enter a valid range")
 
 
 def getb64(expected="message", size=-1):
@@ -231,14 +223,10 @@ def getb64(expected="message", size=-1):
                 if size == -1 or len(data) == size:
                     return data
 
-                print(
-                    f"Error: {expected} must be {size} bytes long, enter [c] to go back or enter a valid base64"
-                )
+                print(f"Error: {expected} must be {size} bytes long, enter [c] to go back or enter a valid base64")
 
             except binascii.Error:
-                print(
-                    f'Error: Unable to decode "{i}", the format is not in base64, enter [c] to go back or enter a valid base64'
-                )
+                print(f'Error: Unable to decode "{i}", the format is not in base64, enter [c] to go back or enter a valid base64')
 
 
 def cipher_choice():
@@ -247,9 +235,7 @@ def cipher_choice():
     asc.asciiCat()
 
     print("Choice cypher method: ")
-    print(
-        " 1 - ECB \n 2 - CBC \n 3 - PCBC (Recommended) \n 4 - CTR (Stream) \n 5 - GCM (Authentification)"
-    )
+    print(" 1 - ECB \n 2 - CBC \n 3 - PCBC (Recommended) \n 4 - CTR (Stream) \n 5 - GCM (Authentification)")
 
     pCipher = getInt(3, "choices")
 
@@ -264,9 +250,7 @@ def cipher_choice():
 
     if pCipher == 1:
 
-        answer = query_yn(
-            "ECB is not recommended for use in cryptographic protocols. Are you sure?"
-        )
+        answer = query_yn("ECB is not recommended for use in cryptographic protocols. Are you sure?")
 
         if answer:
             clear()
@@ -343,9 +327,7 @@ def whatInThere(directory=c.DIRECTORY_FOUNT):
     return [os.path.splitext(f)[0] for f in os.listdir(directory)]
 
 
-def writeVartoFile(
-    var: object, name: str, directory=c.DIRECTORY_GEN, ext: str = ".txt"
-):
+def writeVartoFile(var: object, name: str, directory=c.DIRECTORY_GEN, ext: str = ".txt"):
     """Write given variable into a file with variable name"""
     # r+ for reading and writing
     name = directory + name
@@ -440,9 +422,7 @@ def getB64Keys(key):
     return base64.b64encode(tw).decode()
 
 
-def writeKeytoFile(
-    key, fileName: str, directory=c.DIRECTORY_PROCESSING, ext: str = ".kpk"
-) -> str:
+def writeKeytoFile(key, fileName: str, directory=c.DIRECTORY_PROCESSING, ext: str = ".kpk") -> str:
     """
     Write key in b64 format to file .kpk with key length's as header.
     """
@@ -467,9 +447,7 @@ def writeKeytoFile(
     return b64K
 
 
-def extractKeyFromFile(
-    fileName: str, directory=c.DIRECTORY_PROCESSING, ext: str = ".kpk"
-):
+def extractKeyFromFile(fileName: str, directory=c.DIRECTORY_PROCESSING, ext: str = ".kpk"):
     """
     Extract key's from b64 format to tuples from katsumi public/private keys file's.
     """
@@ -486,10 +464,7 @@ def extractKeyFromFile(
         if b64data[0] == "L":
             # It's a list !
             # Case when message is longer than modulus -> separation into list of keys
-            return [
-                getIntKey(b64decode(el), b64data[1])
-                for el in b64decode(b64data[2:]).decode().split("|")
-            ]
+            return [getIntKey(b64decode(el), b64data[1]) for el in b64decode(b64data[2:]).decode().split("|")]
 
         return getIntKey(b64decode(b64data[1:]), b64data[0])
 
@@ -576,13 +551,9 @@ def handleInvBox(doIt: bool = False):
 
         if not isFileHere("inversion_Sbox.txt"):
 
-            print(
-                "A necessary file for the substitution has been deleted / corrupted from the system.\n"
-            )
+            print("A necessary file for the substitution has been deleted / corrupted from the system.\n")
 
-            if query_yn(
-                "- Do you want to generate the inverse substitution box (No if you want to compute each time needed)? "
-            ):
+            if query_yn("- Do you want to generate the inverse substitution box (No if you want to compute each time needed)? "):
 
                 handleInvBox(True)
 
@@ -665,13 +636,9 @@ def extractSafePrimes(
                     # It's the only ramaining element and it's not possible to use easy gen with him.
 
                     if Verbose:
-                        print(
-                            "No safe prime available for easy generator creation into current {nBits} bits fountain's."
-                        )
+                        print("No safe prime available for easy generator creation into current {nBits} bits fountain's.")
 
-                        question = query_yn(
-                            "Do you want to generate one compatible with this condition (It can be long)? "
-                        )
+                        question = query_yn("Do you want to generate one compatible with this condition (It can be long)? ")
 
                         if question:
                             s = prng.safePrime(nBits, easyGenerator=True)
@@ -701,9 +668,7 @@ def stockSafePrimes(n: int = 1024, x: int = 15, randomFunction=prng.xorshiftpers
 
     # Safety check, if already exist, then you just update it !
     if isFileHere(f"{str(n)}_bits.txt", c.DIRECTORY_FOUNT):
-        print(
-            "\nData concerning this number of bits already exists. Update in progress."
-        )
+        print("\nData concerning this number of bits already exists. Update in progress.")
         Update = True
     else:
         print("\nData not existing, creating file...")
@@ -805,9 +770,7 @@ def primeNumbersFountain():
         elif i == 3:
             clear()
             asc.asciiDeath()
-            print(
-                "Enter the number of bits corresponding to the list you would like to be removed."
-            )
+            print("Enter the number of bits corresponding to the list you would like to be removed.")
             lnumber = getInt(2048, "bits size", True)
             name = f"{str(lnumber)}_bits.txt"
 
@@ -845,13 +808,9 @@ def elGamalKeysGeneration():
     asc.asciiCat()
 
     # Because here default is no so not(yes)
-    if not query_yn(
-        "Do you want to use the fastest ElGamal key generation's (default: no)?", "no"
-    ):
+    if not query_yn("Do you want to use the fastest ElGamal key generation's (default: no)?", "no"):
 
-        if query_yn(
-            "Do you want to choose the length of the key (default = 2048 bits)?", "no"
-        ):
+        if query_yn("Do you want to choose the length of the key (default = 2048 bits)?", "no"):
             n = getInt(2048, "key size", True)
         else:
             n = 2048
@@ -861,9 +820,7 @@ def elGamalKeysGeneration():
             "no",
         )
 
-        if query_yn(
-            "Do you want to use the Prime Number's Fountain to generate the keys (fastest) (default: yes)?"
-        ):
+        if query_yn("Do you want to use the Prime Number's Fountain to generate the keys (fastest) (default: yes)?"):
             primes = extractSafePrimes(n, False, eGen, Verbose=True)
         else:
             primes = False
@@ -913,9 +870,7 @@ def keysVerif(verif: bool = True):
             if publicS != privateS:
                 clear()
                 asc.asciiDeath()
-                print(
-                    f"Key sizes do not match ({privateS} != {publicS}). Suspected corruption."
-                )
+                print(f"Key sizes do not match ({privateS} != {publicS}). Suspected corruption.")
 
                 if query_yn("Do you want to delete them?"):
 
@@ -932,9 +887,7 @@ def keysVerif(verif: bool = True):
 
             else:
 
-                if verif and not query_yn(
-                    "Do you want to keep them? (default: No)", "no"
-                ):
+                if verif and not query_yn("Do you want to keep them? (default: No)", "no"):
                     rmFile("public_key.kpk", c.DIRECTORY_PROCESSING)
                     rmFile("private_key.kpk", c.DIRECTORY_PROCESSING)
                     rmFile("encrypted.kat", c.DIRECTORY_PROCESSING)
@@ -950,9 +903,7 @@ def keysVerif(verif: bool = True):
 
                 while not isFileHere("private_key.kpk", c.DIRECTORY_PROCESSING):
                     clear()
-                    input(
-                        "Please put your 'private_key.kpk' file into the 'processing' folder."
-                    )
+                    input("Please put your 'private_key.kpk' file into the 'processing' folder.")
 
                 clear()
                 print("Gotcha !")
@@ -969,9 +920,7 @@ def keysVerif(verif: bool = True):
 
             while not isFileHere("public_key.kpk", c.DIRECTORY_PROCESSING):
                 clear()
-                input(
-                    "Please put your 'public_key.kpk' file into the 'processing' folder."
-                )
+                input("Please put your 'public_key.kpk' file into the 'processing' folder.")
 
             clear()
             print("Gotcha !")
@@ -1015,9 +964,7 @@ def dlogAttack():
                 clear()
                 asc.asciiJongling()
 
-                input(
-                    "Please put your 'public_key.kpk' file into the 'processing' folder."
-                )
+                input("Please put your 'public_key.kpk' file into the 'processing' folder.")
 
             clear()
             asc.asciiJongling()
@@ -1044,9 +991,7 @@ def dlogAttack():
                 clear()
                 asc.asciiJongling()
 
-                input(
-                    "Please put your 'public_key.kpk' file into the 'processing' folder."
-                )
+                input("Please put your 'public_key.kpk' file into the 'processing' folder.")
 
             clear()
             asc.asciiJongling()
@@ -1056,9 +1001,7 @@ def dlogAttack():
                 clear()
                 asc.asciiJongling()
 
-                input(
-                    "Please put your 'encrypted.kat' file into the 'processing' folder."
-                )
+                input("Please put your 'encrypted.kat' file into the 'processing' folder.")
 
             clear()
             asc.asciiJongling()
@@ -1125,9 +1068,7 @@ def dHgestion():
             accord = dH.agreement(size, fountain)
 
             accord = writeKeytoFile(accord, "dH_agreement")
-            print(
-                "According to the size of the private key, your agreement is: ", end=""
-            )
+            print("According to the size of the private key, your agreement is: ", end="")
             prGreen(accord)
 
             if query_yn("Do you want to process with given agreement now?"):
@@ -1139,9 +1080,7 @@ def dHgestion():
             asc.asciiKeys()
 
             if not processWithAgreement:
-                if query_yn(
-                    "Do you want to use the dH_agreement.kat file's? (default: Yes)"
-                ):
+                if query_yn("Do you want to use the dH_agreement.kat file's? (default: Yes)"):
                     accord = extractKeyFromFile("dH_agreement")
                 else:
                     accord = getIntKey(getb64("agreement"), 2)
@@ -1155,9 +1094,7 @@ def dHgestion():
 
             import random as rd
 
-            secret = getInt(
-                rd.randrange(2, accord[0]), "your secret integer", False, accord[0]
-            )
+            secret = getInt(rd.randrange(2, accord[0]), "your secret integer", False, accord[0])
 
             asc.asciiKeys()
 
@@ -1222,9 +1159,7 @@ def katsuSymm():
             inFile = ""
 
             if cipher == 5:
-                if query_yn(
-                    "GCM allows to store authentified additional data (not encrypted), do you want to store some AAD?"
-                ):
+                if query_yn("GCM allows to store authentified additional data (not encrypted), do you want to store some AAD?"):
                     aad = readFromUser()
                 else:
                     clear()
@@ -1326,9 +1261,7 @@ def katsuAsymm():
         asc.asciiCat()
 
         if i == 1:
-            print(
-                "You are going to generate public/private key pairs with ElGamal algorithm."
-            )
+            print("You are going to generate public/private key pairs with ElGamal algorithm.")
 
             if keysVerif():
                 elGamalKeysGeneration()
@@ -1386,18 +1319,14 @@ def katsuAsymm():
             while not isFileHere("public_key.kpk", c.DIRECTORY_PROCESSING):
                 asc.asciiCat()
 
-                input(
-                    "Please put your 'private_key.kpk' file into the 'processing' folder."
-                )
+                input("Please put your 'private_key.kpk' file into the 'processing' folder.")
 
             print("Gotcha !\n")
 
             while not isFileHere("encrypted.kat", c.DIRECTORY_PROCESSING):
                 asc.asciiCat()
 
-                input(
-                    "Please put your 'encrypted.kat' file into the 'processing' folder."
-                )
+                input("Please put your 'encrypted.kat' file into the 'processing' folder.")
 
             print("Gotcha !\n")
             #####
@@ -1409,9 +1338,7 @@ def katsuAsymm():
             else:
                 e = getIntKey(getb64("key"), 2)
 
-            d = elG.decrypt(
-                e, extractKeyFromFile("private_key", c.DIRECTORY_PROCESSING), asTxt=True
-            )
+            d = elG.decrypt(e, extractKeyFromFile("private_key", c.DIRECTORY_PROCESSING), asTxt=True)
 
             asc.asciiCat()
 
@@ -1486,18 +1413,14 @@ def katsuHash():
             clear()
 
             if f:
-                print(
-                    f"File hash: {base64.b64encode(hf.sponge(bm.fileToBytes(f), size)).decode()}"
-                )
+                print(f"File hash: {base64.b64encode(hf.sponge(bm.fileToBytes(f), size)).decode()}")
 
             else:
                 katsuHash()
         else:
             msg = readFromUser("Enter the text to hash:")
 
-            print(
-                f"Text hash: {base64.b64encode(hf.sponge(msg.encode(), size)).decode()}"
-            )
+            print(f"Text hash: {base64.b64encode(hf.sponge(msg.encode(), size)).decode()}")
 
     elif selection == 2:
 
@@ -1519,9 +1442,7 @@ def katsuHash():
                 else:
                     katsuHash()
             else:
-                verifyHash(
-                    h, readFromUser("Enter the text to compare with the hash:").encode()
-                )
+                verifyHash(h, readFromUser("Enter the text to compare with the hash:").encode())
         else:
             katsuHash()
     else:
@@ -1608,14 +1529,8 @@ from core.hashbased import blockchain as bc
 def bcSimulationParam():
 
     asc.asciiBlockC()
-    print(
-        "List of simulation parameters, select the corresponding parameter to view its description and edit it:\n"
-    )
-    params = (
-        [f"{bc.bcolors.BOLD}START THE SIMULATION{bc.bcolors.ENDC}"]
-        + [f"{x[1]} \t\t | {x[0]}" for x in c.BC_USER_PARAMS]
-        + ["Back to menu"]
-    )
+    print("List of simulation parameters, select the corresponding parameter to view its description and edit it:\n")
+    params = [f"{bc.bcolors.BOLD}START THE SIMULATION{bc.bcolors.ENDC}"] + [f"{x[1]} \t\t | {x[0]}" for x in c.BC_USER_PARAMS] + ["Back to menu"]
 
     enumerateMenu(params)
     selection = getInt(1, "choices")
@@ -1655,10 +1570,7 @@ def bcSimulationParam():
             param[0] = getRange((param[0]))
         elif param[3] == str:
             enumerateMenu(param[5])
-            param[0] = param[5][
-                getInt(param[5].index(param[0]) + 1, "algorithm", False, len(param[5]))
-                - 1
-            ]
+            param[0] = param[5][getInt(param[5].index(param[0]) + 1, "algorithm", False, len(param[5])) - 1]
 
         bcSimulationParam()
 

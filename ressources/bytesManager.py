@@ -82,9 +82,7 @@ file_name = ""
 without_ext = ""
 
 
-def fileToBytes(
-    file, message=True, directory=config.DIRECTORY_PROCESSING, Verbose=False
-):
+def fileToBytes(file, message=True, directory=config.DIRECTORY_PROCESSING, Verbose=False):
     """
     Read a file and convert to bytearray.
     True if it's a .txt file with a message.
@@ -140,9 +138,7 @@ def codeOut(thing, coded=True, inFile=""):
             katFile.write(bytes(packed))
         else:
             katFile = open(
-                os.path.join(
-                    os.path.dirname(inFile), f"dec_{os.path.basename(inFile)[:-4]}"
-                ),
+                os.path.join(os.path.dirname(inFile), f"dec_{os.path.basename(inFile)[:-4]}"),
                 "wb",
             )
             katFile.write(bytes(packed))

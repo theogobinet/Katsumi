@@ -147,9 +147,7 @@ def md5(block):
     # Number of 0 to add
     b = 512 - ((lN + 1) % 512)
 
-    lN = int.from_bytes(
-        lN.to_bytes(8, byteorder="little"), byteorder="big", signed=False
-    )
+    lN = int.from_bytes(lN.to_bytes(8, byteorder="little"), byteorder="big", signed=False)
 
     iN = (((iN << 1) | 1) << b) ^ lN
 
@@ -237,9 +235,7 @@ def PoW(block, zBits=1, interruptOnChange=("", 0)):
     from ressources import config as c
 
     if interruptOnChange[0]:
-        originalData = getattr(locals()["c"], interruptOnChange[0])[
-            interruptOnChange[1]
-        ].copy()
+        originalData = getattr(locals()["c"], interruptOnChange[0])[interruptOnChange[1]].copy()
 
     if zBits >= 255:
         raise ValueError("The number of zero bits must be lower than 2^8")
@@ -250,10 +246,7 @@ def PoW(block, zBits=1, interruptOnChange=("", 0)):
     while not nullBits(H, zBits):
 
         if interruptOnChange[0]:
-            if (
-                originalData
-                != getattr(locals()["c"], interruptOnChange[0])[interruptOnChange[1]]
-            ):
+            if originalData != getattr(locals()["c"], interruptOnChange[0])[interruptOnChange[1]]:
                 return False
 
         salt = random.randint(0, 1 << 32)

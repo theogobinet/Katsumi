@@ -35,13 +35,9 @@ def key_gen(size: int = 2048, randomFunction=None, saving=False, Verbose=False):
     # 1- Choose two distinct prime numbers p and q
 
     if Verbose:
-        print(
-            f"Let's try to generate two distinct prime numbers p and q of {size} bits."
-        )
+        print(f"Let's try to generate two distinct prime numbers p and q of {size} bits.")
 
-    p, q = prng.randomPrime(sizeB, randomFunction, Verbose=Verbose), prng.randomPrime(
-        sizeB, randomFunction, Verbose=Verbose
-    )
+    p, q = prng.randomPrime(sizeB, randomFunction, Verbose=Verbose), prng.randomPrime(sizeB, randomFunction, Verbose=Verbose)
 
     # 2- Compute n = pq.
     n = p * q  # new modulus
@@ -67,17 +63,11 @@ def key_gen(size: int = 2048, randomFunction=None, saving=False, Verbose=False):
     public_key, private_key = (n, e), (n, d)
 
     if saving:
-        public_key = it.writeKeytoFile(
-            public_key, "public_key", config.DIRECTORY_PROCESSING, ".kpk"
-        )
-        it.writeKeytoFile(
-            private_key, "private_key", config.DIRECTORY_PROCESSING, ".kpk"
-        )
+        public_key = it.writeKeytoFile(public_key, "public_key", config.DIRECTORY_PROCESSING, ".kpk")
+        it.writeKeytoFile(private_key, "private_key", config.DIRECTORY_PROCESSING, ".kpk")
 
     if Verbose:
-        print(
-            "\nYour private key has been generated Bob, keep it safe and never distibute them !"
-        )
+        print("\nYour private key has been generated Bob, keep it safe and never distibute them !")
         print("\nThe public key has been generated, send this to your Alice: ", end="")
 
         it.prGreen(public_key)
@@ -160,9 +150,7 @@ def decrypt(c, privateKey: tuple, asTxt=False):
 #############################################################
 
 
-def signing(
-    M: bytes, privateK: tuple = None, saving: bool = False, Verbose: bool = False
-):
+def signing(M: bytes, privateK: tuple = None, saving: bool = False, Verbose: bool = False):
     """
     Signing the message (M).
     You need to attach this signature to the message.

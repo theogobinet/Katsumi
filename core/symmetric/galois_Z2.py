@@ -166,9 +166,7 @@ def genElts_2():
     # When you get the generator, use it to generate proper list of elements
     config.ALPHA_ELEMENTS = []
     for expo in range(0, config.NBR_ELEMENTS):
-        config.ALPHA_ELEMENTS.append(
-            poly_exp_mod_2(config.GENERATOR, expo, config.IRRED_POLYNOMIAL)
-        )
+        config.ALPHA_ELEMENTS.append(poly_exp_mod_2(config.GENERATOR, expo, config.IRRED_POLYNOMIAL))
 
     return True
 
@@ -208,9 +206,7 @@ def invertGalois2(toInv: object):
         # where P(x) irreductible polynomial of given degree
         # A ^ p^n - 2 = inverted
 
-        inv = poly_exp_mod_2(
-            bm.bytes_to_int(toInv), config.NBR_ELEMENTS - 2, config.IRRED_POLYNOMIAL
-        )
+        inv = poly_exp_mod_2(bm.bytes_to_int(toInv), config.NBR_ELEMENTS - 2, config.IRRED_POLYNOMIAL)
         inv = inv.to_bytes(bm.bytes_needed(inv), "big")
 
         config.WATCH_GLOBAL_INVERSION += time.time() - exTime
@@ -227,9 +223,7 @@ def genInverses2():
     print("\n\t || Inverses are going to be generated || \n")
     config.IN_CREATION = True
 
-    config.INVERSIONS_BOX = [
-        invertGalois2(bm.mult_to_bytes(elt)) for elt in config.ELEMENTS
-    ]
+    config.INVERSIONS_BOX = [invertGalois2(bm.mult_to_bytes(elt)) for elt in config.ELEMENTS]
     it.writeVartoFile(config.INVERSIONS_BOX, "inversion_Sbox")
 
     config.IN_CREATION = False
@@ -240,9 +234,7 @@ def GF2(degree):
     """Initialize the Galois Field GF(p^degree) in Zn."""
     config.DEGREE = degree
     config.NBR_ELEMENTS = 2 ** degree
-    config.IRRED_POLYNOMIAL = int.from_bytes(
-        bm.mult_to_bytes(config.IRRED_POLYNOMIAL), "big"
-    )
+    config.IRRED_POLYNOMIAL = int.from_bytes(bm.mult_to_bytes(config.IRRED_POLYNOMIAL), "big")
     config.GENERATOR = gen_GL_2(config.IRRED_POLYNOMIAL, degree)
 
     it.handleInvBox()

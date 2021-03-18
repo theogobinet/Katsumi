@@ -26,15 +26,9 @@ def set_key(km=config.KEY):
 
     config.KL1 = [bytearray(bm.circularRotation(skm[x], 0, 1)) for x in range(0, 8)]
     config.KL2 = [skp[(x + 2) % 8] for x in range(0, 8)]
-    config.KO1 = [
-        bytearray(bm.circularRotation(skm[(x + 1) % 8], 0, 5)) for x in range(0, 8)
-    ]
-    config.KO2 = [
-        bytearray(bm.circularRotation(skm[(x + 5) % 8], 0, 8)) for x in range(0, 8)
-    ]
-    config.KO3 = [
-        bytearray(bm.circularRotation(skm[(x + 6) % 8], 0, 13)) for x in range(0, 8)
-    ]
+    config.KO1 = [bytearray(bm.circularRotation(skm[(x + 1) % 8], 0, 5)) for x in range(0, 8)]
+    config.KO2 = [bytearray(bm.circularRotation(skm[(x + 5) % 8], 0, 8)) for x in range(0, 8)]
+    config.KO3 = [bytearray(bm.circularRotation(skm[(x + 6) % 8], 0, 13)) for x in range(0, 8)]
     config.KI1 = [skp[(x + 4) % 8] for x in range(0, 8)]
     config.KI2 = [skp[(x + 3) % 8] for x in range(0, 8)]
     config.KI3 = [skp[(x + 7) % 8] for x in range(0, 8)]
