@@ -168,14 +168,7 @@ def safePrime(nBits: int = 1024, randomFunction=xorshiftperso, easyGenerator: bo
     return list(return_list)[0]
 
 
-def safePrime_worker(
-    nBits: int = 1024,
-    randomFunction=None,
-    easyGenerator: bool = False,
-    Verbose: bool = False,
-    flag=None,
-    returnL: list = [],
-):
+def safePrime_worker(nBits: int = 1024, randomFunction=None, easyGenerator: bool = False, Verbose: bool = False, flag=None, returnL: list = []):
     """
     Function executed on each process for safe prime generation
     """

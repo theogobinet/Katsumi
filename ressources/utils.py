@@ -35,16 +35,6 @@ def integer_sqrt(x: int):
             return r
         r = newr
 
-
-def swapPos(table: list, pos1: int, pos2: int):
-    """
-    Swap two elements in list. Return modified list
-    """
-
-    table[pos1], table[pos2] = table[pos2], table[pos1]
-    return table
-
-
 def closestValue(aList: list, givenV: int):
     """
     Return the nearest value to a given one in a list.
@@ -152,27 +142,31 @@ def pairwise_coprime(listing: list):
     return True
 
 
-def square_and_multiply(x, k, p=None, Verbose=False):
+def square_and_multiply(x: int, exponent: int, modulus: int = None, Verbose: bool = False):
     """
     Square and Multiply Algorithm
 
         x: positive integer
-        k: exponent integer
-        p: module
+        exponent: exponent integer
+        modulus: module
 
-    Returns: x**k or x**k mod p when p is given
+    Returns: x**exponent or x**exponent mod modulus when modulus is given
     """
-    b = bin(k).lstrip("0b")
+    b = bin(exponent).lstrip("0b")
     r = 1
     for i in b:
+
         rBuffer = r
         r = r ** 2
+        
         if i == "1":
             r = r * x
-        if p:
-            r %= p
+        if modulus:
+            r %= modulus
+        
         if Verbose:
-            print(f"{rBuffer}^2 = {r} mod {p}")
+            print(f"{rBuffer}^2 = {r} mod {modulus}")
+    
     return r
 
 
