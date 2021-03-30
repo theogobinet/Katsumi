@@ -1166,7 +1166,9 @@ def katsuSymm():
                     clear()
                     asc.asciiCat()
 
-            if query_yn("Do you want to encrypt a file?", "no"):
+            useFile = query_yn("Do you want to encrypt a file?", "no")
+
+            if useFile:
                 inFile = getFile()
                 if inFile:
                     data = bm.fileToBytes(inFile)
@@ -1178,9 +1180,15 @@ def katsuSymm():
             print("Encryption started....")
 
             begin_time = datetime.now()
-            print("Here is your ciphered message, copy it and send it !\n")
+
+            if useFile:
+                print(f"Your file has been ciphered correctly ! Find-it into {c.DIRECTORY_PROCESSING} folder.")
+            else:
+                print("Here is your ciphered message, copy it and send it !")
+
             prGreen(ciphers.run(data, inFile, True, cipher, aad, key))
             end = datetime.now() - begin_time
+
             input(f"\nEncryption finished in {end} seconds !")
 
             clear()

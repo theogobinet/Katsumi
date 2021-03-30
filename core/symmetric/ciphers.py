@@ -137,7 +137,7 @@ def CBC(arr, encrypt=True):
 
     if encrypt:
         # Adding the IV to the encrypted data
-        IV_action(res, iv, "store")
+        res = IV_action(res, iv, "store")
 
     return res
 
@@ -379,6 +379,7 @@ def IV_action(arr, iv=None, action="extract"):
 
     if action == "store" and iv is not None:
         arr.append(iv)
+        return arr
 
     elif action == "extract" and iv is None:
         iv = arr.pop()
