@@ -381,7 +381,7 @@ def IV_action(arr, iv=None, action="extract"):
         arr.append(iv)
         return arr
 
-    elif action == "extract" and iv is None:
+    if action == "extract" and iv is None:
         iv = arr.pop()
         return iv
     
