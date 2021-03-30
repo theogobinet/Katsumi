@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+import time
 import base64
 from math import log
 
@@ -22,7 +23,6 @@ def isBase64(sb):
     """
     Check if both string and bytes objects are in base64.
     """
-    import base64
 
     try:
         if isinstance(sb, str):
@@ -53,8 +53,6 @@ def mult_to_bytes(obj: object) -> bytes:
         res = obj.to_bytes(bytes_needed(obj), "big")
 
     elif isBase64(obj):
-        import base64
-
         res = base64.b64decode(obj)
 
     elif isinstance(obj, bytes):
@@ -71,13 +69,9 @@ def mult_to_bytes(obj: object) -> bytes:
     return res
 
 
-def swapPos(list, pos1, pos2):
-    list[pos1], list[pos2] = list[pos2], list[pos1]
-    return list
-
-
-file_name = ""
-without_ext = ""
+def swapPos(toSwap, pos1, pos2):
+    toSwap[pos1], toSwap[pos2] = toSwap[pos2], toSwap[pos1]
+    return toSwap
 
 
 def fileToBytes(file, message=True, directory=config.DIRECTORY_PROCESSING, Verbose=False):
@@ -85,27 +79,20 @@ def fileToBytes(file, message=True, directory=config.DIRECTORY_PROCESSING, Verbo
     Read a file and convert to bytearray.
     True if it's a .txt file with a message.
     """
-    import time
-
-    global file_name, without_ext
-    file_name = os.path.join(directory, file)
-    without_ext = os.path.splitext(file)[0]
 
     if Verbose:
         print(f"Opening the {file} file.")
 
     readTime = time.time()
-    with open(file_name, "rb") as f:
+    with open(os.path.join(directory, file), "rb") as f:
         data = bytearray(f.read())
     config.WATCH_READ_TIME = time.time() - readTime
 
     if not message:  # If it's a file
         if len(data) < 1024:  # At least some kilo_octets
-            return "Error: give in input at least some kilo_octets file's."
-        else:
-            return data
-    else:
-        return data
+            raise Exception("Give in input at least some kilo_octets file's.")
+
+    return data
 
 
 ###################### - File Manager
@@ -117,8 +104,6 @@ def codeOut(thing, coded=True, inFile=""):
 
     thing: Array of bytesArrays
     """
-
-    import time
 
     # Pack and remove null bytes added by z_filling.
     if not coded:
@@ -151,14 +136,14 @@ def codeOut(thing, coded=True, inFile=""):
     else:
         if coded:
             return base64.b64encode(packed).decode()
-        else:
-            try:
-                decoded = packed.decode()
-                return decoded
-            except UnicodeDecodeError:
-                raise UnicodeDecodeError(
-                    "Unable to decode the message, the decryption method does not match the encryption method, the wrong key is used or the encrypted message has been corrupted.\n"
-                )
+
+        try:
+            decoded = packed.decode()
+            return decoded
+        except UnicodeDecodeError:
+            raise UnicodeDecodeError(
+                "Unable to decode the message, the decryption method does not match the encryption method, the wrong key is used or the encrypted message has been corrupted.\n"
+            )
 
 
 def zfill_b(byteA, n: int):
@@ -224,9 +209,9 @@ def packSplittedBytes(pSplitted):
     return packed
 
 
-def circularRotation(arr, dir=0, n=1):
+def circularRotation(arr, direction=0, n=1):
     """
-    Circular shift to dir (left=0, right=1) of n (=1 by default) bits
+    Circular shift to direction (left=0, right=1) of n (=1 by default) bits
     Output: bytes
     """
 
@@ -243,7 +228,7 @@ def circularRotation(arr, dir=0, n=1):
 
     r = 0
 
-    if dir == 0:
+    if direction == 0:
         r = ((arrInt << n) | (arrInt >> (nB - n))) & size
     else:
         r = ((arrInt >> n) | (arrInt << (nB - n))) & size

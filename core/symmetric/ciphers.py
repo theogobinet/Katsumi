@@ -28,18 +28,19 @@ def cipher(arr, method=3, encrypt=True, aad=""):
         config.WATCH_CIPHER_TYPE = "ECB"
         return ECB(arr, encrypt)
 
-    elif method == 2:  # CBC
+    if method == 2:  # CBC
         config.WATCH_CIPHER_TYPE = "CBC"
         return CBC(arr, encrypt)
 
-    elif method == 3:  # PCBC
+    if method == 3:  # PCBC
         config.WATCH_CIPHER_TYPE = "PCBC"
         return PCBC(arr, encrypt)
 
-    elif method == 4:  # CTR
+    if method == 4:  # CTR
         config.WATCH_CIPHER_TYPE = "CTR"
         return CTR(arr, encrypt)
-    elif method == 5:  # CTR
+    
+    if method == 5:  # CTR
         config.WATCH_CIPHER_TYPE = "GCM"
         return GCM(arr, encrypt, aad)
 
@@ -281,9 +282,6 @@ def GCM(arr, encrypt=True, aad=""):
     # 1 + α + α3 + α4 + α64 - 64 field polynomial
     p = int("10000000000000000000000000000000000000000000000000000000000001111", 2)
 
-    def bti(b):
-        return int.from_bytes(b, "big")
-
     def lenb(i):
         return (len(i) * 8).to_bytes(8, "big")
 
@@ -293,23 +291,25 @@ def GCM(arr, encrypt=True, aad=""):
 
         if i <= m:
             # A1 = A[1-1]
-            return gz2.poly_mult_mod_2(bti(bm.b_op(X, A[i - 1], "XOR")), H, p)
-        elif i <= m + n:
-            return gz2.poly_mult_mod_2(bti(bm.b_op(X, C[i - m - 1], "XOR")), H, p)
-        elif i == m + n + 1:
+            return gz2.poly_mult_mod_2(bm.bytes_to_int(bm.b_op(X, A[i - 1], "XOR")), H, p)
+        
+        if i <= m + n:
+            return gz2.poly_mult_mod_2(bm.bytes_to_int(bm.b_op(X, C[i - m - 1], "XOR")), H, p)
+        
+        if i == m + n + 1:
             return gz2.poly_mult_mod_2(
-                bti(
+                a=bm.bytes_to_int(
                     bm.b_op(
-                        gz2.poly_mult_mod_2(bti(bm.b_op(X, lenb(A), "XOR")), H, p).to_bytes(8, "big"),
-                        lenb(C),
-                        "XOR",
+                        b1=gz2.poly_mult_mod_2(bm.bytes_to_int(bm.b_op(X, lenb(A), "XOR")), H, p).to_bytes(8, "big"),
+                        b2=lenb(C),
+                        ope="XOR",
                     )
                 ),
-                H,
-                p,
+                b=H,
+                mod=p,
             )
 
-    H = bti(kasu.kasumi(b"\x00" * 8))
+    H = bm.bytes_to_int(kasu.kasumi(b"\x00" * 8))
 
     Y = GHASH64(H, b"", [iv], b"\x00", 1).to_bytes(8, "big")
     E0 = kasu.kasumi(Y)
@@ -383,8 +383,8 @@ def IV_action(arr, iv=None, action="extract"):
     elif action == "extract" and iv is None:
         iv = arr.pop()
         return iv
-    else:
-        raise ValueError("Error: No action assigned.")
+    
+    raise ValueError("Error: No action assigned.")
 
 
 def IV(arr, key="y/B?E(H+MbQeThVm".encode()):

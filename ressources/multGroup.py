@@ -88,7 +88,7 @@ def phi(n: int, m: int = 1, k: int = 1, Verbose: bool = False):
 
         return mult * phi(n, 1, 1, Verbose)
 
-    # Else :
+    # Else:
     if n >= 0 and n <= 123:
         # Fastest results for common totients (sequence A000010 in the OEIS)
         totients = [
@@ -592,7 +592,7 @@ def isGenerator(
 
         return True
 
-    elif e % n != 0:
+    if e % n != 0:
         # We can test if some g not divisible by p is a generator of Zp*
         # by checking if g^k mod p != 1
         # with k = (p-1)/q for q each of prime factors of p-1

@@ -192,7 +192,7 @@ def verifying(M: bytes, sign: int, pK: tuple = None):
     Verify given signature of message M with corresponding public key's.
     """
 
-    assert isinstance(M, bytes) or isinstance(M, bytearray)
+    assert isinstance(M, (bytes, bytearray))
 
     from ..hashbased import hashFunctions as hashF
 

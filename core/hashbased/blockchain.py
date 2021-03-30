@@ -2,7 +2,9 @@
 # -*- coding: utf-8 -*-
 
 from ressources import config as c
+
 import time
+import base64
 import random
 
 ###########################
@@ -237,7 +239,6 @@ def initChain():
     Create the first block of the block-chain
     """
 
-    import time
     from core.hashbased import hashFunctions as hf
 
     # Reset variables
@@ -378,7 +379,7 @@ def validBlock(blockI: int, user: int, validated: tuple = (-1, [], [])):
         cBlock.remove(transaction)
 
     # add already validated transactions to the local copy
-    cBlock = validated[1] + cBlock[validated[0] + 1 :]
+    cBlock = validated[1] + cBlock[validated[0] + 1:]
 
     # Calculating the hash of the previous block
     prevH = getBlockHash(c.BC_CHAIN[blockI - 1])
@@ -516,12 +517,12 @@ def validTransaction(user: int, transaction: list, UTXO: list = None):
         # Then perform the transaction, return true if the transaction can be performed
         if transitUTXO(sender, core[1], core[2], UTXO):
             return True
-        else:
-            addLog(user, 2, [transactionToString(transaction, UTXO)])
-            return False
-    else:
-        addLog(user, 3, [transactionToString(transaction, UTXO)])
+
+        addLog(user, 2, [transactionToString(transaction, UTXO)])
         return False
+
+    addLog(user, 3, [transactionToString(transaction, UTXO)])
+    return False
 
 
 def getUserBalance(user: int, UTXO: list = None):
@@ -649,17 +650,12 @@ def addLog(user: int, logID: int, params: list = []):
     params: list of param associated with the log
     """
 
-    import time
-
     c.BC_LOGS.append([time.time() - c.BC_TIME_START, user, logID, params])
 
 
 #######################
 #       UTILS        #
 ######################
-
-import base64
-
 
 # Define colors for logs
 class bcolors:
@@ -801,9 +797,7 @@ def arrayToBytes(array: list):
     Convert an array to bytes, return base64 of array data
 
     array: data to convert
-    """
-
-    import base64
+    """   
 
     byts = b""
     for x in array:

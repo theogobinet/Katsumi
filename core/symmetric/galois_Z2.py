@@ -240,8 +240,6 @@ def GF2(degree):
     it.handleInvBox()
 
     if config.IN_CREATION:
-        import time
-
         start = time.time()
 
         while config.IN_CREATION:

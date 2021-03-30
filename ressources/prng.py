@@ -24,10 +24,10 @@ def xorshiftperso(evenOrodd: int = 0, nBits: int = 512):
     """
 
     assert nBits > 23
-    bytes = int(nBits / 8)
+    bytesT = int(nBits / 8)
 
     # Unpredictable random seed
-    state1, state2 = os.urandom(bytes), os.urandom(bytes)
+    state1, state2 = os.urandom(bytesT), os.urandom(bytesT)
 
     a, b = bm.bytes_to_int(state1), bm.bytes_to_int(state2)
 

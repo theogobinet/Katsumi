@@ -64,19 +64,9 @@ def isEasyGeneratorPossible(s: tuple):
     """
     Return True is it's possible to generate easly a generator.
     """
-
-    # Control if easy generator is possible
-    def p_filter(to_be_filtered: int):
-        return p % 3 == 2 and (p % 12 == 1 or p % 12 == 11)
-
     p, _ = s
-
-    if p_filter(p):
-        easyGenerator = True
-    else:
-        easyGenerator = False
-
-    return easyGenerator
+    
+    return p % 3 == 2 and (p % 12 == 1 or p % 12 == 11)
 
 
 #############################################
@@ -288,8 +278,6 @@ def signing(M: bytes, privateK: tuple = None, saving: bool = False, Verbose: boo
     if Verbose:
         print("Hashing done.\n")
 
-    import random as rd
-
     p1 = p - 1
 
     k = rd.randrange(2, p - 2)
@@ -324,7 +312,7 @@ def verifying(M: bytes, sign: tuple, publicKey: tuple = None):
     """
     Verify given signature of message M with corresponding public key's.
     """
-    assert isinstance(M, bytes) or isinstance(M, bytearray)
+    assert isinstance(M, (bytes, bytearray))
 
     from ..hashbased import hashFunctions as hashF
 

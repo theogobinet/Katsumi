@@ -214,19 +214,20 @@ def getb64(expected="message", size=-1):
     print(f"Enter {expected} in base64:")
     while True:
         i = input("> ")
+        
         if i == "c":
             return None
-        else:
-            try:
-                data = base64.b64decode(i)
 
-                if size == -1 or len(data) == size:
-                    return data
+        try:
+            data = base64.b64decode(i)
 
-                print(f"Error: {expected} must be {size} bytes long, enter [c] to go back or enter a valid base64")
+            if size == -1 or len(data) == size:
+                return data
 
-            except binascii.Error:
-                print(f'Error: Unable to decode "{i}", the format is not in base64, enter [c] to go back or enter a valid base64')
+            print(f"Error: {expected} must be {size} bytes long, enter [c] to go back or enter a valid base64")
+
+        except binascii.Error:
+            print(f'Error: Unable to decode "{i}", the format is not in base64, enter [c] to go back or enter a valid base64')
 
 
 def cipher_choice():
@@ -370,11 +371,11 @@ def getIntKey(data: bytes, keyNumber: int = 1):
         keys = ()
         kL = []
         for i in range(keyNumber):
-            kL.append(int.from_bytes(data[i * 2 : i * 2 + 2], "big"))
+            kL.append(int.from_bytes(data[i * 2: i * 2 + 2], "big"))
 
         padding = keyNumber * 2
         for i, s in enumerate(kL):
-            keys += (int.from_bytes(data[padding : padding + s], "big"),)
+            keys += (int.from_bytes(data[padding: padding + s], "big"),)
             padding = padding + s
     else:
         keys = bm.bytes_to_int(data)
@@ -1372,8 +1373,7 @@ def katsuAsymm():
                 print("Done.\n")
                 return doSomethingElse(katsuAsymm)
 
-            else:
-                katsuAsymm()
+            katsuAsymm()
 
         elif i == 8:
             clear()
