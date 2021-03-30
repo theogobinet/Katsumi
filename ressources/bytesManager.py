@@ -36,6 +36,11 @@ def isBase64(sb):
     except Exception:
         return False
 
+def bytes_needed(n: int):
+    """Return BYTES needed to encode an integer."""
+    if n == 0:
+        return 1
+    return int(log(n, 256)) + 1
 
 def mult_to_bytes(obj: object) -> bytes:
     """Convert given {array of bits, bytes, int, str, b64} to bytes"""
@@ -69,13 +74,6 @@ def mult_to_bytes(obj: object) -> bytes:
 def swapPos(list, pos1, pos2):
     list[pos1], list[pos2] = list[pos2], list[pos1]
     return list
-
-
-def bytes_needed(n: int):
-    """Return BYTES needed to encode an integer."""
-    if n == 0:
-        return 1
-    return int(log(n, 256)) + 1
 
 
 file_name = ""
@@ -209,7 +207,7 @@ def b_op(b1, b2, ope="XOR"):
 
 def splitBytes(data, n=8):
     """Split BytesArray into chunks of n (=8 by default) bytes."""
-    return [data[i : i + n] for i in range(0, len(data), n)]
+    return [data[i: i + n] for i in range(0, len(data), n)]
 
 
 def packSplittedBytes(pSplitted):

@@ -26,6 +26,12 @@ sudo black Katsumi/
 
 Carried out in accordance with [PEP8](https://www.python.org/dev/peps/pep-0008/)
 
+[![CodeFactor](https://www.codefactor.io/repository/github/theogobinet/katsumi/badge)](https://www.codefactor.io/repository/github/theogobinet/katsumi)
+![GitHub forks](https://img.shields.io/github/forks/theogobinet/Katsumi)
+![GitHub stars](https://img.shields.io/github/stars/theogobinet/Katsumi)
+![GitHub issues](https://img.shields.io/github/issues/theogobinet/Katsumi)
+
+
 **Read this in other languages**: [French](README.fr.md)
 ## Table of content
 
