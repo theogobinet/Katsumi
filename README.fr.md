@@ -33,7 +33,7 @@ Réalisé sous le respect de [PEP8](https://www.python.org/dev/peps/pep-0008/)
 
 **Lire ceci dans un autre language**: [English](README.md)
 
-## Sommaire
+# Sommaire
 
 - [A propos](#A_propos)
 - [Installation](#Installation)
@@ -49,43 +49,44 @@ Réalisé sous le respect de [PEP8](https://www.python.org/dev/peps/pep-0008/)
 - [Auteurs](#Auteurs)
 - [Licence](#Licence)
 - [Documentation](#Documentation)
+- [Fin](#Fin)
 
-## A propos
-C'est un projet cryptogrpahique réalisé au sein de l'[UTT](https://www.utt.fr/) pour le projet de [GS15](images/GS15.png).
+# A propos
+C'est un projet cryptogrpahique réalisé au sein de l'[UTT](https://www.utt.fr/) pour le projet de [GS15](images/GS15.png) en Automne 2020 (A20).
 Pour plus ample informations, cliquez [ici](pdfs/Projet.pdf).
 
-## Installation
+# Installation
 * Clonez le dépôt puis allez dans le dossier éponyme et lancez "katsumi.py" avec python 3.
 
 * *Pas de requirements.txt nécessaire* . Tout fonctionne sans avoir besoin de bibliothèques supplémentaires. Une installation native de python3 suffit !
 
-## Vue d'ensemble
+# Vue d'ensemble
 Ce projet a été initialement consacré au développement d'une version modifiée de l'agorithme de [chiffrement symétrique de Kasumi](https://en.wikipedia.org/wiki/KASUMI) puis à la génération d'une paire de clés publiques/privées pour enfin rassembler toutes les connaissances acquises et simuler une [blockchain](pdfs/blockChain_article.pdf).
-### Structure
+## Structure
 Le code source est ordonné ainsi:
 * Le dossier ["coeur"](core/) contient le cœur du programme.Tout ce qui concerne les méthodes de chiffrement symétriques, asymétriques et basées sur le hachage.(c'est à dire [la BlockChain](core/hashbased/blockchain.py)).
 * Le dossier ["traitement"](processing/) qui contient toutes les sorties du programme destinées à l'utilisateur (c'est-à-dire les clés publiques/privées, les signatures numériques et les choses chiffrées).
 * Le dossier ["resources"](ressources/) contient tous les fichiers de code les plus importants. C'est là que se trouvent la plupart des fonctions primaires.
 
-#### Symétrique
+### Symétrique
 <p align="center">
   <img src="images/sym.gif" alt="animated" />
 </p>
 
-#### Asymétrique
+### Asymétrique
 
 <p align="center">
   <img src="images/df.gif" alt="animated" />
 </p>
 
-#### BlockChain
+### BlockChain
 
 <p align="center">
   <img src="images/bc.gif" alt="animated" />
 </p>
 
 
-### Choix d'implémentation
+## Choix d'implémentation
 
 * Le polynôme primitif du champ d'extension binaire GF(2) de degré 16 a été trouvé [en ligne](https://www.partow.net/programming/polynomials/index.html) et codé en dur dans un [fichier de configuration] (ressources/config.py).
 
@@ -107,7 +108,7 @@ Le code source est ordonné ainsi:
 
 * La base64 est utilisée à la place de l'hexadécimal pour le stockage et l'affichage des clés et/ou des messages chiffrés. **La base 64 prend 4 caractères pour 3 octets, ce qui la rend plus efficace que l'hexadécimal.**
 
-#### Fontaine à nombres premiers
+### Fontaine à nombres premiers
 
 La génération de nombres premiers sûrs peut prendre beaucoup de temps de calcul. Pour surmonter ce problème, nous avons imaginé de stocker nos safe primes dans un endroit accessible et modifiable. Nous avons décidé d'appeler cette chose : [**La fontaine à nombres premiers**](ressources/generated/PrimeNumber's_Fount)
 
@@ -119,29 +120,29 @@ Grâce à cette méthode, l'utilisateur peut faire charger des nombres premiers 
 
 **Python use nativement qu'un seul coeur**. On a donc [mulitprocessé la recheche d'un nombre premier sûr](ressources/prng.py) usant 85% de la capacité de vos coeurs.
 
-### Performances
+## Performances
 **Each measurement is based on a i7-10510U with 2.5GHz**.
 
 * La génération des inverses dans un champ de Galois binaire (Z2) de degré 16 prend environ **117 secondes** (moyenne sur 5 essais).
 * La génération d'un **nombre premier sûr de 512 bits** prend en moyenne **12.4 secondes** pour 10 tests.
 * La génération d'un **nombre premier sûr de 2048 bits** prend en moyenne **71 minutes** pour 4 tests.
 
-### Améliorations
+## Améliorations
 * Une amélioration évidente serait d'intégrer les [courbes elliptiques] (https://en.wikipedia.org/wiki/Elliptic-curve_cryptography). Il s'agit d'une idée qui est apparue à la fin du semestre et qui, dans le respect du délai, n'a pas pu être mise en œuvre (et n'était pas requise).
 
 * Utiliser les [signatures de Shnorr](https://medium.com/digitalassetresearch/schnorr-signatures-the-inevitability-of-privacy-in-bitcoin-b2f45a1f7287) pour notre BlockChain.
 
 * Regrouper RSA et ElGamal dans une classe mère pour bénéficier de l'héritage des fonctions (c'est-à-dire utiliser la programmation orientée objet).
 
-## Auteurs
+# Auteurs
 * **Azaël MARTIN** - [n3rada](https://github.com/n3rada)
 * **Théo GOBINET** - [Elec](https://github.com/theogobinet)
 
-## Licence
+# Licence
 Katsumi est sous les termes de la licence MIT 
 et est disponible gratuitement - voir le fichier [LICENSE.md](LICENSE.md) pour plus de détails.
 
-## Documentation
+# Documentation
 Voici quelques liens utiles pour aider à la compréhension de certains points du sujet:
 
 * https://en.wikipedia.org/wiki/Quadratic_residue
@@ -151,3 +152,6 @@ Voici quelques liens utiles pour aider à la compréhension de certains points d
 * https://en.wikipedia.org/wiki/Hamming_weight
 * https://www.keylength.com/  - pour choisir la taille des clés
 * https://blkcipher.pl/assets/pdfs/gcm-spec.pdf - pour l'implémentation de GCM
+
+# Fin
+*A l'attention des élèves de GS15 qui passeront par là, dites bonjour à Rémi, puis demandez-lui si votre projet est meilleur que le nôtre. Si c'est le cas, on vous doit une bière, mais ne vous faites pas d'illusions, votre projet ne sera pas meilleur. Bonne chance !* :wink:

@@ -49,42 +49,43 @@ Carried out in accordance with [PEP8](https://www.python.org/dev/peps/pep-0008/)
 - [Authors](#Authors)
 - [License](#License)
 - [Documentation](#Documentation)
-## About
-It is a school cryptography project carried out at the [UTT](https://www.utt.fr/) for the [GS15](images/GS15.png) subject.
+- [End](#End)
+# About
+It is a school cryptography project carried out at the [UTT](https://www.utt.fr/) for the [GS15](images/GS15.png) subject in the Fall 2020 (A20).
 For more information about this subject, click [here](pdfs/Projet.pdf) (it's in French).
 
-## Installation
+# Installation
 * Clone the repository then go to the eponymous folder and launch "katsumi.py" with python 3.
 
 * **No requirements.txt needed** . Everything works without the need for additional libraries. A native installation of python3 is enough ! 
 
-## Overview
+# Overview
 This project was initially devoted to the development of a modified version of [Kasumi's symmetric encryption](https://en.wikipedia.org/wiki/KASUMI) algorithm, then to the generation of a public/private key pair to finally gather all the acquired knowledge and simulate a [blockchain](pdfs/blockChain_article.pdf).
-### Structure
+## Structure
 The source code is ordered as follows:
 * The ["core" folder](core/) contains the core of the program. Everything related to symmetric, asymmetric and hash-based encryption methods (i.e. [the BlockChain](core/hashbased/blockchain.py)).
 * The ["processing" folder](processing/) which contains all outputs of the program destined for the user (i.e. public/private keys, digital signatures and encrypted things).
 * The ["resources" folder](ressources/) contains all the largest code files. This is where most of the primary functions reside.
 
-#### Symmetric
+### Symmetric
 <p align="center">
   <img src="images/sym.gif" alt="animated" />
 </p>
 
-#### Asymmetric
+### Asymmetric
 
 <p align="center">
   <img src="images/df.gif" alt="animated" />
 </p>
 
-#### BlockChain
+### BlockChain
 
 <p align="center">
   <img src="images/bc.gif" alt="animated" />
 </p>
 
 
-### Implementation choices
+## Implementation choices
 
 * The primitive polynomial of the binary extension field GF(2) of degree 16 was found [online](https://www.partow.net/programming/polynomials/index.html) and hard-coded into a [config file](ressources/config.py)
 
@@ -106,7 +107,7 @@ The source code is ordered as follows:
 
 * Base64 is used instead of hexadecimal for storing and displaying encrypted keys and/or messages. **Base64 takes 4 characters for every 3 bytes, so it's more efficient than hex.**
 
-#### Prime Numbers Fountain's
+### Prime Numbers Fountain's
 
 Generating safe primes can take a lot of computing time. 
 To overcome this problem, we have imagined storing our safe primes in an accessible and editable location.
@@ -120,27 +121,27 @@ With this method, the user can have safe prime numbers loaded in his free time a
 
 **Python natively uses only one core**. So [we have multiprocessed the safe prime number search](ressources/prng.py) using 85% of the core capacity.
 
-### Performances
+## Performances
 **Each measurement is based on a i7-10510U with 2.5GHz**.
 
 * The generation of the inverses in a binary Galois field (Z2) of degree 16 takes about **117 secondes** (average over 5 trials).
 * Generating a **safe prime of 512 bits** take at average **12.4 secondes** for 10 tests.
 * Generating a **safe prime of 2048 bits** take at average **71 minutes** for 4 tests.
 
-### Improvements
+## Improvements
 * An obvious improvement would be to integrate the [elliptic curves](https://en.wikipedia.org/wiki/Elliptic-curve_cryptography). This is a notion that came up at the end of the semester and which, respecting the deadline, could not be implemented (and was not required).
 
 * Using [Schnorr signatures](https://medium.com/digitalassetresearch/schnorr-signatures-the-inevitability-of-privacy-in-bitcoin-b2f45a1f7287) for our BlockChain.
 
 * Group RSA and ElGamal into a parent class to benefit from function heritage (i.e. use object-oriented programming).
-## Authors
+# Authors
 * **Azaël MARTIN** - [n3rada](https://github.com/n3rada)
 * **Théo GOBINET** - [Elec](https://github.com/theogobinet)
-## License
+# License
 Katsumi is licensed under the terms of the MIT Licence 
 and is available for free - see the [LICENSE.md](LICENSE.md) file for details.
 
-## Documentation
+# Documentation
 Here is some useful links for documentation concerning related subjects:
 
 * https://en.wikipedia.org/wiki/Quadratic_residue
@@ -150,3 +151,6 @@ Here is some useful links for documentation concerning related subjects:
 * https://en.wikipedia.org/wiki/Hamming_weight
 * https://www.keylength.com/  - for choosing appropriated key length's.
 * https://blkcipher.pl/assets/pdfs/gcm-spec.pdf - for GCM implementation
+
+# End
+*To the attention of the GS15 students who will be passing by, say hi to Rémi, then ask him if your project is better than ours. If it is, we owe you a beer, but don't kid yourself, your project won't be better. Good luck!* :wink:
