@@ -13,6 +13,16 @@ DIRECTORY_PROCESSING = os.path.join(THIS_FOLDER, "processing/")
 DIRECTORY_GEN = os.path.join(DIRECTORY_RESSOURCES, "generated/")
 DIRECTORY_FOUNT = os.path.join(DIRECTORY_GEN, "PrimeNumber's_Fount/")
 
+# Define colors for logs
+class bcolors:
+    OKGREEN = "\033[92m"
+    OKBLUE = "\033[94m"
+    OKCYAN = "\033[96m"
+    YELLOW = "\033[93m"
+    RED = "\033[91m"
+    ENDC = "\033[0m"
+    BOLD = "\033[1m"
+
 # Keys
 KL1 = []
 KL2 = []

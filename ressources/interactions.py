@@ -15,29 +15,18 @@ import ressources.bytesManager as bm
 ################################################
 ###############- Colored Interactions - ########
 ################################################
-# colored text and background
-from colorama import Fore, Style
+from ressources.config import bcolors
 
-
-def prRed(s):
-    print(f"{Fore.RED}{s}{Style.RESET_ALL}")
+def prYellow(s):
+    print(f"{bcolors.YELLOW}{s}{bcolors.ENDC}")
 
 
 def prGreen(s):
-    print(f"{Fore.GREEN}{s}{Style.RESET_ALL}")
+    print(f"{bcolors.OKGREEN}{s}{bcolors.ENDC}")
 
 
-def prYellow(s):
-    print(f"{Fore.YELLOW}{s}{Style.RESET_ALL}")
-
-
-def prPurple(s):
-    print(f"{Fore.MAGENTA}{s}{Style.RESET_ALL}")
-
-
-def prCyan(s):
-    print(f"{Fore.CYAN}{s}{Style.RESET_ALL}")
-
+def prRed(s):
+    print(f"{bcolors.RED}{s}{bcolors.ENDC}")
 
 ################################################
 ###############- Console Interactions - ########

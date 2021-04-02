@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from ressources import config as c
+from ressources.config import bcolors
 
 import time
 import base64
@@ -653,21 +654,6 @@ def addLog(user: int, logID: int, params: list = []):
     c.BC_LOGS.append([time.time() - c.BC_TIME_START, user, logID, params])
 
 
-#######################
-#       UTILS        #
-######################
-
-# Define colors for logs
-class bcolors:
-    OKGREEN = "\033[92m"
-    OKBLUE = "\033[94m"
-    OKCYAN = "\033[96m"
-    WARNING = "\033[93m"
-    FAIL = "\033[91m"
-    ENDC = "\033[0m"
-    BOLD = "\033[1m"
-
-
 def transactionToString(transaction: list, UTXO: list = None):
     """
     Return a string from a transaction
@@ -720,11 +706,11 @@ def displayLogs(last: int = 0):
             if logID == 0:
                 core = f"Start to validate block: {params[0]}"
             elif logID == 1:
-                core = f"{bcolors.FAIL}Invalid transaction ignored: {params[0]}{bcolors.ENDC}"
+                core = f"{bcolors.RED}Invalid transaction ignored: {params[0]}{bcolors.ENDC}"
             elif logID == 2:
-                core = f"{bcolors.FAIL}Not enough money for transaction: {params[0]}{bcolors.ENDC}"
+                core = f"{bcolors.RED}Not enough money for transaction: {params[0]}{bcolors.ENDC}"
             elif logID == 3:
-                core = f"{bcolors.FAIL}Wrong signature for transaction: {params[0]}{bcolors.ENDC}"
+                core = f"{bcolors.RED}Wrong signature for transaction: {params[0]}{bcolors.ENDC}"
             elif logID == 4:
                 core = f"{bcolors.OKGREEN}Transaction performed: {params[0]}{bcolors.ENDC}"
             elif logID == 5:
@@ -734,9 +720,9 @@ def displayLogs(last: int = 0):
             elif logID == 7:
                 core = f"{bcolors.OKGREEN}Block {params[0]} validated{bcolors.ENDC}"
             elif logID == 8:
-                core = f"{bcolors.WARNING}Block {params[0]} has already been validated{bcolors.ENDC}"
+                core = f"{bcolors.YELLOW}Block {params[0]} has already been validated{bcolors.ENDC}"
             elif logID == 9:
-                core = f"{bcolors.WARNING}Block {params[0]} changed before POW calculation{bcolors.ENDC}"
+                core = f"{bcolors.YELLOW}Block {params[0]} changed before POW calculation{bcolors.ENDC}"
             elif logID == 10:
                 core = f"{bcolors.OKCYAN}Transaction added to block {params[0]}: {params[1]}{bcolors.ENDC}"
             else:
@@ -785,7 +771,7 @@ def displayBC():
             print(f"\t\tBlock salt: {base64.b64encode(b[-1]).decode()}")
             print()
         else:
-            print(f"\t{bcolors.WARNING}Block has not been validated yet{bcolors.ENDC}")
+            print(f"\t{bcolors.YELLOW}Block has not been validated yet{bcolors.ENDC}")
 
         print()
 

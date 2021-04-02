@@ -354,7 +354,7 @@ def GCM(arr, encrypt=True, aad=""):
 
     if not encrypt:
         if icv != icvc:
-            print("\nWARNING: INTEGRITY CHECK CONTROL INCORRECT, AAD HAVE BEEN MODIFIED !!")
+            print("\nYELLOW: INTEGRITY CHECK CONTROL INCORRECT, AAD HAVE BEEN MODIFIED !!")
 
     if encrypt:
         IV_action(res, icvc, "store")
